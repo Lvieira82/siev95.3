@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+
+.form-card{
+    background:#fff;
+    max-width:1100px;
+    margin:auto;
+    padding:40px;
+    border-radius:15px;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+.form-title{
+    color:#111827;
+    margin-bottom:30px;
+    text-align:center;
+}
+.btn-voltar{
+    display:inline-block;
+    padding:12px 26px;
+    background:#6b7280;
+    color:#fff;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:600;
+    transition:.25s;    }
+
+.btn-voltar:hover{
+    background:#4b5563;
+    transform:translateY(-2px);
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.full{
+    grid-column:1 / -1;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:bold;
+    color:#111827;
+}
+
+input,
+textarea,
+select{
+    width:100%;
+    padding:12px;
+    border:1px solid #d1d5db;
+    border-radius:8px;
+    font-size:15px;
+}
+
+textarea{
+    min-height:120px;
+}
+.acoes-formulario{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:35px;
+}
+
+.btn-voltar{
+    display:inline-block;
+    padding:12px 26px;
+    background:#6b7280;
+    color:#fff;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:600;
+    transition:.25s;
+}
+
+.btn-voltar:hover{
+    background:#4b5563;
+    transform:translateY(-2px);
+}
+
+.btn-salvar{
+    padding:12px 28px;
+    background:#907C64;
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.btn-salvar:hover{
+    background:#7d6a54;
+    transform:translateY(-2px);
+}
+.upload-box{
+    border:2px dashed #cbd5e1;
+    padding:20px;
+    border-radius:10px;
+    background:#f8fafc;
+}
+
+.btn-area{
+    margin-top:30px;
+    display:flex;
+    gap:15px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+.btn-submit{
+    background:#111827;
+    color:white;
+    border:none;
+    padding:15px 35px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btn-submit:hover{
+    background:#111827;
+}
+
+.btn-back{
+    background:#6b7280;
+    color:white;
+    text-decoration:none;
+    padding:15px 35px;
+    border-radius:10px;
+    font-weight:bold;
+}
+
+.erro{
+    background:#fee2e2;
+    color:#991b1b;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:25px;
+}
+
+/* NOVO BLOCO LEGAL */
+
+.termos-lei{
+    background:#f8fbff;
+    border:1px solid #111827;
+    border-left:6px solid #111827;
+    padding:18px 22px;
+    border-radius:10px;
+    margin-bottom:30px;
+    color:#1f2937;
+    line-height:1.6;
+}
+
+.termos-lei h3{
+    color:#111827;
+    margin-bottom:10px;
+}
+
+.termos-lei p{
+    margin-bottom:10px;
+}
+
+.aceite-termos{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    margin-top:15px;
+    font-weight:bold;
+}
+
+.aceite-termos input{
+    width:auto;
+    margin-top:4px;
+}
+
+#areaFormulario{
+    opacity:.45;
+    pointer-events:none;
+    transition:.3s;
+}
+
+@media(max-width:768px){
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .form-card{
+        padding:20px;
+    }
+
+}
+
+</style>
+
+
+<div class="container-formulario">
+
+    <div class="card-formulario">
+
+        <h1>📝 Lançamento Manual</h1>
+
+        <p class="subtitulo">
+            Utilize esta área para cadastrar eventos presenciais.
+        </p>
+        {% if form.errors %}
+        <div style="background:#fee2e2;color:#991b1b;padding:15px;border-radius:10px;margin-bottom:20px;">
+            <strong>Corrija os erros:</strong>
+            {{ form.errors }}
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <div class="acoes">
+                <a href="{% url 'painel_gestao' %}" class="btn-voltar">
+                    ← Voltar
+                </a>
+            </div>
+                <button type="submit" class="btn-salvar">
+                    💾 Salvar Informação
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

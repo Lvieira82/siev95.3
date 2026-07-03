@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Gestão SiEv
+{% endblock %}
+
+{% block content %}
+
+<div class="painel">
+
+    <h1>
+        Área Administrativa
+    </h1>
+
+    <p>
+        Sistema para Informações de Eventos
+    </p>
+
+    <div class="cards">
+
+        <a href="/dashboard/" class="card">
+            📊
+            <span>Dashboard</span>
+        </a>
+
+        <a href="/dashboard/" class="card">
+            ✅
+            <span>Aprovações</span>
+        </a>
+
+        <a href="/admin/auth/user/" class="card">
+            👥
+            <span>Usuários</span>
+        </a>
+
+        <a href="/admin/" class="card">
+            📝
+            <span>Auditoria</span>
+        </a>
+
+        <a href="/dashboard/" class="card">
+            📄
+            <span>Relatórios</span>
+        </a>
+
+        <a href="/logout/" class="card sair">
+            🚪
+            <span>Sair</span>
+        </a>
+
+    </div>
+
+</div>
+
+<style>
+
+.painel{
+
+    text-align:center;
+
+    max-width:1200px;
+
+    margin:auto;
+}
+
+.painel h1{
+
+    color:#1e3a8a;
+
+    margin-bottom:10px;
+}
+
+.cards{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(250px,1fr));
+
+    gap:25px;
+
+    margin-top:40px;
+}
+
+.card{
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:40px;
+
+    text-decoration:none;
+
+    color:#1f2937;
+
+    box-shadow:
+    0 4px 15px rgba(0,0,0,.08);
+
+    transition:.3s;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    gap:15px;
+
+    font-size:30px;
+}
+
+.card span{
+
+    font-size:18px;
+
+    font-weight:bold;
+}
+
+.card:hover{
+
+    transform:translateY(-5px);
+}
+
+.sair{
+
+    background:#dc3545;
+
+    color:white;
+}
+
+</style>
+
+{% endblock %}

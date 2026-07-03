@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Agenda de Eventos{% endblock %}
+
+{% block content %}
+
+<style>
+
+.btn-voltar{
+    display:inline-block;
+    padding:12px 26px;
+    background:#6b7280;
+    color:#fff;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:600;
+    transition:.25s;    }
+
+.btn-voltar:hover{
+    background:#4b5563;
+    transform:translateY(-2px);
+}
+</style>
+
+<div style="max-width:1000px;margin:30px auto;background:white;padding:30px;border-radius:15px;box-shadow:0 5px 18px rgba(0,0,0,.08);">
+
+    <h1 style="color:#907C64;margin-bottom:25px;">🗓️ Agenda de Eventos</h1>
+
+    {% for evento in eventos %}
+
+        <div style="padding:15px;border-bottom:1px solid #eee;">
+            <strong>{{ evento.data_evento|date:"d/m/Y" }}</strong><br>
+            📌 {{ evento.nome_evento }}<br>
+            📍 {{ evento.local }}
+        </div>
+
+    {% empty %}
+
+        <p>Nenhum evento futuro cadastrado.</p>
+
+    {% endfor %}
+    <div class="acoes">
+        <a href="{% url 'painel_gestao' %}" class="btn-voltar">
+            ← Voltar
+        </a>
+    
+
+</div>
+
+{% endblock %}

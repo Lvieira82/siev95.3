@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Painel de Gestão{% endblock %}
+
+{% block content %}
+
+<style>
+.painel{
+    max-width:1100px;
+    margin:30px auto;
+}
+
+.painel h1{
+    color:#907C64;
+    margin-bottom:8px;
+}
+
+.painel-sub{
+    color:#6b7280;
+    margin-bottom:30px;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.card{
+    position:relative;
+    background:white;
+    padding:25px;
+    border-radius:16px;
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+    text-decoration:none;
+    color:#111827;
+    transition:.2s;
+}
+
+.card:hover{
+    transform:translateY(-3px);
+}
+
+.icone{
+    font-size:34px;
+    margin-bottom:10px;
+}
+
+.card h2{
+    color:#907C64;
+    margin-bottom:8px;
+}
+
+.badge{
+    position:absolute;
+    top:12px;
+    right:12px;
+    background:#dc2626;
+    color:white;
+    padding:6px 10px;
+    border-radius:999px;
+    font-weight:bold;
+}
+
+.resumo{
+    margin-top:30px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
+
+.box{
+    background:white;
+    padding:20px;
+    border-radius:14px;
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+}
+
+.box h3{
+    color:#907C64;
+    margin-bottom:10px;
+}
+
+.evento-linha{
+    padding:10px 0;
+    border-bottom:1px solid #eee;
+}
+</style>
+
+<div class="painel">
+
+    <h1>⚙️ Painel de Gestão</h1>
+    
+    <div class="cards">
+
+        <a href="{% url 'listar_pendentes_opo' %}" class="card">
+            {% if pendentes_opo > 0 %}
+                <span class="badge">{{ pendentes_opo }}</span>
+            {% endif %}
+            <div class="icone">📁</div>
+            <h2>Informações</h2>
+            <p>Documentos anexos e geração de OPO.</p>
+        </a>
+
+        <a href="/admin/auth/user/" class="card">
+            <div class="icone">👥</div>
+            <h2>Usuários</h2>
+            <p>Criar e gerenciar usuários do sistema.</p>
+        </a>
+
+        <a href="{% url 'agenda_gestao' %}" class="card">
+            <div class="icone">🗓️</div>
+            <h2>Agenda</h2>
+            <p>Eventos em ordem cronológica.</p>
+        </a>
+
+        <a href="{% url 'lancamento_manual' %}" class="card">
+            <div class="icone">✍️</div>
+            <h2>Lançamento Manual</h2>
+            <p>Cadastrar evento presencialmente.</p>
+        </a>
+
+        <a href="{% url 'dashboard_operacional' %}" class="card">
+            <div class="icone">📊</div>
+            <h2>Dashboard</h2>
+            <p>Resumo geral e filtros.</p>
+        </a>
+
+        <a href="{% url 'logout_gestao' %}" class="card">
+            <div class="icone">🚪</div>
+            <h2>Sair</h2>
+            <p>Encerrar sessão administrativa.</p>
+        </a>
+
+    </div>
+
+    <div class="resumo">
+
+        <div class="box">
+            <h3>📅 Eventos da Semana</h3>
+            <strong>{{ eventos_semana }}</strong>
+        </div>
+
+        <div class="box">
+            <h3>🗓️ Eventos do Mês</h3>
+            <strong>{{ eventos_mes }}</strong>
+        </div>
+
+        <div class="box">
+            <h3>👥 Usuários</h3>
+            <strong>{{ usuarios }}</strong>
+        </div>
+
+    </div>
+
+    <div class="box" style="margin-top:30px;">
+        <h3>📌 Próximos Eventos</h3>
+
+        {% for evento in proximos_eventos %}
+            <div class="evento-linha">
+                <strong>{{ evento.data_evento|date:"d/m/Y" }}</strong>
+                — {{ evento.nome_evento }}
+                — {{ evento.local }}
+            </div>
+        {% empty %}
+            <p>Nenhum evento futuro cadastrado.</p>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">
+        Painel Administrativo
+    </h2>
+
+    <table class="table table-striped">
+
+        <thead>
+            <tr>
+                <th>Protocolo</th>
+                <th>Evento</th>
+                <th>Data</th>
+                <th>Solicitante</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for s in solicitacoes %}
+
+            <tr>
+
+                <td>{{ s.protocolo }}</td>
+
+                <td>{{ s.nome_evento }}</td>
+
+                <td>{{ s.data_evento }}</td>
+
+                <td>{{ s.solicitante }}</td>
+
+                <td>
+
+                    {% if s.status == 'PENDENTE' %}
+                        <span class="badge bg-warning">
+                            {{ s.status }}
+                        </span>
+
+                    {% elif s.status == 'APROVADA' %}
+                        <span class="badge bg-success">
+                            {{ s.status }}
+                        </span>
+
+                    {% elif s.status == 'REPROVADA' %}
+                        <span class="badge bg-danger">
+                            {{ s.status }}
+                        </span>
+
+                    {% else %}
+                        <span class="badge bg-secondary">
+                            {{ s.status }}
+                        </span>
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    <a
+                        href="{% url 'alterar_status' s.id 'APROVADA' %}"
+                        class="btn btn-success btn-sm"
+                    >
+                        Aprovar
+                    </a>
+
+                    <a
+                        href="{% url 'alterar_status' s.id 'REPROVADA' %}"
+                        class="btn btn-danger btn-sm"
+                    >
+                        Reprovar
+                    </a>
+
+                    <a
+                        href="{% url 'alterar_status' s.id 'EM_ANALISE' %}"
+                        class="btn btn-warning btn-sm"
+                    >
+                        Análise
+                    </a>
+
+                    <a
+                        href="{% url 'gerar_pdf' s.id %}"
+                        class="btn btn-primary btn-sm"
+                        target="_blank"
+                    >
+                        PDF
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

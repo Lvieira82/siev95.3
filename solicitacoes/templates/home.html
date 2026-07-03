@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Sistema de Eventos{% endblock %}
+
+{% block content %}
+<a href="/gestao/" class="botao">
+    Área da Gestão
+</a>
+<div style="
+    background: white;
+    border-radius: 20px;
+    padding: 50px;
+    margin-top: 30px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+">
+
+    <div style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 30px;
+    ">
+
+        <!-- LOGO ESQUERDA -->
+        <div style="width: 220px; text-align: center;">
+            <img src="/media/logos/logo_pmba.png"
+                 style="width: 180px;">
+        </div>
+
+        <!-- CONTEÚDO CENTRAL -->
+        <div style="flex:1; text-align:center;">
+
+            <h1 style="
+                font-size: 80px;
+                margin-bottom: 20px;
+                color: #1f2937;
+                font-weight: bold;
+            ">
+                SIEV
+            </h1>
+
+            <p style="
+                font-size: 24px;
+                color: #4b5563;
+                margin-bottom: 40px;
+            ">
+                Plataforma oficial para solicitação e acompanhamento de eventos.
+            </p>
+
+            <div style="
+                display:flex;
+                justify-content:center;
+                gap:20px;
+                flex-wrap:wrap;
+            ">
+
+                <a href="/nova/" style="
+                    background:#0d6efd;
+                    color:white;
+                    padding:18px 35px;
+                    border-radius:10px;
+                    text-decoration:none;
+                    font-size:24px;
+                    font-weight:bold;
+                ">
+                    Nova Solicitação
+                </a>
+
+                <a href="/dashboard/" style="
+                    background:#111827;
+                    color:white;
+                    padding:18px 35px;
+                    border-radius:10px;
+                    text-decoration:none;
+                    font-size:24px;
+                    font-weight:bold;
+                ">
+                    Dashboard
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- LOGO DIREITA -->
+        <div style="width: 220px; text-align: center;">
+            <img src="/media/logos/logo95.png"
+                 style="width: 180px;">
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Consultar Protocolo - SiEv</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+        body{
+            background:linear-gradient(
+                135deg,
+                #907C64
+              
+            );
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+        .acoes-formulario{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-top:35px;
+        }
+
+        .btn-voltar{
+            display:inline-block;
+            padding:12px 26px;
+            background:#6b7280;
+            color:#fff;
+            border-radius:10px;
+            text-decoration:none;
+            font-weight:600;
+            transition:.25s;
+        }
+
+        .btn-voltar:hover{
+            background:#4b5563;
+            transform:translateY(-2px);
+        }
+        
+
+        .card{
+            width:500px;
+            background:white;
+            border-radius:20px;
+            padding:40px;
+            text-align:center;
+            box-shadow:0 15px 40px rgba(0,0,0,.25);
+        }
+
+        .logo{
+            font-size:60px;
+            font-weight:bold;
+            color:#111827;
+            margin-bottom:10px;
+        }
+
+        .subtitulo{
+            color:#666;
+            margin-bottom:30px;
+        }
+
+        h2{
+            margin-bottom:25px;
+            color:#907C64;
+        }
+
+        input{
+            width:100%;
+            padding:15px;
+            border:1px solid #ccc;
+            border-radius:10px;
+            margin-bottom:20px;
+            font-size:16px;
+        }
+
+        button{
+            width:100%;
+            padding:15px;
+            border:none;
+            border-radius:10px;
+            background:#907C64;
+            color:white;
+            font-size:16px;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#111827;
+        }
+
+        .resultado{
+            margin-top:25px;
+            text-align:left;
+            background:#f4f6f9;
+            padding:20px;
+            border-radius:10px;
+        }
+
+        .status{
+            font-weight:bold;
+            color:#111827;
+        }
+
+        .voltar{
+            display:block;
+            margin-top:20px;
+            text-decoration:none;
+            color:#111827;
+            font-weight:bold;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <div class="logo">SiEv</div>
+
+    <div class="subtitulo">
+        Sistema para Informações de Eventos
+    </div>
+
+    <h2>Consultar Informação</h2>
+
+    <form method="get">
+
+        {% csrf_token %}
+
+        <input
+            type="text"
+            name="protocolo"
+            placeholder="Digite o protocolo"
+            required
+        >
+
+        <button type="submit">
+            Consultar
+        </button>
+
+    </form>
+
+    {% if solicitacao %}
+
+    <div class="resultado">
+
+        <p>
+            <strong>Protocolo:</strong>
+            {{ solicitacao.protocolo }}
+        </p>
+
+        <br>
+
+        <p>
+            <strong>Evento:</strong>
+            {{ solicitacao.nome_evento }}
+        </p>
+
+        <br>
+
+        <p>
+            <strong>Solicitante:</strong>
+            {{ solicitacao.solicitante }}
+        </p>
+
+        <br>
+
+        <p>
+            <strong>Status:</strong>
+            <span class="status">
+                {{ solicitacao.status }}
+            </span>
+        </p>
+
+    </div>
+
+    {% endif %}
+
+    {% if erro %}
+
+    <div class="resultado">
+
+        <strong style="color:red;">
+            {{ erro }}
+        </strong>
+
+    </div>
+
+    {% endif %}
+
+    <a href="{% url 'painel_gestao' %}" class="btn-voltar">
+        ← Voltar
+    </a>
+
+</div>
+
+</body>
+</html>

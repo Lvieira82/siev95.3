@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Solicitação Enviada</title>
+
+    <meta http-equiv="refresh" content="5;url=/">
+
+    <style>
+
+        body{
+            margin:0;
+            padding:0;
+            background:#f4f6f9;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+        .protocolo-box{
+
+            margin:30px auto;
+
+            max-width:420px;
+
+            padding:20px;
+
+            border-radius:12px;
+
+            background:#FFF8E7;
+
+            border:2px solid #907C64;
+
+            text-align:center;
+
+        }
+
+        .protocolo-box small{
+
+            display:block;
+
+            color:#666;
+
+            font-weight:bold;
+
+            letter-spacing:2px;
+
+            margin-bottom:8px;
+
+        }
+
+        .protocolo-box h2{
+
+            margin:0;
+
+            color:#907C64;
+
+            font-size:34px;
+
+            letter-spacing:3px;
+
+            font-family:monospace;
+
+        }
+
+        .container{
+            width:700px;
+            margin:80px auto;
+            background:white;
+            padding:50px;
+            border-radius:15px;
+            text-align:center;
+            box-shadow:0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .icone{
+            font-size:80px;
+            color:green;
+        }
+
+        h1{
+            color:#123d73;
+            margin-top:20px;
+        }
+
+        p{
+            font-size:20px;
+            color:#444;
+            margin-top:20px;
+        }
+
+        .protocolo{
+            background:#123d73;
+            color:white;
+            padding:20px;
+            border-radius:10px;
+            font-size:28px;
+            font-weight:bold;
+            margin:30px auto;
+            width:300px;
+        }
+
+        .info{
+            margin-top:25px;
+            color:#666;
+            line-height:1.8;
+        }
+
+        .btn{
+            display:inline-block;
+            margin-top:35px;
+            background:#907C64;
+            color:white;
+            padding:15px 30px;
+            text-decoration:none;
+            border-radius:10px;
+            font-weight:bold;
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="icone">
+            ✅
+        </div>
+
+        <h1>
+            Informação recebida com sucesso!
+        </h1>
+
+        <p>
+            Seu evento foi registrado no sistema.
+        </p>
+    <div class="protocolo-box">
+
+        <small>PROTOCOLO DA SOLICITAÇÃO</small>
+
+        <h2>{{ protocolo }}</h2>
+
+    </div>
+       
+
+        <div class="info">
+
+            Um e-mail foi enviado com os dados informação.<br>
+
+            Guarde o protocolo para futuras consultas.
+
+            <br><br>
+
+            Você será redirecionado para a página inicial em 5 segundos...
+
+        </div>
+
+        <a href="/" class="btn">
+            Voltar para Home
+        </a>
+
+    </div>
+
+</body>
+</html>

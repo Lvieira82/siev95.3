@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Documentos da Solicitação
+{% endblock %}
+
+{% block content %}
+
+<style>
+.doc-card{
+    background:white;
+    max-width:1000px;
+    margin:40px auto;
+    padding:35px;
+    border-radius:15px;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+.acoes{
+    margin-top:35px;
+}
+
+.btn-voltar{
+    display:inline-block;
+    padding:12px 26px;
+    background:#6b7280;
+    color:#fff;
+    text-decoration:none;
+    border-radius:10px;
+    font-weight:600;
+    transition:.25s;
+}
+
+.btn-voltar:hover{
+    background:#4b5563;
+    transform:translateY(-2px);
+}
+
+.doc-card h1{
+    color:#907C64;
+    margin-bottom:15px;
+}
+
+.doc-info{
+    margin-bottom:25px;
+    font-weight:bold;
+}
+
+.doc-lista{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.doc-link{
+    display:block;
+    background:#CEC4B8;
+    color:#111827;
+    padding:15px;
+    border-radius:10px;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+.doc-link:hover{
+    background:#B7AA99;
+}
+
+.aviso{
+    background:#fee2e2;
+    color:#991b1b;
+    padding:15px;
+    border-radius:10px;
+    font-weight:bold;
+}
+
+.voltar{
+    display:inline-block;
+    margin-top:25px;
+    color:#907C64;
+    font-weight:bold;
+    text-decoration:none;
+}
+</style>
+
+<div class="doc-card">
+
+    <h1>📁 Documentos Anexos</h1>
+
+    <div class="doc-info">
+        Protocolo: {{ solicitacao.protocolo }}<br>
+        Evento: {{ solicitacao.nome_evento }}
+    </div>
+
+    <div class="doc-lista">
+
+        {% for doc in documentos %}
+
+            {% if doc.arquivo %}
+
+                <a href="{{ doc.url }}" target="_blank" class="doc-link">
+                    📄 Abrir {{ doc.nome }}
+                </a>
+
+            {% else %}
+
+                <div class="aviso">
+                    ⚠ {{ doc.nome }} não foi anexado.
+                </div>
+
+            {% endif %}
+
+        {% endfor %}
+
+    </div>
+
+    <div class="acoes">
+        <a href="{% url 'listar_pendentes_opo' %}" class="btn-voltar">
+            ← Voltar para Aprovações
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}
