@@ -19,9 +19,13 @@ DEBUG = config(
     cast=bool
 )
 
-ALLOWED_HOSTS =ALLOWED_HOSTS = ["siev95.onrender.com",
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "siev2.onrender.com",
     "siev95.com.br",
-    "www.siev95.com.br",]
+    "www.siev95.com.br",
+]
 
 # =====================
 # APPS
