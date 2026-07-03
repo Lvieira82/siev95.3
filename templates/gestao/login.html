@@ -65,7 +65,21 @@ h2{
     color:#907C64;
     margin-bottom:30px;
 }
+.btn-voltar{
+    display:inline-block;
+    padding:12px 26px;
+    background:#6b7280;
+    color:#fff;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:600;
+    transition:.25s;
+}
 
+.btn-voltar:hover{
+    background:#4b5563;
+    transform:translateY(-2px);
+}        
 input{
 
     width:100%;
@@ -193,8 +207,8 @@ button:hover{
             {% endif %}
     </form>
 
-    <a href="/" class="voltar">
-        ← Voltar para página inicial
+    <a href="{% url 'home' %}" class="btn-voltar">
+        ← Voltar
     </a>
 
     <div class="rodape">
