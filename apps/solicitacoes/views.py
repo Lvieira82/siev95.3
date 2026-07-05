@@ -653,3 +653,38 @@ def verificar_autenticidade(request, protocolo):
             "solicitacao": solicitacao
         }
     )
+#=====================================================
+# DESTINOS DA OPO
+# =====================================================   
+@login_required
+def opos_geradas(request):
+
+    solicitacoes = Solicitacao.objects.filter(
+        status="APROVADO"
+    ).order_by("-data_aprovacao", "-criado_em")
+
+    return render(
+        request,
+        "gestao/opos_geradas.html",
+        {
+            "solicitacoes": solicitacoes
+        }
+    )
+
+
+@login_required
+def detalhe_opo(request, id):
+
+    solicitacao = get_object_or_404(
+        Solicitacao,
+        id=id,
+        status="APROVADO"
+    )
+
+    return render(
+        request,
+        "gestao/detalhe_opo.html",
+        {
+            "solicitacao": solicitacao
+        }
+    )
