@@ -19,6 +19,8 @@ from apps.solicitacoes.views import (
     lancamento_manual,
     documentos_solicitacao,
     abrir_documento_solicitacao,
+    opos_geradas,
+    detalhe_opo,
 )
 
 urlpatterns = [
@@ -28,6 +30,17 @@ urlpatterns = [
         "documentos/<int:id>/",
         documentos_solicitacao,
         name="documentos_solicitacao"
+    ),
+    path(
+        "gestao/opos-geradas/",
+        opos_geradas,
+        name="opos_geradas"
+    ),
+
+    path(
+        "gestao/opo/<int:id>/detalhes/",
+        detalhe_opo,
+        name="detalhe_opo"
     ),
 
     path(
