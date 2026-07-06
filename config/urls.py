@@ -47,7 +47,7 @@ urlpatterns = [
         "gestao/opo/<int:id>/detalhes/",
         detalhe_opo,
         name="detalhe_opo"
-
+    ),
     path(
         "gestao/lancamento-manual/",
         lancamento_manual,
