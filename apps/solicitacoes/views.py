@@ -1,380 +1,52 @@
-import os
-import base64
-from io import BytesIO
-from datetime import date, timedelta
-from django.contrib.auth.models import User
-import qrcode
-
-from django.conf import settings
-from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.core.mail import send_mail
-from django.http import FileResponse, Http404
-from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
-from django.utils import timezone
-
 from .models import Solicitacao
 from .forms import SolicitacaoForm, SolicitacaoManualForm
-
-
-# =====================================================
-# HOME
-# =====================================================
-
-def home(request):
-    return render(request, "home.html")
-
-
-# =====================================================
-# NOVA SOLICITAÇÃO
-# =====================================================
-
-def nova_solicitacao(request):
-
-    if request.method == "POST":
-
-        form = SolicitacaoForm(
-            request.POST,
-            request.FILES
-        )
-
-        if form.is_valid():
-
-            try:
-                solicitacao = form.save(commit=False)
-                solicitacao.status = "PENDENTE"
-                solicitacao.save()
-
-                assunto = "Solicitação de Evento Recebida"
-
-                mensagem = f"""
-Olá, {solicitacao.solicitante}!
-
-Sua solicitação foi recebida com sucesso.
-
-PROTOCOLO:
-{solicitacao.protocolo}
-
-EVENTO:
-{solicitacao.nome_evento}
-
-DATA:
-{solicitacao.data_evento}
-
-STATUS:
-{solicitacao.status}
-
-Guarde este protocolo para futuras consultas.
-
-PMBA - Uma força a serviço do cidadão.
-"""
-
-                try:
-                    send_mail(
-                        assunto,
-                        mensagem,
-                        settings.DEFAULT_FROM_EMAIL,
-                        [solicitacao.email],
-                        fail_silently=False
-                    )
-
-                except Exception as erro_email:
-                    print("ERRO AO ENVIAR EMAIL:")
-                    print(erro_email)
-
-                return render(
-                    request,
-                    "solicitacoes/sucesso.html",
-                    {
-                        "protocolo": solicitacao.protocolo
-                    }
-                )
-
-            except Exception as erro:
-                form.add_error(
-                    None,
-                    f"Ocorreu um erro ao salvar a solicitação: {erro}"
-                )
-
-    else:
-        form = SolicitacaoForm()
-
-    return render(
-        request,
-        "solicitacoes/nova.html",
-        {
-            "form": form
-        }
-    )
-
-
-# =====================================================
-# CONSULTAR PROTOCOLO
-# =====================================================
-
-def consultar_protocolo(request):
-
-    protocolo = request.GET.get("protocolo")
-
-    solicitacao = None
-    erro = None
-
-    if protocolo:
-
-        solicitacao = Solicitacao.objects.filter(
-            protocolo=protocolo.upper()
-        ).first()
-
-        if not solicitacao:
-            erro = "Protocolo não encontrado."
-
-    return render(
-        request,
-        "solicitacoes/consultar.html",
-        {
-            "solicitacao": solicitacao,
-            "erro": erro,
-        }
-    )
-
-
-# =====================================================
-# MINHAS SOLICITAÇÕES
-# =====================================================
-
-def minhas_solicitacoes(request):
-
-    protocolo = request.GET.get("protocolo")
-
-    solicitacao = None
-    erro = None
-
-    if protocolo:
-
-        solicitacao = Solicitacao.objects.filter(
-            protocolo=protocolo.upper()
-        ).first()
-
-        if not solicitacao:
-            erro = "Protocolo não encontrado."
-
-    return render(
-        request,
-        "solicitacoes/minhas.html",
-        {
-            "solicitacao": solicitacao,
-            "erro": erro,
-        }
-    )
-
-
-# =====================================================
-# LOGIN / LOGOUT GESTÃO
-# =====================================================
-
-def login_gestao(request):
-
-    if request.method == "POST":
-
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-
-        user = authenticate(
-            request,
-            username=username,
-            password=password
-        )
-
-        if user is not None:
-
-            login(request, user)
-
-            return redirect("painel_gestao")
-
-        return render(
-            request,
-            "gestao/login.html",
-            {
-                "erro": "Usuário ou senha inválidos."
-            }
-        )
-
-    return render(
-        request,
-        "gestao/login.html"
-    )
-
-
-def logout_gestao(request):
-
-    logout(request)
-
-    return redirect("home")
-
-
-# =====================================================
-# PAINEL DA GESTÃO
-# =====================================================
-
-@login_required
-def painel_gestao(request):
-
-    hoje = date.today()
-
-    pendentes_opo = Solicitacao.objects.filter(status="PENDENTE").count()
-
-    eventos_semana = Solicitacao.objects.filter(
-        data_evento__gte=hoje,
-        data_evento__lte=hoje + timedelta(days=7)
-    ).count()
-
-    eventos_mes = Solicitacao.objects.filter(
-        data_evento__year=hoje.year,
-        data_evento__month=hoje.month
-    ).count()
-
-    proximos_eventos = Solicitacao.objects.filter(
-        data_evento__gte=hoje
-    ).order_by("data_evento", "hora_inicio")[:10]
-
-    usuarios = User.objects.count()
-
-    return render(request, "gestao/painel_gestao.html", {
-        "pendentes_opo": pendentes_opo,
-        "eventos_semana": eventos_semana,
-        "eventos_mes": eventos_mes,
-        "proximos_eventos": proximos_eventos,
-        "usuarios": usuarios,
-    })
-
-# =====================================================
-# DASHBOARD OPERACIONAL
-# =====================================================
-
-@login_required
-def dashboard_operacional(request):
-
-    solicitacoes = Solicitacao.objects.all().order_by(
-        "-criado_em"
-    )
-
-    total = solicitacoes.count()
-
-    pendentes = solicitacoes.filter(
-        status="PENDENTE"
-    ).count()
-
-    aprovadas = solicitacoes.filter(
-        status="APROVADO"
-    ).count()
-
-    return render(
-        request,
-        "solicitacoes/dashboard.html",
-        {
-            "solicitacoes": solicitacoes,
-            "total": total,
-            "pendentes": pendentes,
-            "aprovadas": aprovadas,
-        }
-    )
-
-
-# =====================================================
-# AGENDA
-# =====================================================
-
-@login_required
-def agenda_gestao(request):
-
-    hoje = date.today()
-
-    eventos = Solicitacao.objects.filter(
-        data_evento__gte=hoje
-    ).order_by(
-        "data_evento",
-        "hora_inicio"
-    )
-
-    return render(
-        request,
-        "gestao/agenda.html",
-        {
-            "eventos": eventos
-        }
-    )
-
-
-# =====================================================
-# LANÇAMENTO MANUAL
-# =====================================================
-
-@login_required
-def lancamento_manual(request):
-
-    if request.method == "POST":
-
-        form = SolicitacaoManualForm(
-            request.POST,
-            request.FILES
-        )
-
-        if form.is_valid():
-
-            solicitacao = form.save(commit=False)
-            solicitacao.status = "PENDENTE"
-            solicitacao.usuario = request.user
-
-            if not solicitacao.publico_estimado:
-                solicitacao.publico_estimado = 0
-
-            solicitacao.save()
-
-            messages.success(
-                request,
-                f"Lançamento manual salvo. Protocolo: {solicitacao.protocolo}"
-            )
-
-            return redirect("listar_pendentes_opo")
-
-        else:
-            print("ERROS DO FORMULÁRIO MANUAL:")
-            print(form.errors)
-
-    else:
-        form = SolicitacaoManualForm()
-
-    return render(
-        request,
-        "gestao/lancamento_manual.html",
-        {
-            "form": form
-        }
-    )
-# =====================================================
-# APROVAÇÕES / PENDENTES DE OPO
-# =====================================================
-
-@login_required
-def listar_pendentes_opo(request):
-
-    solicitacoes = Solicitacao.objects.filter(
-        status="PENDENTE"
-    ).order_by(
-        "data_evento",
-        "hora_inicio"
-    )
-
-    return render(
-        request,
-        "gestao/aprovacoes.html",
-        {
-            "solicitacoes": solicitacoes,
-        }
-    )
+from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+import os
+import qrcode
+from io import BytesIO
+from django.core.files.base import ContentFile
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.template.loader import get_template
+from django.utils import timezone
+from .models import Solicitacao
+from django.utils import timezone
+from django.conf import settings
+import tempfile
+from reportlab.pdfgen import canvas
+from .models import Solicitacao
+from .forms import SolicitacaoForm
+import traceback
+import os
+import zipfile
+import os
+from django.urls import reverse
+import qrcode
+from django.shortcuts import render
+import base64
+from io import BytesIO
+import qrcode
+from django.http import HttpResponse, FileResponse, Http404
+from .models import Solicitacao
+from django.http import (
+    HttpResponse,
+    FileResponse
+)
+from django.shortcuts import (
+    render,
+    redirect,
+    get_object_or_404
+)
+
+from django.contrib.auth import (
+    authenticate,
+    login,
+    logout
+)
 
 
 @login_required
@@ -386,45 +58,12 @@ def aprovar_solicitacao(request, id):
     )
 
     solicitacao.status = "APROVADO"
-    solicitacao.aprovado_por = request.user.username
     solicitacao.data_aprovacao = timezone.now()
-    solicitacao.data_assinatura = timezone.now()
-    solicitacao.assinado_por = request.user.username
+    solicitacao.aprovado_por = request.user.get_full_name() or request.user.username
+
+    if not solicitacao.numero_opo:
+        solicitacao.numero_opo = solicitacao.protocolo
     solicitacao.save()
-
-    assunto = "Ordem de Policiamento Criada"
-
-    mensagem = f"""
-Olá, {solicitacao.solicitante}!
-
-Sua solicitação foi aprovada e a Ordem de Policiamento foi criada.
-
-PROTOCOLO:
-{solicitacao.protocolo}
-
-EVENTO:
-{solicitacao.nome_evento}
-
-DATA:
-{solicitacao.data_evento}
-
-STATUS:
-Ordem de Policiamento Criada
-
-PMBA - Uma força a serviço do cidadão.
-"""
-
-    try:
-        send_mail(
-            assunto,
-            mensagem,
-            settings.DEFAULT_FROM_EMAIL,
-            [solicitacao.email],
-            fail_silently=True
-        )
-
-    except Exception as erro:
-        print("ERRO AO ENVIAR EMAIL DE APROVAÇÃO:", erro)
 
     return redirect(
         "gerar_opo",
@@ -432,9 +71,33 @@ PMBA - Uma força a serviço do cidadão.
     )
 
 
-# =====================================================
-# GERAR OPO
-# =====================================================
+
+
+
+def link_callback(uri, rel):
+
+    if uri.startswith(settings.MEDIA_URL):
+        path = os.path.join(
+            settings.MEDIA_ROOT,
+            uri.replace(settings.MEDIA_URL, "")
+        )
+
+    elif uri.startswith(settings.STATIC_URL):
+        path = os.path.join(
+            settings.STATIC_ROOT,
+            uri.replace(settings.STATIC_URL, "")
+        )
+
+    else:
+        path = uri
+
+    if not os.path.isfile(path):
+        raise Exception(
+            f"Arquivo não encontrado para PDF: {path}"
+        )
+
+    return path
+
 
 @login_required
 def gerar_opo(request, id):
@@ -451,11 +114,12 @@ def gerar_opo(request, id):
         f"/verificar/{solicitacao.protocolo}/"
     )
 
-    qr_img = qrcode.make(url_verificacao)
+    # QR CODE EM MEMÓRIA
+    qr = qrcode.make(url_verificacao)
 
     buffer = BytesIO()
 
-    qr_img.save(
+    qr.save(
         buffer,
         format="PNG"
     )
@@ -476,139 +140,217 @@ def gerar_opo(request, id):
             "url_verificacao": url_verificacao,
         }
     )
-
-
 # =====================================================
-# DOCUMENTOS ANEXOS
+# CONSULTA DE PROTOCOLO
 # =====================================================
 
-@login_required
-def documentos_solicitacao(request, id):
+def consultar_protocolo(request):
 
-    solicitacao = get_object_or_404(
-        Solicitacao,
-        id=id
-    )
+    protocolo = request.GET.get("protocolo")
 
-    documentos = [
-        {
-            "nome": "Documento Sanitário",
-            "url": reverse(
-                "abrir_documento_solicitacao",
-                args=[solicitacao.id, "sanitario"]
-            ),
-            "arquivo": solicitacao.documento_sanitario,
-        },
-        {
-            "nome": "Documento Meio Ambiente",
-            "url": reverse(
-                "abrir_documento_solicitacao",
-                args=[solicitacao.id, "meio_ambiente"]
-            ),
-            "arquivo": solicitacao.documento_meio_ambiente,
-        },
-        {
-            "nome": "Ofício ao Comandante",
-            "url": reverse(
-                "abrir_documento_solicitacao",
-                args=[solicitacao.id, "comandante"]
-            ),
-            "arquivo": solicitacao.oficio_comandante,
-        },
-        {
-            "nome": "Documento Corpo de Bombeiros",
-            "url": reverse(
-                "abrir_documento_solicitacao",
-                args=[solicitacao.id, "bombeiro"]
-            ),
-            "arquivo": solicitacao.oficio_bombeiro,
-        },
-    ]
+    solicitacao = None
+    erro = None
+
+    if protocolo:
+
+        solicitacao = (
+            Solicitacao.objects
+            .filter(
+                protocolo=protocolo.upper()
+            )
+            .first()
+        )
+
+        if not solicitacao:
+            erro = "Protocolo não encontrado."
 
     return render(
         request,
-        "gestao/documentos_solicitacao.html",
+        'solicitacoes/consultar.html',
+        {
+            'solicitacao': solicitacao,
+            'erro': erro
+        }
+    )
+
+# =====================================================
+# MINHAS SOLICITAÇÕES
+# =====================================================
+
+def minhas_solicitacoes(request):
+
+    protocolo = request.GET.get("protocolo")
+
+    solicitacao = None
+    erro = None
+
+    if protocolo:
+
+        try:
+
+            solicitacao = Solicitacao.objects.get(
+                protocolo=protocolo.upper()
+            )
+
+        except Solicitacao.DoesNotExist:
+
+            erro = "Protocolo não encontrado."
+
+    return render(
+        request,
+        "solicitacoes/minhas.html",
         {
             "solicitacao": solicitacao,
-            "documentos": documentos,
+            "erro": erro
         }
     )
 
 
-@login_required
-def abrir_documento_solicitacao(request, id, tipo):
+# =====================================================
+# LOGIN GESTÃO
+# =====================================================
 
-    solicitacao = get_object_or_404(
-        Solicitacao,
-        id=id
+
+
+def login_gestao(request):
+
+    erro = None
+
+    if request.method == "POST":
+
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(
+            request,
+            username=username,
+            password=password
+        )
+
+        if user:
+
+            login(request, user)
+
+            return redirect("painel_gestao")
+
+        erro = "Usuário ou senha inválidos."
+
+    return render(
+        request,
+        "gestao/login.html",
+        {
+            "erro": erro
+        }
     )
 
-    arquivos = {
-        "sanitario": solicitacao.documento_sanitario,
-        "meio_ambiente": solicitacao.documento_meio_ambiente,
-        "comandante": solicitacao.oficio_comandante,
-        "bombeiro": solicitacao.oficio_bombeiro,
-    }
+# =====================================================
+# LOGOUT
+# =====================================================
 
-    arquivo = arquivos.get(tipo)
+def logout_gestao(request):
 
-    if not arquivo or not arquivo.name:
-        raise Http404("Documento não informado.")
+    logout(request)
 
-    if not os.path.exists(arquivo.path):
-        raise Http404("Arquivo não encontrado no disco.")
+    return redirect("home")
 
-    return FileResponse(
-        open(arquivo.path, "rb"),
-        content_type="application/pdf"
+
+# =====================================================
+# MENU GESTÃO
+# =====================================================
+
+@login_required
+def menu_gestao(request):
+
+    return render(
+        request,
+        "gestao/menu.html"
     )
 
 
 # =====================================================
-# BAIXAR PROCESSO EM ZIP
+# PAINEL GESTÃO
 # =====================================================
 
 @login_required
-def baixar_processo(request, id):
+def painel_gestao(request):
 
-    import zipfile
+    pendentes_opo = Solicitacao.objects.filter(
+        status="PENDENTE"
+    ).count()
 
-    solicitacao = get_object_or_404(
-        Solicitacao,
-        id=id
+    return render(
+        request,
+        "gestao/painel_gestao.html",
+        {
+            "pendentes_opo": pendentes_opo,
+        }
     )
 
-    buffer = BytesIO()
+# =====================================================
+# DASHBOARD
+# =====================================================
 
-    arquivos = [
-        solicitacao.documento_sanitario,
-        solicitacao.documento_meio_ambiente,
-        solicitacao.oficio_comandante,
-        solicitacao.oficio_bombeiro,
-    ]
+@login_required
+def dashboard_operacional(request):
 
-    with zipfile.ZipFile(buffer, "w") as zip_file:
-
-        for arquivo in arquivos:
-
-            if arquivo and arquivo.name and os.path.exists(arquivo.path):
-
-                zip_file.write(
-                    arquivo.path,
-                    os.path.basename(arquivo.path)
-                )
-
-    buffer.seek(0)
-
-    nome_zip = f"processo_{solicitacao.protocolo}.zip"
-
-    response = FileResponse(
-        buffer,
-        as_attachment=True,
-        filename=nome_zip
+    solicitacoes = (
+        Solicitacao.objects
+        .all()
+        .order_by("-criado_em")
     )
 
-    return response
+    total = solicitacoes.count()
+
+    pendentes = (
+        solicitacoes
+        .filter(status="PENDENTE")
+        .count()
+    )
+
+    aprovadas = (
+        solicitacoes
+        .filter(status="APROVADO")
+        .count()
+    )
+
+    rejeitadas = (
+        solicitacoes
+        .filter(status="REJEITADO")
+        .count()
+    )
+
+    return render(
+        request,
+        "solicitacoes/dashboard.html",
+        {
+            "solicitacoes": solicitacoes,
+            "total": total,
+            "pendentes": pendentes,
+            "aprovadas": aprovadas,
+            "rejeitadas": rejeitadas,
+        }
+    )
+
+
+# =====================================================
+# APROVAR SOLICITAÇÃO
+# =====================================================
+@login_required
+def aprovacoes(request):
+
+    solicitacoes = (
+        Solicitacao.objects
+        .filter(status="PENDENTE")
+        .order_by("-criado_em")
+    )
+
+    return render(
+        request,
+        "gestao/aprovacoes.html",
+        {
+            "solicitacoes": solicitacoes
+        }
+    )
 
 
 # =====================================================
@@ -624,20 +366,30 @@ def alterar_status(request, id, status):
     )
 
     solicitacao.status = status.upper()
+
     solicitacao.save()
 
-    return redirect("dashboard_operacional")
+    return redirect(
+        "dashboard_operacional"
+    )
 
 
 # =====================================================
-# VERIFICAR AUTENTICIDADE
+# VERIFICAÇÃO DE AUTENTICIDADE
 # =====================================================
 
-def verificar_autenticidade(request, protocolo):
+def verificar_autenticidade(
+    request,
+    protocolo
+):
 
-    solicitacao = Solicitacao.objects.filter(
-        protocolo=protocolo.upper()
-    ).first()
+    solicitacao = (
+        Solicitacao.objects
+        .filter(
+            protocolo=protocolo
+        )
+        .first()
+    )
 
     return render(
         request,
@@ -646,6 +398,433 @@ def verificar_autenticidade(request, protocolo):
             "solicitacao": solicitacao
         }
     )
+
+def gerar_pdf_arquivo(solicitacao):
+
+    pasta = os.path.join(
+        settings.MEDIA_ROOT,
+        "protocolos",
+        solicitacao.protocolo
+    )
+
+    os.makedirs(
+        pasta,
+        exist_ok=True
+    )
+
+    caminho_pdf = os.path.join(
+        pasta,
+        f"formulario_{solicitacao.protocolo}.pdf"
+    )
+
+    pdf = canvas.Canvas(caminho_pdf)
+
+    y = 800
+
+    pdf.setFont("Helvetica-Bold", 16)
+    pdf.drawString(160, y, "FORMULÁRIO DE SOLICITAÇÃO DE EVENTO")
+
+    y -= 50
+    pdf.setFont("Helvetica", 11)
+
+    dados = [
+        f"Protocolo: {solicitacao.protocolo}",
+        f"Solicitante: {solicitacao.solicitante}",
+        f"CPF: {solicitacao.cpf}",
+        f"E-mail: {solicitacao.email}",
+        f"Telefone: {solicitacao.telefone}",
+        f"Evento: {solicitacao.nome_evento}",
+        f"Local: {solicitacao.local}",
+        f"Data: {solicitacao.data_evento}",
+        f"Início: {solicitacao.hora_inicio}",
+        f"Fim: {solicitacao.hora_fim}",
+        f"Público estimado: {solicitacao.publico_estimado}",
+        f"Status: {solicitacao.status}",
+        f"Criado em: {solicitacao.criado_em}",
+    ]
+
+    for linha in dados:
+        pdf.drawString(50, y, linha)
+        y -= 25
+
+    y -= 15
+    pdf.drawString(50, y, "Observações:")
+    y -= 25
+    pdf.drawString(50, y, str(solicitacao.observacoes or ""))
+
+    pdf.showPage()
+    pdf.save()
+
+    return caminho_pdf
+# =====================================================
+# GERAR PDF
+# =====================================================
+
+@login_required
+def gerar_pdf(request, id):
+
+    solicitacao = get_object_or_404(
+        Solicitacao,
+        id=id
+    )
+
+    response = HttpResponse(
+        content_type="application/pdf"
+    )
+
+    response[
+        "Content-Disposition"
+    ] = (
+        f'inline; filename="solicitacao_{id}.pdf"'
+    )
+
+    pdf = canvas.Canvas(response)
+
+    y = 800
+
+    pdf.setFont(
+        "Helvetica-Bold",
+        16
+    )
+
+    pdf.drawString(
+        180,
+        y,
+        "SOLICITAÇÃO DE EVENTO"
+    )
+
+    y -= 50
+
+    pdf.setFont(
+        "Helvetica",
+        11
+    )
+
+    dados = [
+
+        f"Protocolo: {solicitacao.protocolo}",
+        f"Solicitante: {solicitacao.solicitante}",
+        f"CPF: {solicitacao.cpf}",
+        f"E-mail: {solicitacao.email}",
+        f"Telefone: {solicitacao.telefone}",
+        f"Evento: {solicitacao.nome_evento}",
+        f"Local: {solicitacao.local}",
+        f"Data: {solicitacao.data_evento}",
+        f"Início: {solicitacao.hora_inicio}",
+        f"Fim: {solicitacao.hora_fim}",
+        f"Público Estimado: {solicitacao.publico_estimado}",
+        f"Status: {solicitacao.status}",
+        f"Criado em: {solicitacao.criado_em}",
+
+    ]
+
+    for linha in dados:
+
+        pdf.drawString(
+            50,
+            y,
+            linha
+        )
+
+        y -= 25
+
+    y -= 15
+
+    pdf.drawString(
+        50,
+        y,
+        "Observações:"
+    )
+
+    y -= 25
+
+    pdf.drawString(
+        50,
+        y,
+        str(
+            solicitacao.observacoes
+        )
+    )
+
+    pdf.showPage()
+
+    pdf.save()
+
+    return response
+
+# =====================================================
+# BAIXAR PROCESSO
+# =====================================================
+@login_required
+def baixar_processo(request, id):
+
+    solicitacao = get_object_or_404(Solicitacao, id=id)
+
+    protocolo = solicitacao.protocolo
+
+    pasta_processo = os.path.join(
+        settings.MEDIA_ROOT,
+        "protocolos",
+        protocolo
+    )
+
+    os.makedirs(pasta_processo, exist_ok=True)
+
+    pdf_path = gerar_pdf_arquivo(solicitacao)
+
+    zip_path = os.path.join(
+        pasta_processo,
+        f"processo_{protocolo}.zip"
+    )
+
+    with zipfile.ZipFile(
+        zip_path,
+        "w",
+        zipfile.ZIP_DEFLATED
+    ) as zipf:
+
+        zipf.write(
+            pdf_path,
+            f"{protocolo}/formulario_{protocolo}.pdf"
+        )
+
+        arquivos = [
+            solicitacao.documento_sanitario,
+            solicitacao.documento_meio_ambiente,
+            solicitacao.oficio_bombeiro,
+        ]
+
+        for arquivo in arquivos:
+
+            if arquivo and os.path.exists(arquivo.path):
+
+                zipf.write(
+                    arquivo.path,
+                    f"{protocolo}/{os.path.basename(arquivo.path)}"
+                )
+
+    return FileResponse(
+        open(zip_path, "rb"),
+        as_attachment=True,
+        filename=f"processo_{protocolo}.zip"
+    )
+@login_required
+def listar_pendentes_opo(request):
+
+    solicitacoes = Solicitacao.objects.filter(
+        status="PENDENTE"
+    ).order_by("-criado_em")
+
+    return render(
+        request,
+        "gestao/aprovacoes.html",
+        {
+            "solicitacoes": solicitacoes,
+        }
+    )
+def nova_solicitacao(request):
+
+    if request.method == "POST":
+
+        form = SolicitacaoForm(
+            request.POST,
+            request.FILES
+        )
+
+        if form.is_valid():
+
+            solicitacao = form.save(commit=False)
+            solicitacao.status = "PENDENTE"
+            solicitacao.save()
+
+            gerar_pdf_arquivo(solicitacao)
+
+            assunto = "Solicitação Recebida - SiEv"
+
+            mensagem = f"""
+Olá, {solicitacao.solicitante}!
+
+Sua informação foi recebida com sucesso.
+
+PROTOCOLO:
+{solicitacao.protocolo}
+
+EVENTO:
+{solicitacao.nome_evento}
+
+DATA:
+{solicitacao.data_evento}
+
+STATUS:
+{solicitacao.status}
+
+Guarde este protocolo para acompanhamento.
+
+PMBA - Uma Força a Serviço do Cidadão.
+"""
+
+            try:
+                send_mail(
+                    assunto,
+                    mensagem,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [solicitacao.email],
+                    fail_silently=False
+                )
+
+                print("EMAIL ENVIADO COM SUCESSO")
+
+            except Exception as erro_email:
+                print("ERRO AO ENVIAR EMAIL:")
+                print(erro_email)
+
+            return render(
+                request,
+                "solicitacoes/sucesso.html",
+                {
+                    "protocolo": solicitacao.protocolo
+                }
+            )
+
+    else:
+        form = SolicitacaoForm()
+
+    return render(
+        request,
+        "solicitacoes/nova.html",
+        {
+            "form": form
+        }
+    )
+def home(request):
+    return render(request, "home.html")
+@login_required
+def abrir_documento_solicitacao(request, id, tipo):
+
+    solicitacao = get_object_or_404(Solicitacao, id=id)
+
+    arquivos = {
+        "sanitario": solicitacao.documento_sanitario,
+        "meio_ambiente": solicitacao.documento_meio_ambiente,
+        "bombeiro": solicitacao.oficio_bombeiro,
+    }
+
+    arquivo = arquivos.get(tipo)
+
+    if not arquivo or not arquivo.name:
+        raise Http404("Documento não encontrado.")
+
+    if not os.path.exists(arquivo.path):
+        raise Http404("Arquivo não existe no disco.")
+
+    return FileResponse(
+        open(arquivo.path, "rb"),
+        content_type="application/pdf"
+    )
+
+
+@login_required
+def visualizar_documentos(request, id):
+
+    solicitacao = get_object_or_404(Solicitacao, id=id)
+
+    documentos = []
+
+    campos = [
+        ("sanitario", "Documento Sanitário", solicitacao.documento_sanitario),
+        ("meio_ambiente", "Documento Meio Ambiente", solicitacao.documento_meio_ambiente),
+        ("bombeiro", "Documento Corpo de Bombeiros", solicitacao.oficio_bombeiro),
+    ]
+
+    for tipo, nome, arquivo in campos:
+        if arquivo and arquivo.name and os.path.exists(arquivo.path):
+            documentos.append({
+                "nome": nome,
+                "url": reverse("abrir_documento_solicitacao", args=[solicitacao.id, tipo]),
+            })
+
+    return render(
+        request,
+        "gestao/visualizar_documentos.html",
+        {
+            "solicitacao": solicitacao,
+            "documentos": documentos,
+        }
+    )
+@login_required
+def documentos_solicitacao(request, id):
+
+    solicitacao = get_object_or_404(
+        Solicitacao,
+        id=id
+    )
+
+    documentos = []
+
+    campos = [
+        ("sanitario", "Documento Sanitário", solicitacao.documento_sanitario),
+        ("meio_ambiente", "Documento Meio Ambiente", solicitacao.documento_meio_ambiente),
+        ("bombeiro", "Documento Corpo de Bombeiros", solicitacao.oficio_bombeiro),
+    ]
+
+    for tipo, nome, arquivo in campos:
+
+        if arquivo and arquivo.name:
+
+            existe = os.path.exists(arquivo.path)
+
+            documentos.append({
+                "nome": nome,
+                "url": reverse(
+                    "abrir_documento_solicitacao",
+                    args=[solicitacao.id, tipo]
+                ) if existe else "",
+                "arquivo": arquivo.name,
+                "existe": existe,
+            })
+
+    return render(
+        request,
+        "gestao/documentos_solicitacao.html",
+        {
+            "solicitacao": solicitacao,
+            "documentos": documentos,
+        }
+    )
+@login_required
+def visualizar_documentos(request, id):
+
+    solicitacao = get_object_or_404(
+        Solicitacao,
+        id=id
+    )
+
+    documentos = []
+
+    campos = [
+        ("Documento Sanitário", solicitacao.documento_sanitario),
+        ("Documento Meio Ambiente", solicitacao.documento_meio_ambiente),
+        ("Documento Corpo de Bombeiros", solicitacao.oficio_bombeiro),
+    ]
+
+    for nome, arquivo in campos:
+
+        if arquivo and arquivo.name and os.path.exists(arquivo.path):
+
+            documentos.append({
+                "nome": nome,
+                "url": arquivo.url,
+            })
+
+    return render(
+        request,
+        "gestao/visualizar_documentos.html",
+        {
+            "solicitacao": solicitacao,
+            "documentos": documentos,
+        }
+    )
+ 
 #=====================================================
 # DESTINOS DA OPO
 # =====================================================   
@@ -680,4 +859,57 @@ def detalhe_opo(request, id):
         {
             "solicitacao": solicitacao
         }
+    )
+from datetime import date
+
+@login_required
+def agenda_gestao(request):
+
+    eventos = Solicitacao.objects.filter(
+        data_evento__gte=date.today()
+    ).order_by(
+        "data_evento",
+        "hora_inicio"
+    )
+
+    return render(
+        request,
+        "gestao/agenda.html",
+        {
+            "eventos": eventos
+        }
+    )
+@login_required
+def lancamento_manual(request):
+
+    if request.method == "POST":
+
+        form = SolicitacaoManualForm(
+            request.POST,
+            request.FILES
+        )
+
+        if form.is_valid():
+
+            solicitacao = form.save(commit=False)
+            solicitacao.status = "PENDENTE"
+            solicitacao.usuario = request.user
+
+            if not solicitacao.publico_estimado:
+                solicitacao.publico_estimado = 0
+
+            solicitacao.save()
+
+            return redirect("listar_pendentes_opo")
+
+    else:
+        form = SolicitacaoManualForm()
+
+    return render(
+        request,
+        "gestao/lancamento_manual.html",
+        {
+            "form": form
+        }
+    )
     )
