@@ -224,9 +224,7 @@ def painel_gestao(request):
 
     hoje = date.today()
 
-    pendentes_opo = Solicitacao.objects.filter(
-        status="PENDENTE"
-    ).count()
+    pendentes_opo = Solicitacao.objects.filter(status="PENDENTE").count()
 
     eventos_semana = Solicitacao.objects.filter(
         data_evento__gte=hoje,
@@ -240,22 +238,17 @@ def painel_gestao(request):
 
     proximos_eventos = Solicitacao.objects.filter(
         data_evento__gte=hoje
-    ).order_by("data_evento", "hora_inicio")[:5]
+    ).order_by("data_evento", "hora_inicio")[:10]
 
-    usuarios = User.objects.all().count()
+    usuarios = User.objects.count()
 
-    return render(
-        request,
-        "gestao/painel_gestao.html",
-        {
-            "pendentes_opo": pendentes_opo,
-            "eventos_semana": eventos_semana,
-            "eventos_mes": eventos_mes,
-            "proximos_eventos": proximos_eventos,
-            "usuarios": usuarios,
-        }
-    )
-
+    return render(request, "gestao/painel_gestao.html", {
+        "pendentes_opo": pendentes_opo,
+        "eventos_semana": eventos_semana,
+        "eventos_mes": eventos_mes,
+        "proximos_eventos": proximos_eventos,
+        "usuarios": usuarios,
+    })
 
 # =====================================================
 # DASHBOARD OPERACIONAL
