@@ -203,14 +203,18 @@ Painel de Gestão
                         {% endif %}
                     </td>
                     <td>
-                        {% if evento.status == "APROVADO" %}
-                            <a href="{% url 'detalhe_opo' evento.id %}" class="btn-detalhes">
-                                📄 Detalhes
-                            </a>
+                        {% if evento.id %}
+                            {% if evento.status == "APROVADO" %}
+                                <a href="{% url 'gerar_opo' evento.id %}" class="btn-detalhes" target="_blank">
+                                    📄 Detalhes
+                                </a>
+                            {% else %}
+                                <a href="{% url 'documentos_solicitacao' evento.id %}" class="btn-detalhes">
+                                    📁 Detalhes
+                                </a>
+                            {% endif %}
                         {% else %}
-                            <a href="{% url 'documentos_solicitacao' evento.id %}" class="btn-detalhes">
-                                📁 Detalhes
-                            </a>
+                            -
                         {% endif %}
                     </td>
                 </tr>
