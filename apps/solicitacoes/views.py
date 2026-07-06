@@ -2,7 +2,7 @@ import os
 import base64
 from io import BytesIO
 from datetime import date, timedelta
-
+from django.contrib.auth.models import User
 import qrcode
 
 from django.conf import settings
