@@ -48,7 +48,7 @@ urlpatterns = [
         abrir_documento_solicitacao,
         name="abrir_documento_solicitacao"
     ),
-    path('home', home, name='home'),
+    path('', home, name='home'),
     path(
         "gestao/agenda/",
         agenda_gestao,
