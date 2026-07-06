@@ -1,4 +1,5 @@
 from .models import Solicitacao
+from datetime import date
 from .forms import SolicitacaoForm, SolicitacaoManualForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.shortcuts import render, redirect, get_object_or_404
@@ -860,7 +861,7 @@ def detalhe_opo(request, id):
             "solicitacao": solicitacao
         }
     )
-from datetime import date
+
 
 @login_required
 def agenda_gestao(request):
@@ -912,4 +913,4 @@ def lancamento_manual(request):
             "form": form
         }
     )
-    )
+    
