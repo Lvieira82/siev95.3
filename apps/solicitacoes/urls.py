@@ -15,9 +15,12 @@ from apps.solicitacoes.views import (
     logout_gestao,
     painel_gestao,
     baixar_processo,
-    agenda_gestao,
-    lancamento_manual,
+    abrir_documento_solicitacao,
     documentos_solicitacao,
+    aprovar_solicitacao,
+    gerar_opo,
+    listar_pendentes_opo,
+    visualizar_documentos,
     abrir_documento_solicitacao,
     opos_geradas,
     detalhe_opo,
@@ -26,6 +29,44 @@ from apps.solicitacoes.views import (
 urlpatterns = [
 
     path('admin/', admin.site.urls),
+    
+    path(
+        "documentos/<int:id>/",
+        visualizar_documentos,
+        name="visualizar_documentos"
+    ),
+        
+
+    path('', home, name='home'),
+
+    path('gestao/', login_gestao, name='login_gestao'),
+
+    path('logout/', logout_gestao, name='logout_gestao'),
+    
+    path(
+        "aprovar/<int:id>/",
+        aprovar_solicitacao,
+        name="aprovar_solicitacao"
+    ),
+
+    path(
+        "arquivo-documento/<int:id>/<str:tipo>/",
+        abrir_documento_solicitacao,
+        name="abrir_documento_solicitacao"
+    ),
+
+    path(
+        "opo/<int:id>/",
+        gerar_opo,
+        name="gerar_opo"
+    ),
+
+    path(
+        "aprovacoes/",
+        listar_pendentes_opo,
+        name="listar_pendentes_opo"
+    ),
+
     path(
         "documentos/<int:id>/",
         documentos_solicitacao,
@@ -42,27 +83,11 @@ urlpatterns = [
         detalhe_opo,
         name="detalhe_opo"
     ),
-
     path(
-        "documentos/<int:id>/<str:tipo>/",
+        "documento/<int:id>/<str:tipo>/",
         abrir_documento_solicitacao,
         name="abrir_documento_solicitacao"
     ),
-    path('', home, name='home'),
-    path(
-        "gestao/agenda/",
-        agenda_gestao,
-        name="agenda_gestao"
-    ),
-
-    path(
-        "gestao/lancamento-manual/",
-        lancamento_manual,
-        name="lancamento_manual"
-    ),
-    path('gestao/', login_gestao, name='login_gestao'),
-
-    path('logout/', logout_gestao, name='logout_gestao'),
 
     path(
         'painel/',
@@ -119,3 +144,4 @@ if settings.DEBUG:
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT
     )
+
