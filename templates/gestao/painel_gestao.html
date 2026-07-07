@@ -7,65 +7,10 @@ Painel de Gestão
 {% block content %}
 
 <style>
-.painel{
-    max-width:1320px;
-    margin:40px auto;
-}
-
-.titulo-painel{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    color:#907C64;
-    font-size:34px;
-    margin-bottom:25px;
-}
-
-.cards{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:24px;
-}
-
-.card{
-    background:white;
-    border-radius:16px;
-    padding:28px;
-    min-height:180px;
-    text-decoration:none;
-    color:#111827;
-    box-shadow:0 8px 22px rgba(0,0,0,.08);
-    transition:.25s;
-}
-
-.card:hover{
-    transform:translateY(-4px);
-}
-
-.card .icone{
-    font-size:42px;
-    margin-bottom:18px;
-}
-
-.card h2{
-    color:#907C64;
-    font-size:26px;
-    margin-bottom:10px;
-}
-
-.badge-novo{
-    background:#bbf7d0;
-    color:#15803d;
-    padding:4px 9px;
-    border-radius:999px;
-    font-size:12px;
-    margin-left:8px;
-}
-
 .proximos{
     background:white;
     margin-top:28px;
-    border-radius:16px;
+    border-radius:18px;
     padding:28px;
     box-shadow:0 8px 22px rgba(0,0,0,.08);
 }
@@ -73,47 +18,216 @@ Painel de Gestão
 .proximos h2{
     color:#907C64;
     font-size:28px;
-    margin-bottom:18px;
+    margin-bottom:22px;
+}
+
+.tabela-card{
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    overflow:hidden;
 }
 
 .tabela-eventos{
     width:100%;
     border-collapse:collapse;
+    table-layout:fixed;
 }
 
-.tabela-eventos th,
-.tabela-eventos td{
-    padding:14px;
-    border-bottom:1px solid #e5e7eb;
+.tabela-eventos th{
+    background:#ffffff;
+    color:#111827;
+    padding:16px 18px;
     text-align:left;
+    font-size:15px;
+    border-bottom:1px solid #d1d5db;
+}
+
+.tabela-eventos td{
+    padding:18px;
+    border-bottom:1px solid #e5e7eb;
+    vertical-align:middle;
+    line-height:1.4;
+}
+
+.tabela-eventos tr:last-child td{
+    border-bottom:none;
+}
+
+.tabela-eventos th:nth-child(1),
+.tabela-eventos td:nth-child(1){
+    width:13%;
+}
+
+.tabela-eventos th:nth-child(2),
+.tabela-eventos td:nth-child(2){
+    width:10%;
+}
+
+.tabela-eventos th:nth-child(3),
+.tabela-eventos td:nth-child(3){
+    width:30%;
+}
+
+.tabela-eventos th:nth-child(4),
+.tabela-eventos td:nth-child(4){
+    width:20%;
+}
+
+.tabela-eventos th:nth-child(5),
+.tabela-eventos td:nth-child(5){
+    width:14%;
+}
+
+.tabela-eventos th:nth-child(6),
+.tabela-eventos td:nth-child(6){
+    width:13%;
+}
+
+.evento-nome{
+    font-weight:500;
+}
+
+.status-aprovado{
+    display:inline-block;
+    background:#dcfce7;
+    color:#15803d;
+    border:1px solid #86efac;
+    padding:7px 14px;
+    border-radius:6px;
+    font-weight:bold;
+    font-size:13px;
+}
+
+.status-pendente{
+    display:inline-block;
+    background:#fef3c7;
+    color:#92400e;
+    border:1px solid #facc15;
+    padding:7px 14px;
+    border-radius:6px;
+    font-weight:bold;
+    font-size:13px;
 }
 
 .btn-detalhes{
-    border:1px solid #2563eb;
-    color:#2563eb;
-    padding:7px 12px;
-    border-radius:6px;
+    display:inline-block;
+    background:#907C64;
+    color:white;
+    padding:10px 16px;
+    border-radius:7px;
     text-decoration:none;
     font-weight:bold;
+    font-size:14px;
 }
 
-.ver-todos{
-    display:block;
+.btn-detalhes:hover{
+    background:#7c6a54;
+}
+
+.area-ver-todos{
     text-align:center;
-    margin-top:18px;
-    color:#2563eb;
-    font-weight:bold;
-    text-decoration:none;
+    margin-top:28px;
 }
 
-@media(max-width:900px){
-    .cards{
-        grid-template-columns:1fr;
-    }
+.btn-ver-todos{
+    display:inline-block;
+    background:#907C64;
+    color:white;
+    padding:14px 26px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:bold;
+    box-shadow:0 4px 12px rgba(0,0,0,.12);
+}
 
-    .painel{
-        padding:0 20px;
-    }
+.btn-ver-todos:hover{
+    background:#7c6a54;
+}
+
+.sem-eventos{
+    text-align:center;
+    color:#6b7280;
+    padding:28px;
+}
+.painel{
+    max-width:1100px;
+    margin:30px auto;
+}
+
+.painel h1{
+    color:#907C64;
+    margin-bottom:8px;
+}
+
+.painel-sub{
+    color:#6b7280;
+    margin-bottom:30px;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.card{
+    position:relative;
+    background:white;
+    padding:25px;
+    border-radius:16px;
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+    text-decoration:none;
+    color:#111827;
+    transition:.2s;
+}
+
+.card:hover{
+    transform:translateY(-3px);
+}
+
+.icone{
+    font-size:34px;
+    margin-bottom:10px;
+}
+
+.card h2{
+    color:#907C64;
+    margin-bottom:8px;
+}
+
+.badge{
+    position:absolute;
+    top:12px;
+    right:12px;
+    background:#dc2626;
+    color:white;
+    padding:6px 10px;
+    border-radius:999px;
+    font-weight:bold;
+}
+
+.resumo{
+    margin-top:30px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
+
+.box{
+    background:white;
+    padding:20px;
+    border-radius:14px;
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+}
+
+.box h3{
+    color:#907C64;
+    margin-bottom:10px;
+}
+
+.evento-linha{
+    padding:10px 0;
+    border-bottom:1px solid #eee;
 }
 </style>
 
@@ -126,6 +240,9 @@ Painel de Gestão
     <div class="cards">
 
         <a href="{% url 'listar_pendentes_opo' %}" class="card">
+            {% if pendentes_opo > 0 %}
+                <span class="badge">{{ pendentes_opo }}</span>
+            {% endif %}
             <div class="icone">📁</div>
             <h2>Informações</h2>
             <p>Documentos anexos e geração de OPO.</p>
@@ -176,36 +293,39 @@ Painel de Gestão
 
         <h2>🗓️ Próximos Eventos</h2>
 
-        <table class="tabela-eventos">
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Hora</th>
-                    <th>Evento</th>
-                    <th>Local</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
+        <div class="tabela-card">
 
-            <tbody>
-                {% for evento in proximos_eventos %}
-                <tr>
-                    <td>{{ evento.data_evento|date:"d/m/Y" }}</td>
-                    <td>{{ evento.hora_inicio|time:"H:i" }}</td>
-                    <td>{{ evento.nome_evento }}</td>
-                    <td>{{ evento.local }}</td>
-                    <td>
-                        {% if evento.status == "APROVADO" %}
-                            OPO Criada
-                        {% else %}
-                            {{ evento.status }}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if evento.id %}
+            <table class="tabela-eventos">
+                <thead>
+                    <tr>
+                        <th>📅 Data</th>
+                        <th>🕘 Hora</th>
+                        <th>👥 Evento</th>
+                        <th>📍 Local</th>
+                        <th>⚑ Status</th>
+                        <th>⚙️ Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for evento in proximos_eventos %}
+                    <tr>
+                        <td>{{ evento.data_evento|date:"d/m/Y" }}</td>
+                        <td>{{ evento.hora_inicio|time:"H:i" }}</td>
+                        <td class="evento-nome">{{ evento.nome_evento }}</td>
+                        <td>{{ evento.local }}</td>
+
+                        <td>
                             {% if evento.status == "APROVADO" %}
-                                <a href="{% url 'gerar_opo' evento.id %}" class="btn-detalhes" target="_blank">
+                                <span class="status-aprovado">APROVADO</span>
+                            {% else %}
+                                <span class="status-pendente">{{ evento.status }}</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if evento.status == "APROVADO" %}
+                                <a href="{% url 'detalhe_opo' evento.id %}" class="btn-detalhes">
                                     📄 Detalhes
                                 </a>
                             {% else %}
@@ -213,26 +333,26 @@ Painel de Gestão
                                     📁 Detalhes
                                 </a>
                             {% endif %}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6">Nenhum evento futuro cadastrado.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        </td>
+                    </tr>
 
-        <a href="{% url 'agenda_gestao' %}" class="ver-todos">
-            Ver todos os eventos →
-        </a>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="sem-eventos">
+                            Nenhum evento futuro cadastrado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="area-ver-todos">
+            <a href="/gestao/agenda/" class="btn-ver-todos">
+                🗂️ Ver todos os eventos →
+            </a>
+        </div>
 
     </div>
-
-</div>
-
-{% endblock %}
 {% endblock %}
