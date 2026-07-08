@@ -58,10 +58,11 @@ def oficio_comandante(instance, filename):
 class Solicitacao(models.Model):
 
     STATUS = [
-        ("PENDENTE", "Pendente"),
-        ("APROVADO", "Aprovado"),
-        ("REJEITADO", "Rejeitado"),
-    ]
+    ("PENDENTE", "Pendente"),
+    ("CORRECAO", "Aguardando Correção"),
+    ("APROVADO", "Aprovado"),
+    ("REJEITADO", "Rejeitado"),
+]
 
     parecer_operacional = models.TextField(
         blank=True,
