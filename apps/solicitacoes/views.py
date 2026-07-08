@@ -562,7 +562,6 @@ def opos_geradas(request):
         "protocolos": protocolos,
     })
 
-
 @login_required
 def detalhe_opo(request, id):
 
