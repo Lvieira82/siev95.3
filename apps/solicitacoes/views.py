@@ -20,6 +20,8 @@ from .models import Solicitacao
 from .forms import SolicitacaoForm, SolicitacaoManualForm
 
 
+
+
 # =====================================================
 # HOME
 # =====================================================
@@ -726,3 +728,54 @@ def detalhe_opo_publica(request, id):
     return render(request, "consulta/detalhe_opo_publica.html", {
         "solicitacao": solicitacao
     })
+
+def solicitar_correcao(request, id):
+
+    solicitacao = get_object_or_404(Solicitacao, id=id)
+
+    mensagem = f"""
+Prezado(a) {solicitacao.solicitante},
+
+Após análise da documentação referente ao evento:
+
+{solicitacao.nome_evento}
+
+informamos que sua Ordem de Policiamento Operacional (OPO)
+não pôde ser gerada.
+
+Motivo:
+
+• erro no cadastro;
+• duplicidade da solicitação;
+• ausência de documentos obrigatórios.
+
+Solicitamos que compareça à sede da 95ª CIPM para regularizar as pendências.
+
+Endereço:
+95ª Companhia Independente de Polícia Militar
+
+Após a regularização, uma nova análise será realizada.
+
+Atenciosamente,
+
+95ª CIPM
+Polícia Militar da Bahia
+"""
+
+    send_mail(
+        subject="Pendência na Solicitação de Ordem de Policiamento",
+        message=mensagem,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[solicitacao.email],
+        fail_silently=False,
+    )
+
+    solicitacao.status = "CORRECAO"
+    solicitacao.save()
+
+    messages.success(
+        request,
+        "Solicitante notificado por e-mail."
+    )
+
+    return redirect("listar_pendentes_opo")
