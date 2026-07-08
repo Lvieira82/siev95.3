@@ -713,3 +713,16 @@ def validar_matricula_opo_publica(request, id):
     return render(request, "consulta/validar_matricula_opo.html", {
         "solicitacao": solicitacao
     })
+def detalhe_opo_publica(request, id):
+    if not request.session.get(f"opo_publica_autorizada_{id}"):
+        return redirect("validar_matricula_opo_publica", id=id)
+
+    solicitacao = get_object_or_404(
+        Solicitacao,
+        id=id,
+        status="APROVADO"
+    )
+
+    return render(request, "consulta/detalhe_opo_publica.html", {
+        "solicitacao": solicitacao
+    })
