@@ -1,6 +1,8 @@
+from django.views.static import serve
+from django.urls import re_path
+from django.conf import settings
 from django.contrib import admin
 from django.urls import path
-from django.conf import settings
 from django.conf.urls.static import static
 from apps.solicitacoes.views import gerar_opo
 from apps.solicitacoes.views import (
@@ -123,8 +125,23 @@ urlpatterns = [
         name="listar_pendentes_opo"
     ),
 ]
+urlpatterns = [
+    "https://siev95.com.br",
+    "https://www.siev95.com.br",
+    "https://siev2.onrender.com",
+]
 
-urlpatterns += static(
-    settings.MEDIA_URL,
-    document_root=settings.MEDIA_ROOT
-)
+urlpatterns += [
+    re_path(
+        r'^media/(?P<path>.*)$',
+        serve,
+        {'document_root': settings.MEDIA_ROOT},
+    ),
+]
+urlpatterns += [
+    re_path(
+        r'^media/(?P<path>.*)$',
+        serve,
+        {'document_root': settings.MEDIA_ROOT},
+    ),
+]
