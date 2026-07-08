@@ -535,18 +535,32 @@ def documentos_solicitacao(request, id):
     )
 @login_required
 def opos_geradas(request):
+    pasta_protocolos = Path(settings.MEDIA_ROOT) / "protocolos"
 
-    solicitacoes = Solicitacao.objects.filter(
-        status="APROVADO"
-    ).order_by("-data_aprovacao", "-criado_em")
+    protocolos = []
 
-    return render(
-        request,
-        "gestao/opos_geradas.html",
-        {
-            "solicitacoes": solicitacoes
-        }
-    )
+    if pasta_protocolos.exists():
+        for pasta in pasta_protocolos.iterdir():
+            if pasta.is_dir():
+                arquivos = []
+
+                for arquivo in pasta.iterdir():
+                    if arquivo.is_file() and arquivo.suffix.lower() == ".pdf":
+                        arquivos.append({
+                            "nome": arquivo.name,
+                            "url": f"{settings.MEDIA_URL}protocolos/{pasta.name}/{arquivo.name}",
+                        })
+
+                protocolos.append({
+                    "codigo": pasta.name,
+                    "arquivos": arquivos,
+                })
+
+    protocolos = sorted(protocolos, key=lambda x: x["codigo"])
+
+    return render(request, "solicitacoes/opos_geradas.html", {
+        "protocolos": protocolos,
+    })
 
 
 @login_required
