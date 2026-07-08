@@ -7,6 +7,40 @@ Painel de Gestão
 {% block content %}
 
 <style>
+
+.tabela-eventos{
+    width:100%;
+    min-width:850px;
+    border-collapse:collapse;
+}
+
+@media(max-width:768px){
+
+    .proximos{
+        padding:20px;
+        margin:25px 10px 0 10px;
+    }
+
+    .proximos h2{
+        font-size:22px;
+        text-align:center;
+    }
+
+    .tabela-card{
+        overflow-x:auto;
+    }
+
+    .btn-detalhes{
+        display:block;
+        text-align:center;
+        white-space:nowrap;
+    }
+
+    .btn-ver-todos{
+        width:100%;
+        text-align:center;
+    }
+}
 .proximos{
     background:white;
     margin-top:28px;
@@ -21,17 +55,7 @@ Painel de Gestão
     margin-bottom:22px;
 }
 
-.tabela-card{
-    border:1px solid #d1d5db;
-    border-radius:10px;
-    overflow:hidden;
-}
 
-.tabela-eventos{
-    width:100%;
-    border-collapse:collapse;
-    table-layout:fixed;
-}
 
 .tabela-eventos th{
     background:#ffffff;
@@ -109,16 +133,7 @@ Painel de Gestão
     font-size:13px;
 }
 
-.btn-detalhes{
-    display:inline-block;
-    background:#907C64;
-    color:white;
-    padding:10px 16px;
-    border-radius:7px;
-    text-decoration:none;
-    font-weight:bold;
-    font-size:14px;
-}
+
 
 .btn-detalhes:hover{
     background:#7c6a54;
@@ -129,16 +144,7 @@ Painel de Gestão
     margin-top:28px;
 }
 
-.btn-ver-todos{
-    display:inline-block;
-    background:#907C64;
-    color:white;
-    padding:14px 26px;
-    border-radius:8px;
-    text-decoration:none;
-    font-weight:bold;
-    box-shadow:0 4px 12px rgba(0,0,0,.12);
-}
+
 
 .btn-ver-todos:hover{
     background:#7c6a54;
@@ -353,6 +359,9 @@ Painel de Gestão
                 🗂️ Ver todos os eventos →
             </a>
         </div>
+
+    </div>
+{% endblock %}
 
     </div>
 {% endblock %}
