@@ -60,24 +60,21 @@ OPOs Geradas
 }
 </style>
 
-
-
 <div class="container mt-5 mb-5">
     <div class="card shadow-lg border-0 rounded-4">
         <div class="card-body p-4">
 
-            <h2 class="mb-4 fw-bold text-secondary">
-                📁 OPOs Geradas
-            </h2>
+            <h2 class="mb-4 fw-bold text-secondary">📁 OPOs Geradas</h2>
 
             {% if solicitacoes %}
-
             <table class="table table-hover align-middle">
                 <thead class="table-dark">
                     <tr>
                         <th>Protocolo</th>
+                        <th>Evento</th>
+                        <th>Data</th>
                         <th>Status</th>
-                        <th>Ação</th>
+                        <th>Documentos</th>
                     </tr>
                 </thead>
 
@@ -85,11 +82,37 @@ OPOs Geradas
                 {% for solicitacao in solicitacoes %}
                     <tr>
                         <td><strong>{{ solicitacao.protocolo }}</strong></td>
+                        <td>{{ solicitacao.nome_evento }}</td>
+                        <td>{{ solicitacao.data_evento|date:"d/m/Y" }}</td>
                         <td>{{ solicitacao.status }}</td>
+
                         <td>
-                            <a href="{% url 'documentos_solicitacao' solicitacao.id %}"
-                               class="btn btn-sm btn-primary">
-                                📄 Ver documentos
+                            {% if solicitacao.oficio_comandante %}
+                                <a href="{{ solicitacao.oficio_comandante.url }}" target="_blank" class="btn btn-sm btn-primary mb-1">
+                                    Ofício Comandante
+                                </a>
+                            {% endif %}
+
+                            {% if solicitacao.documento_sanitario %}
+                                <a href="{{ solicitacao.documento_sanitario.url }}" target="_blank" class="btn btn-sm btn-success mb-1">
+                                    Sanitário
+                                </a>
+                            {% endif %}
+
+                            {% if solicitacao.documento_meio_ambiente %}
+                                <a href="{{ solicitacao.documento_meio_ambiente.url }}" target="_blank" class="btn btn-sm btn-warning mb-1">
+                                    Meio Ambiente
+                                </a>
+                            {% endif %}
+
+                            {% if solicitacao.oficio_bombeiro %}
+                                <a href="{{ solicitacao.oficio_bombeiro.url }}" target="_blank" class="btn btn-sm btn-danger mb-1">
+                                    Bombeiro
+                                </a>
+                            {% endif %}
+
+                            <a href="{% url 'documentos_solicitacao' solicitacao.id %}" class="btn btn-sm btn-secondary mb-1">
+                                Ver todos
                             </a>
                         </td>
                     </tr>
@@ -112,6 +135,5 @@ OPOs Geradas
         </div>
     </div>
 </div>
-
 
 {% endblock %}
