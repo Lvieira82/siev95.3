@@ -138,17 +138,21 @@ Aprovações
                     </td>
 
                     <td class="col-acoes">
+
                         <a href="{% url 'documentos_solicitacao' s.id %}" class="btn-doc">
                             📁 Documentos
                         </a>
-
+                    
                         <a href="{% url 'aprovar_solicitacao' s.id %}" class="btn-gerar">
-                            Gerar OPO
+                            ✅ Gerar OPO
                         </a>
-                        <a href="{% url 'solicitar_correcao' solicitacao.id %}"
-                           class="btn btn-warning">
+                    
+                        <a href="{% url 'solicitar_correcao' s.id %}"
+                           class="btn-doc"
+                           style="background:#d97706;">
                             ✏️ Corrigir
                         </a>
+                    
                     </td>
                 </tr>
 
