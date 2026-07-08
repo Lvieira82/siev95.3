@@ -6,13 +6,13 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.utils import timezone
 import os   
+from django.shortcuts import render
+from pathlib import Path
 from reportlab.pdfgen import canvas
 from .models import Solicitacao
 from .forms import SolicitacaoForm
 from django.http import HttpResponse
 import traceback
-from django.shortcuts import render
-from django.shortcuts import render
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
@@ -493,3 +493,29 @@ def listar_pendentes_opo(request):
             "solicitacoes": solicitacoes,
         }
     )
+   
+def opos_geradas(request):
+    pasta_protocolos = Path(settings.MEDIA_ROOT) / "protocolos"
+
+    protocolos = []
+
+    if pasta_protocolos.exists():
+        for pasta in pasta_protocolos.iterdir():
+            if pasta.is_dir():
+                arquivos = []
+
+                for arquivo in pasta.iterdir():
+                    if arquivo.is_file() and arquivo.suffix.lower() == ".pdf":
+                        arquivos.append({
+                            "nome": arquivo.name,
+                            "url": f"{settings.MEDIA_URL}protocolos/{pasta.name}/{arquivo.name}",
+                        })
+
+                protocolos.append({
+                    "protocolo": pasta.name,
+                    "arquivos": arquivos,
+                })
+
+    return render(request, "solicitacoes/opos_geradas.html", {
+        "protocolos": protocolos
+    })
