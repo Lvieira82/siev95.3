@@ -534,34 +534,16 @@ def documentos_solicitacao(request, id):
         }
     )
 @login_required
+from django.shortcuts import render
+from apps.solicitacoes.models import Solicitacao
+
+
 def opos_geradas(request):
-    pasta_protocolos = Path(settings.MEDIA_ROOT) / "protocolos"
-
-    protocolos = []
-
-    if pasta_protocolos.exists():
-        for pasta in pasta_protocolos.iterdir():
-            if pasta.is_dir():
-                arquivos = []
-
-                for arquivo in pasta.iterdir():
-                    if arquivo.is_file() and arquivo.suffix.lower() == ".pdf":
-                        arquivos.append({
-                            "nome": arquivo.name,
-                            "url": f"{settings.MEDIA_URL}protocolos/{pasta.name}/{arquivo.name}",
-                        })
-
-                protocolos.append({
-                    "codigo": pasta.name,
-                    "arquivos": arquivos,
-                })
-
-    protocolos = sorted(protocolos, key=lambda x: x["codigo"])
+    solicitacoes = Solicitacao.objects.all().order_by("-id")
 
     return render(request, "solicitacoes/opos_geradas.html", {
-        "protocolos": protocolos,
+        "solicitacoes": solicitacoes
     })
-
 @login_required
 def detalhe_opo(request, id):
 
