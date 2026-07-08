@@ -93,7 +93,7 @@ urlpatterns = [
         "consulta/opo/<int:id>/matricula/",
         validar_matricula_opo_publica,
         name="validar_matricula_opo_publica"
-    
+    ),
     path(
         "consulta/opo/<int:id>/detalhes/",
         detalhe_opo_publica,
