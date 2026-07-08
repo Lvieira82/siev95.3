@@ -24,6 +24,7 @@ from apps.solicitacoes.views import (
     detalhe_opo,
     gerar_opo,
     validar_matricula_opo_publica,
+    detalhe_opo_publica,
 )
 
 urlpatterns = [
