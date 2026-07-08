@@ -25,6 +25,7 @@ from apps.solicitacoes.views import (
     gerar_opo,
     validar_matricula_opo_publica,
     detalhe_opo_publica,
+    solicitar_correcao,
 )
 
 urlpatterns = [
@@ -70,6 +71,11 @@ urlpatterns = [
         "painel/",
         painel_gestao,
         name="painel_gestao",
+    ),
+    path(
+        "solicitacao/<int:id>/corrigir/",
+        solicitar_correcao,
+        name="solicitar_correcao"
     ),
 
     path(
