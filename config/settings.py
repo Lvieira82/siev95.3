@@ -158,5 +158,5 @@ LOGOUT_REDIRECT_URL = '/'
 CSRF_TRUSTED_ORIGINS = [
     "https://siev95.com.br",
     "https://www.siev95.com.br",
-    "https://siev95.onrender.com",
+    "https://siev2.onrender.com",
 ]
