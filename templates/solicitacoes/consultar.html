@@ -120,6 +120,84 @@
             color:#111827;
             font-weight:bold;
         }
+        .eventos-dia-card{
+            background:white;
+            max-width:1000px;
+            margin:30px auto 0 auto;
+            padding:28px;
+            border-radius:16px;
+            box-shadow:0 8px 22px rgba(0,0,0,.08);
+        }
+
+        .eventos-dia-card h2{
+            color:#907C64;
+            margin-bottom:20px;
+            text-align:center;
+        }
+
+        .eventos-dia-lista{
+            display:flex;
+            flex-direction:column;
+            gap:14px;
+        }
+
+        .evento-dia-item{
+            background:#fff7ed;
+            border:2px solid #907C64;
+            border-radius:12px;
+            padding:16px 18px;
+            animation:piscarEvento 1.5s infinite;
+        }
+
+        .evento-dia-item strong{
+            color:#907C64;
+            font-size:18px;
+        }
+
+        .evento-dia-info{
+            margin-top:8px;
+            color:#374151;
+            line-height:1.5;
+        }
+
+        .sem-evento-dia{
+            background:#f3f4f6;
+            color:#6b7280;
+            text-align:center;
+            padding:18px;
+            border-radius:10px;
+            font-weight:bold;
+        }
+
+        @keyframes piscarEvento{
+            0%{
+                box-shadow:0 0 0 rgba(144,124,100,0);
+            }
+
+            50%{
+                box-shadow:0 0 18px rgba(144,124,100,.55);
+            }
+
+            100%{
+                box-shadow:0 0 0 rgba(144,124,100,0);
+            }
+        }
+
+        @media(max-width:768px){
+            .eventos-dia-card{
+                padding:20px;
+                margin:25px 10px 0 10px;
+            }
+
+            .evento-dia-item{
+                padding:14px;
+            }
+
+            .evento-dia-item strong{
+                font-size:16px;
+            }
+        }
+        
 
     </style>
 </head>
@@ -150,9 +228,48 @@
         <button type="submit">
             Consultar
         </button>
-
     </form>
 
+
+
+<div class="eventos-dia-card">
+
+    <h2>📢 Eventos do Dia</h2>
+
+    <div class="eventos-dia-lista">
+
+        {% for evento in eventos_hoje %}
+
+            <div class="evento-dia-item">
+
+                <strong>
+                    {{ evento.hora_inicio|time:"H:i" }} - {{ evento.nome_evento }}
+                </strong>
+
+                <div class="evento-dia-info">
+                    📍 {{ evento.local }}<br>
+                    👤 {{ evento.solicitante }}<br>
+                    ⚑
+                    {% if evento.status == "APROVADO" %}
+                        Ordem de Policiamento Criada
+                    {% else %}
+                        {{ evento.status }}
+                    {% endif %}
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <div class="sem-evento-dia">
+                Nenhum evento cadastrado para hoje.
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
     {% if solicitacao %}
 
     <div class="resultado">
