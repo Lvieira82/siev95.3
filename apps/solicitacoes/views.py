@@ -1,4 +1,5 @@
-
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Solicitacao, MatriculaAutorizada
 import os
 import base64
 from io import BytesIO
@@ -687,3 +688,28 @@ def verificar_autenticidade(request, protocolo):
             "solicitacao": solicitacao
         }
     )
+
+
+
+def validar_matricula_opo_publica(request, id):
+    solicitacao = get_object_or_404(
+        Solicitacao,
+        id=id,
+        status="APROVADO"
+    )
+
+    if request.method == "POST":
+        matricula = request.POST.get("matricula", "").strip()
+
+        if MatriculaAutorizada.objects.filter(
+            matricula=matricula,
+            ativo=True
+        ).exists():
+            request.session[f"opo_publica_autorizada_{id}"] = True
+            return redirect("detalhe_opo_publica", id=id)
+
+        messages.error(request, "Matrícula não autorizada.")
+
+    return render(request, "consulta/validar_matricula_opo.html", {
+        "solicitacao": solicitacao
+    })
