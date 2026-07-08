@@ -556,9 +556,9 @@ def opos_geradas(request):
 
     protocolos = sorted(protocolos, key=lambda x: x["codigo"])
 
-    return render(request, "solicitacoes/opos_geradas.html", {
-        "protocolos": protocolos,
-    })
+    return render(request, "gestao/opos_geradas.html", {
+    "protocolos": protocolos,
+})
 @login_required
 def detalhe_opo(request, id):
 
