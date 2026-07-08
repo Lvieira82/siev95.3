@@ -751,15 +751,11 @@ Motivo:
 
 Solicitamos que compareça à sede da 95ª CIPM para regularizar as pendências.
 
-Endereço:
-95ª Companhia Independente de Polícia Militar
-
 Após a regularização, uma nova análise será realizada.
 
 Atenciosamente,
 
-95ª CIPM
-Polícia Militar da Bahia
+Seção de Planejamento Operacional
 """
 
     send_mail(
