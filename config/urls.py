@@ -23,6 +23,7 @@ from apps.solicitacoes.views import (
     opos_geradas,
     detalhe_opo,
     gerar_opo,
+    validar_matricula_opo_publica,
 )
 
 urlpatterns = [
@@ -86,6 +87,11 @@ urlpatterns = [
         "nova/",
         nova_solicitacao,
         name="nova_solicitacao",
+    ),
+    path(
+        "consulta/opo/<int:id>/matricula/",
+        validar_matricula_opo_publica,
+        name="validar_matricula_opo_publica"
     ),
 
     path(
