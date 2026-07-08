@@ -3,9 +3,8 @@ import os
 import base64
 from io import BytesIO
 from datetime import date, timedelta
-
+from pathlib import Path
 import qrcode
-
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -16,7 +15,6 @@ from django.http import FileResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
-
 from .models import Solicitacao
 from .forms import SolicitacaoForm, SolicitacaoManualForm
 
@@ -535,10 +533,31 @@ def documentos_solicitacao(request, id):
     )
 @login_required
 def opos_geradas(request):
-    solicitacoes = Solicitacao.objects.all().order_by("-id")
+    pasta_protocolos = Path(settings.MEDIA_ROOT) / "protocolos"
+
+    protocolos = []
+
+    if pasta_protocolos.exists():
+        for pasta in pasta_protocolos.iterdir():
+            if pasta.is_dir():
+                arquivos = []
+
+                for arquivo in pasta.iterdir():
+                    if arquivo.is_file() and arquivo.suffix.lower() == ".pdf":
+                        arquivos.append({
+                            "nome": arquivo.name,
+                            "url": f"{settings.MEDIA_URL}protocolos/{pasta.name}/{arquivo.name}",
+                        })
+
+                protocolos.append({
+                    "codigo": pasta.name,
+                    "arquivos": arquivos,
+                })
+
+    protocolos = sorted(protocolos, key=lambda x: x["codigo"])
 
     return render(request, "solicitacoes/opos_geradas.html", {
-        "solicitacoes": solicitacoes
+        "protocolos": protocolos,
     })
 @login_required
 def detalhe_opo(request, id):
