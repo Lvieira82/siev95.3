@@ -26,11 +26,16 @@ from apps.solicitacoes.views import (
     validar_matricula_opo_publica,
     detalhe_opo_publica,
     solicitar_correcao,
+    importar_matriculas_painel,
 )
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-
+    path(
+        "gestao/importar-matriculas/",
+        importar_matriculas_painel,
+        name="importar_matriculas_painel"
+    ),
     path(
         "documento/<int:id>/<str:tipo>/",
         abrir_documento_solicitacao,
@@ -117,7 +122,7 @@ urlpatterns = [
         dashboard_operacional,
         name="dashboard_operacional",
     ),
-
+   
     path(
         "verificar/<str:protocolo>/",
         verificar_autenticidade,
