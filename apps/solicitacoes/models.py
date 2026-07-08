@@ -197,3 +197,39 @@ class Solicitacao(models.Model):
     def __str__(self):
 
         return f"{self.protocolo} - {self.nome_evento}"
+
+class MatriculaAutorizada(models.Model):
+
+    matricula = models.CharField(
+        max_length=20,
+        unique=True
+    )
+
+    nome = models.CharField(
+        max_length=120
+    )
+
+    posto = models.CharField(
+        max_length=20,
+        blank=True
+    )
+
+    unidade = models.CharField(
+        max_length=80,
+        blank=True
+    )
+
+    ativo = models.BooleanField(
+        default=True
+    )
+
+    criado_em = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = "Matrícula Autorizada"
+        verbose_name_plural = "Matrículas Autorizadas"
+
+    def __str__(self):
+        return f"{self.posto} {self.nome} - {self.matricula}"
