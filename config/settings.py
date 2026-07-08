@@ -37,11 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'rest_framework',
     'crispy_forms',
     'crispy_bootstrap5',
-
     'apps.usuarios.apps.UsuariosConfig',
     'apps.solicitacoes.apps.SolicitacoesConfig',
     'apps.documentos.apps.DocumentosConfig',
@@ -126,7 +124,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # =====================
 MEDIA_URL = '/media/'
 if os.environ.get("RENDER") == "true":
-    MEDIA_ROOT = os.environ.get("MEDIA_ROOT", "/var/data/media")
+    MEDIA_ROOT = "/var/data/media"
 else:
     MEDIA_ROOT = BASE_DIR / "media"
 
