@@ -1,49 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <title>Consultar Protocolo - SiEv</title>
 
     <style>
-        .evento-dia-info{
-            margin-top:8px;
-            color:#374151;
-            line-height:1.5;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            gap:15px;
-        }
-        
-        .btn-detalhes-evento{
-            background:#907C64;
-            color:white;
-            padding:10px 18px;
-            border-radius:8px;
-            text-decoration:none;
-            font-weight:bold;
-            white-space:nowrap;
-            transition:.25s;
-        }
-        
-        .btn-detalhes-evento:hover{
-            background:#111827;
-            transform:translateY(-2px);
-        }
-        
-        @media(max-width:768px){
-            .evento-dia-info{
-                flex-direction:column;
-                align-items:flex-start;
-            }
-        
-            .btn-detalhes-evento{
-                width:100%;
-                text-align:center;
-                margin-top:10px;
-            }
-
         *{
             margin:0;
             padding:0;
@@ -52,42 +13,17 @@
         }
 
         body{
-            background:linear-gradient(
-                135deg,
-                #907C64
-              
-            );
+            background:#907C64;
             min-height:100vh;
             display:flex;
             justify-content:center;
             align-items:center;
+            padding:30px 12px;
         }
-        .acoes-formulario{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-top:35px;
-        }
-
-        .btn-voltar{
-            display:inline-block;
-            padding:12px 26px;
-            background:#6b7280;
-            color:#fff;
-            border-radius:10px;
-            text-decoration:none;
-            font-weight:600;
-            transition:.25s;
-        }
-
-        .btn-voltar:hover{
-            background:#4b5563;
-            transform:translateY(-2px);
-        }
-        
 
         .card{
             width:500px;
+            max-width:100%;
             background:white;
             border-radius:20px;
             padding:40px;
@@ -137,31 +73,10 @@
             background:#111827;
         }
 
-        .resultado{
-            margin-top:25px;
-            text-align:left;
-            background:#f4f6f9;
-            padding:20px;
-            border-radius:10px;
-        }
-
-        .status{
-            font-weight:bold;
-            color:#111827;
-        }
-
-        .voltar{
-            display:block;
-            margin-top:20px;
-            text-decoration:none;
-            color:#111827;
-            font-weight:bold;
-        }
         .eventos-dia-card{
             background:white;
-            max-width:1000px;
             margin:30px auto 0 auto;
-            padding:28px;
+            padding:25px;
             border-radius:16px;
             box-shadow:0 8px 22px rgba(0,0,0,.08);
         }
@@ -183,7 +98,6 @@
             border:2px solid #907C64;
             border-radius:12px;
             padding:16px 18px;
-            animation:piscarEvento 1.5s infinite;
         }
 
         .evento-dia-item strong{
@@ -192,9 +106,27 @@
         }
 
         .evento-dia-info{
-            margin-top:8px;
+            margin-top:10px;
             color:#374151;
             line-height:1.5;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:15px;
+        }
+
+        .btn-detalhes-evento{
+            background:#907C64;
+            color:white;
+            padding:10px 18px;
+            border-radius:8px;
+            text-decoration:none;
+            font-weight:bold;
+            white-space:nowrap;
+        }
+
+        .btn-detalhes-evento:hover{
+            background:#111827;
         }
 
         .sem-evento-dia{
@@ -206,36 +138,53 @@
             font-weight:bold;
         }
 
-        @keyframes piscarEvento{
-            0%{
-                box-shadow:0 0 0 rgba(144,124,100,0);
-            }
+        .resultado{
+            margin-top:25px;
+            text-align:left;
+            background:#f4f6f9;
+            padding:20px;
+            border-radius:10px;
+        }
 
-            50%{
-                box-shadow:0 0 18px rgba(144,124,100,.55);
-            }
+        .status{
+            font-weight:bold;
+            color:#111827;
+        }
 
-            100%{
-                box-shadow:0 0 0 rgba(144,124,100,0);
-            }
+        .btn-voltar{
+            display:inline-block;
+            margin-top:30px;
+            padding:12px 26px;
+            background:#6b7280;
+            color:#fff;
+            border-radius:10px;
+            text-decoration:none;
+            font-weight:600;
+        }
+
+        .btn-voltar:hover{
+            background:#4b5563;
         }
 
         @media(max-width:768px){
-            .eventos-dia-card{
-                padding:20px;
-                margin:25px 10px 0 10px;
+            .card{
+                padding:25px;
             }
 
-            .evento-dia-item{
-                padding:14px;
+            .logo{
+                font-size:46px;
             }
 
-            .evento-dia-item strong{
-                font-size:16px;
+            .evento-dia-info{
+                flex-direction:column;
+                align-items:flex-start;
+            }
+
+            .btn-detalhes-evento{
+                width:100%;
+                text-align:center;
             }
         }
-        
-
     </style>
 </head>
 
@@ -252,9 +201,6 @@
     <h2>Consultar Informação</h2>
 
     <form method="get">
-
-        {% csrf_token %}
-
         <input
             type="text"
             name="protocolo"
@@ -262,103 +208,76 @@
             required
         >
 
-        <button type="submit">
-            Consultar
-        </button>
+        <button type="submit">Consultar</button>
     </form>
 
+    <div class="eventos-dia-card">
 
+        <h2>📢 Eventos do Dia</h2>
 
-<div class="eventos-dia-card">
+        <div class="eventos-dia-lista">
 
-    <h2>📢 Eventos do Dia</h2>
+            {% for evento in eventos_hoje %}
 
-    <div class="eventos-dia-lista">
+                <div class="evento-dia-item">
 
-        {% for evento in eventos_hoje %}
+                    <strong>
+                        {{ evento.hora_inicio|time:"H:i" }} - {{ evento.nome_evento }}
+                    </strong>
 
-            <div class="evento-dia-item">
+                    <div class="evento-dia-info">
 
-                <strong>
-                    {{ evento.hora_inicio|time:"H:i" }} - {{ evento.nome_evento }}
-                </strong>
+                        <div>
+                            📍 {{ evento.local }}<br>
+                            👤 {{ evento.solicitante }}<br>
+                            ⚑
+                            {% if evento.status == "APROVADO" %}
+                                Ordem de Policiamento Criada
+                            {% else %}
+                                {{ evento.status }}
+                            {% endif %}
+                        </div>
 
-                <div class="evento-dia-info">
-                    <div>
-                        📍 {{ evento.local }}<br>
-                        👤 {{ evento.solicitante }}<br>
-                        ⚑
-                        {% if evento.status == "APROVADO" %}
-                            Ordem de Policiamento Criada
-                        {% else %}
-                            {{ evento.status }}
-                        {% endif %}
+                        <a href="{% url 'validar_matricula_opo_publica' evento.id %}"
+                           class="btn-detalhes-evento">
+                            Detalhes
+                        </a>
+
                     </div>
 
-                    <a href="{% url 'validar_matricula_opo_publica' evento.id %}"
-                       class="btn-detalhes-evento">
-                        Detalhes
-                    </a>
                 </div>
 
-            </div>
+            {% empty %}
 
-        {% empty %}
+                <div class="sem-evento-dia">
+                    Nenhum evento cadastrado para hoje.
+                </div>
 
-            <div class="sem-evento-dia">
-                Nenhum evento cadastrado para hoje.
-            </div>
+            {% endfor %}
 
-        {% endfor %}
+        </div>
 
     </div>
 
-</div>
     {% if solicitacao %}
 
-    <div class="resultado">
-
-        <p>
-            <strong>Protocolo:</strong>
-            {{ solicitacao.protocolo }}
-        </p>
-
-        <br>
-
-        <p>
-            <strong>Evento:</strong>
-            {{ solicitacao.nome_evento }}
-        </p>
-
-        <br>
-
-        <p>
-            <strong>Solicitante:</strong>
-            {{ solicitacao.solicitante }}
-        </p>
-
-        <br>
-
-        <p>
-            <strong>Status:</strong>
-            <span class="status">
-                {{ solicitacao.status }}
-            </span>
-        </p>
-
-    </div>
+        <div class="resultado">
+            <p><strong>Protocolo:</strong> {{ solicitacao.protocolo }}</p><br>
+            <p><strong>Evento:</strong> {{ solicitacao.nome_evento }}</p><br>
+            <p><strong>Solicitante:</strong> {{ solicitacao.solicitante }}</p><br>
+            <p>
+                <strong>Status:</strong>
+                <span class="status">{{ solicitacao.status }}</span>
+            </p>
+        </div>
 
     {% endif %}
 
     {% if erro %}
 
-    <div class="resultado">
-
-        <strong style="color:red;">
-            {{ erro }}
-        </strong>
-
-    </div>
+        <div class="resultado">
+            <strong style="color:red;">{{ erro }}</strong>
+        </div>
 
     {% endif %}
 
@@ -367,5 +286,6 @@
     </a>
 
 </div>
+
 </body>
 </html>
