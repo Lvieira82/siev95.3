@@ -66,54 +66,33 @@ OPOs Geradas
 
             <h2 class="mb-4 fw-bold text-secondary">📁 OPOs Geradas</h2>
 
-            {% if solicitacoes %}
+            {% if protocolos %}
+
             <table class="table table-hover align-middle">
                 <thead class="table-dark">
                     <tr>
                         <th>Protocolo</th>
-                        <th>Evento</th>
-                        <th>Data</th>
-                        <th>Status</th>
                         <th>Documentos</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                {% for solicitacao in solicitacoes %}
+                {% for protocolo in protocolos %}
                     <tr>
-                        <td><strong>{{ solicitacao.protocolo }}</strong></td>
-                        <td>{{ solicitacao.nome_evento }}</td>
-                        <td>{{ solicitacao.data_evento|date:"d/m/Y" }}</td>
-                        <td>{{ solicitacao.status }}</td>
+                        <td>
+                            <strong>{{ protocolo.codigo }}</strong>
+                        </td>
 
                         <td>
-                            {% if solicitacao.oficio_comandante %}
-                                <a href="{{ solicitacao.oficio_comandante.url }}" target="_blank" class="btn btn-sm btn-primary mb-1">
-                                    Ofício Comandante
+                            {% for arquivo in protocolo.arquivos %}
+                                <a href="{{ arquivo.url }}"
+                                   target="_blank"
+                                   class="btn btn-sm btn-primary mb-1">
+                                    📄 {{ arquivo.nome }}
                                 </a>
-                            {% endif %}
-
-                            {% if solicitacao.documento_sanitario %}
-                                <a href="{{ solicitacao.documento_sanitario.url }}" target="_blank" class="btn btn-sm btn-success mb-1">
-                                    Sanitário
-                                </a>
-                            {% endif %}
-
-                            {% if solicitacao.documento_meio_ambiente %}
-                                <a href="{{ solicitacao.documento_meio_ambiente.url }}" target="_blank" class="btn btn-sm btn-warning mb-1">
-                                    Meio Ambiente
-                                </a>
-                            {% endif %}
-
-                            {% if solicitacao.oficio_bombeiro %}
-                                <a href="{{ solicitacao.oficio_bombeiro.url }}" target="_blank" class="btn btn-sm btn-danger mb-1">
-                                    Bombeiro
-                                </a>
-                            {% endif %}
-
-                            <a href="{% url 'documentos_solicitacao' solicitacao.id %}" class="btn btn-sm btn-secondary mb-1">
-                                Ver todos
-                            </a>
+                            {% empty %}
+                                <span class="text-muted">Nenhum PDF encontrado.</span>
+                            {% endfor %}
                         </td>
                     </tr>
                 {% endfor %}
@@ -122,7 +101,7 @@ OPOs Geradas
 
             {% else %}
                 <div class="alert alert-warning">
-                    Nenhuma solicitação encontrada.
+                    Nenhum protocolo encontrado.
                 </div>
             {% endif %}
 
