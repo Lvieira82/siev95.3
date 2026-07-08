@@ -125,10 +125,10 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # MEDIA
 # =====================
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.environ.get(
-    "MEDIA_ROOT",
-    BASE_DIR / "media"
-)
+if os.environ.get("RENDER") == "true":
+    MEDIA_ROOT = os.environ.get("MEDIA_ROOT", "/var/data/media")
+else:
+    MEDIA_ROOT = BASE_DIR / "media"
 
 # =====================
 # CRISPY FORMS
