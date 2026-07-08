@@ -125,20 +125,7 @@ urlpatterns = [
         name="listar_pendentes_opo"
     ),
 ]
-urlpatterns = [
-    "https://siev95.com.br",
-    "https://www.siev95.com.br",
-    "https://siev2.onrender.com",
-]
 
-urlpatterns += [
-    re_path(
-        r'^media/(?P<path>.*)$',
-        serve,
-        {'document_root': settings.MEDIA_ROOT},
-    ),
-]
-urlpatterns += [
     re_path(
         r'^media/(?P<path>.*)$',
         serve,
