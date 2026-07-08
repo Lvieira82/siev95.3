@@ -1,5 +1,5 @@
 from django.contrib import admin
-
+from .models import MatriculaAutorizada
 from django.utils import timezone
 
 from .models import Solicitacao
@@ -60,4 +60,27 @@ class SolicitacaoAdmin(admin.ModelAdmin):
 
     aprovar_solicitacao.short_description = (
         'Aprovar solicitações'
+    )
+@admin.register(MatriculaAutorizada)
+class MatriculaAutorizadaAdmin(admin.ModelAdmin):
+    list_display = (
+        "matricula",
+        "nome",
+        "posto",
+        "unidade",
+        "ativo",
+        "criado_em",
+    )
+
+    search_fields = (
+        "matricula",
+        "nome",
+        "posto",
+        "unidade",
+    )
+
+    list_filter = (
+        "ativo",
+        "posto",
+        "unidade",
     )
