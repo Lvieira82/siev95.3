@@ -145,6 +145,10 @@ Aprovações
                         <a href="{% url 'aprovar_solicitacao' s.id %}" class="btn-gerar">
                             Gerar OPO
                         </a>
+                        <a href="{% url 'solicitar_correcao' solicitacao.id %}"
+                           class="btn btn-warning">
+                            ✏️ Corrigir
+                        </a>
                     </td>
                 </tr>
 
