@@ -63,6 +63,23 @@ OPOs Geradas
 <div class="card-opos">
 
     <h1>🗂️ OPOs Geradas</h1>
+    {% for item in protocolos %}
+        <div class="card mb-3 p-3">
+            <h4>Protocolo: {{ item.protocolo }}</h4>
+    
+            {% if item.arquivos %}
+                {% for arquivo in item.arquivos %}
+                    <a href="{{ arquivo.url }}" target="_blank" class="btn btn-primary btn-sm mb-2">
+                        Abrir {{ arquivo.nome }}
+                    </a>
+                {% endfor %}
+            {% else %}
+                <p>Nenhum PDF encontrado.</p>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p>Nenhum protocolo encontrado.</p>
+    {% endfor %}
 
     <table class="tabela">
         <thead>
