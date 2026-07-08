@@ -60,67 +60,81 @@ OPOs Geradas
 }
 </style>
 
-<div class="container mt-4 mb-5">
+{% block content %}
+
+<div class="container mt-5 mb-5">
 
     <div class="card shadow-lg border-0 rounded-4">
 
-        <div class="card-body">
+        <div class="card-body p-4">
 
             <h2 class="mb-4 fw-bold text-secondary">
                 📁 OPOs Geradas
             </h2>
 
-            {% if protocolos %}
+            {% if solicitacoes %}
 
             <table class="table table-hover align-middle">
 
                 <thead class="table-dark">
-
                     <tr>
-                        <th width="220">Protocolo</th>
+                        <th>Protocolo</th>
+                        <th>Evento</th>
+                        <th>Data do Evento</th>
                         <th>Documentos</th>
                     </tr>
-
                 </thead>
 
                 <tbody>
 
-                {% for protocolo in protocolos %}
+                {% for solicitacao in solicitacoes %}
 
                     <tr>
+                        <td>
+                            <strong>{{ solicitacao.protocolo }}</strong>
+                        </td>
 
                         <td>
+                            {{ solicitacao.nome_evento|default:"-" }}
+                        </td>
 
-                            <strong>{{ protocolo.codigo }}</strong>
-
+                        <td>
+                            {{ solicitacao.data_evento|date:"d/m/Y"|default:"-" }}
                         </td>
 
                         <td>
 
-                            {% if protocolo.arquivos %}
+                            {% if solicitacao.oficio_comandante %}
+                                <a href="{{ solicitacao.oficio_comandante.url }}"
+                                   target="_blank"
+                                   class="btn btn-sm btn-primary mb-1">
+                                    📄 Ofício
+                                </a>
+                            {% endif %}
 
-                                {% for arquivo in protocolo.arquivos %}
+                            {% if solicitacao.documento_sanitario %}
+                                <a href="{{ solicitacao.documento_sanitario.url }}"
+                                   target="_blank"
+                                   class="btn btn-sm btn-success mb-1">
+                                    📄 Sanitário
+                                </a>
+                            {% endif %}
 
-                                    <a href="{{ arquivo.url }}"
-                                       target="_blank"
-                                       class="btn btn-sm btn-primary me-2 mb-2">
+                            {% if solicitacao.documento_meio_ambiente %}
+                                <a href="{{ solicitacao.documento_meio_ambiente.url }}"
+                                   target="_blank"
+                                   class="btn btn-sm btn-warning mb-1">
+                                    📄 Meio Ambiente
+                                </a>
+                            {% endif %}
 
-                                        📄 {{ arquivo.nome }}
-
-                                    </a>
-
-                                {% endfor %}
-
-                            {% else %}
-
+                            {% if not solicitacao.oficio_comandante and not solicitacao.documento_sanitario and not solicitacao.documento_meio_ambiente %}
                                 <span class="text-muted">
-                                    Nenhum documento encontrado.
+                                    Nenhum PDF encontrado
                                 </span>
-
                             {% endif %}
 
                         </td>
-
                     </tr>
 
                 {% endfor %}
@@ -131,21 +145,16 @@ OPOs Geradas
 
             {% else %}
 
-            <div class="alert alert-warning">
-
-                Nenhum protocolo encontrado.
-
-            </div>
+                <div class="alert alert-warning">
+                    Nenhuma solicitação encontrada.
+                </div>
 
             {% endif %}
 
             <hr>
 
-            <a href="{% url 'painel_gestao' %}"
-               class="btn btn-secondary">
-
+            <a href="{% url 'painel_gestao' %}" class="btn btn-secondary">
                 ← Voltar ao Painel
-
             </a>
 
         </div>
