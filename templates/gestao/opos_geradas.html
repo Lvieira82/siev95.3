@@ -60,45 +60,98 @@ OPOs Geradas
 }
 </style>
 
-<div class="card-opos">
+<div class="container mt-4 mb-5">
 
-   <h1>📁 OPOs Geradas</h1>
+    <div class="card shadow-lg border-0 rounded-4">
 
-{% if protocolos %}
-    <table>
-        <thead>
-            <tr>
-                <th>Protocolo</th>
-                <th>Documentos</th>
-            </tr>
-        </thead>
+        <div class="card-body">
 
-        <tbody>
-            {% for item in protocolos %}
-                <tr>
-                    <td>
-                        <strong>{{ item.codigo }}</strong>
-                    </td>
+            <h2 class="mb-4 fw-bold text-secondary">
+                📁 OPOs Geradas
+            </h2>
 
-                    <td>
-                        {% for arquivo in item.arquivos %}
-                            <a href="{{ arquivo.url }}" target="_blank" class="btn btn-sm btn-primary">
-                                {{ arquivo.nome }}
-                            </a>
-                        {% empty %}
-                            Nenhum PDF encontrado.
-                        {% endfor %}
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>Nenhum protocolo encontrado.</p>
-{% endif %}
+            {% if protocolos %}
 
-<a href="{% url 'painel_gestao' %}" class="btn btn-secondary">
-    ← Voltar ao Painel
-</a>
+            <table class="table table-hover align-middle">
 
-{% endblock %}  
+                <thead class="table-dark">
+
+                    <tr>
+                        <th width="220">Protocolo</th>
+                        <th>Documentos</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for protocolo in protocolos %}
+
+                    <tr>
+
+                        <td>
+
+                            <strong>{{ protocolo.codigo }}</strong>
+
+                        </td>
+
+                        <td>
+
+                            {% if protocolo.arquivos %}
+
+                                {% for arquivo in protocolo.arquivos %}
+
+                                    <a href="{{ arquivo.url }}"
+                                       target="_blank"
+                                       class="btn btn-sm btn-primary me-2 mb-2">
+
+                                        📄 {{ arquivo.nome }}
+
+                                    </a>
+
+                                {% endfor %}
+
+                            {% else %}
+
+                                <span class="text-muted">
+                                    Nenhum documento encontrado.
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+            <div class="alert alert-warning">
+
+                Nenhum protocolo encontrado.
+
+            </div>
+
+            {% endif %}
+
+            <hr>
+
+            <a href="{% url 'painel_gestao' %}"
+               class="btn btn-secondary">
+
+                ← Voltar ao Painel
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
