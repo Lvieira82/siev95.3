@@ -534,10 +534,6 @@ def documentos_solicitacao(request, id):
         }
     )
 @login_required
-from django.shortcuts import render
-from apps.solicitacoes.models import Solicitacao
-
-
 def opos_geradas(request):
     solicitacoes = Solicitacao.objects.all().order_by("-id")
 
