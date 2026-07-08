@@ -93,23 +93,23 @@ Documentos da Solicitação
 
     <div class="doc-lista">
 
-        {% for doc in documentos %}
+        {% for documento in documentos %}
 
-            {% if doc.arquivo %}
+    {% if documento.arquivo %}
+        <a
+            href="{% url 'abrir_documento_solicitacao' solicitacao.id documento.tipo %}"
+            target="_blank"
+            class="item"
+        >
+            📄 Abrir {{ documento.nome }}
+        </a>
+    {% else %}
+        <div class="aviso">
+            ⚠ {{ documento.nome }} não foi anexado.
+        </div>
+    {% endif %}
 
-                <a href="{{ doc.url }}" target="_blank" class="doc-link">
-                    📄 Abrir {{ doc.nome }}
-                </a>
-
-            {% else %}
-
-                <div class="aviso">
-                    ⚠ {{ doc.nome }} não foi anexado.
-                </div>
-
-            {% endif %}
-
-        {% endfor %}
+{% endfor %}
 
     </div>
 
