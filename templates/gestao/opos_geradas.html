@@ -62,63 +62,43 @@ OPOs Geradas
 
 <div class="card-opos">
 
-    <h1>🗂️ OPOs Geradas</h1>
-    {% for item in protocolos %}
-        <div class="card mb-3 p-3">
-            <h4>Protocolo: {{ item.protocolo }}</h4>
-    
-            {% if item.arquivos %}
-                {% for arquivo in item.arquivos %}
-                    <a href="{{ arquivo.url }}" target="_blank" class="btn btn-primary btn-sm mb-2">
-                        Abrir {{ arquivo.nome }}
-                    </a>
-                {% endfor %}
-            {% else %}
-                <p>Nenhum PDF encontrado.</p>
-            {% endif %}
-        </div>
-    {% empty %}
-        <p>Nenhum protocolo encontrado.</p>
-    {% endfor %}
+   <h1>📁 OPOs Geradas</h1>
 
-    <table class="tabela">
+{% if protocolos %}
+    <table>
         <thead>
             <tr>
                 <th>Protocolo</th>
-                <th>Evento</th>
-                <th>Data do Evento</th>
-                <th>Aprovado por</th>
-                <th>Data da OPO</th>
-                <th>Ação</th>
+                <th>Documentos</th>
             </tr>
         </thead>
 
         <tbody>
-            {% for s in solicitacoes %}
-            <tr>
-                <td>{{ s.protocolo }}</td>
-                <td>{{ s.nome_evento }}</td>
-                <td>{{ s.data_evento|date:"d/m/Y" }}</td>
-                <td>{{ s.aprovado_por|default:"-" }}</td>
-                <td>{{ s.data_aprovacao|date:"d/m/Y H:i" }}</td>
-                <td>
-                    <a href="{% url 'detalhe_opo' s.id %}" class="btn">
-                        📁 Abrir Pasta
-                    </a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6">Nenhuma OPO gerada ainda.</td>
-            </tr>
+            {% for item in protocolos %}
+                <tr>
+                    <td>
+                        <strong>{{ item.codigo }}</strong>
+                    </td>
+
+                    <td>
+                        {% for arquivo in item.arquivos %}
+                            <a href="{{ arquivo.url }}" target="_blank" class="btn btn-sm btn-primary">
+                                {{ arquivo.nome }}
+                            </a>
+                        {% empty %}
+                            Nenhum PDF encontrado.
+                        {% endfor %}
+                    </td>
+                </tr>
             {% endfor %}
         </tbody>
     </table>
+{% else %}
+    <p>Nenhum protocolo encontrado.</p>
+{% endif %}
 
-    <a href="{% url 'painel_gestao' %}" class="btn-voltar">
-        ← Voltar ao Painel
-    </a>
-
-</div>
+<a href="{% url 'painel_gestao' %}" class="btn btn-secondary">
+    ← Voltar ao Painel
+</a>
 
 {% endblock %}  
