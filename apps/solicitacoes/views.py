@@ -123,6 +123,13 @@ def consultar_protocolo(request):
     solicitacao = None
     erro = None
 
+    eventos_hoje = Solicitacao.objects.filter(
+        data_evento=date.today()
+    ).order_by(
+        "hora_inicio",
+        "nome_evento"
+    )
+
     if protocolo:
 
         solicitacao = Solicitacao.objects.filter(
@@ -138,9 +145,9 @@ def consultar_protocolo(request):
         {
             "solicitacao": solicitacao,
             "erro": erro,
+            "eventos_hoje": eventos_hoje,
         }
     )
-
 
 # =====================================================
 # MINHAS SOLICITAÇÕES
