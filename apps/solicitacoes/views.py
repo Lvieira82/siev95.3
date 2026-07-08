@@ -500,42 +500,27 @@ def gerar_opo(request, id):
 @login_required
 def documentos_solicitacao(request, id):
 
-    solicitacao = get_object_or_404(
-        Solicitacao,
-        id=id
-    )
+    solicitacao = get_object_or_404(Solicitacao, id=id)
 
     documentos = [
         {
             "nome": "Documento Sanitário",
-            "url": reverse(
-                "abrir_documento_solicitacao",
-                args=[solicitacao.id, "sanitario"]
-            ),
+            "tipo": "sanitario",
             "arquivo": solicitacao.documento_sanitario,
         },
         {
             "nome": "Documento Meio Ambiente",
-            "url": reverse(
-                "abrir_documento_solicitacao",
-                args=[solicitacao.id, "meio_ambiente"]
-            ),
+            "tipo": "meio_ambiente",
             "arquivo": solicitacao.documento_meio_ambiente,
         },
         {
             "nome": "Ofício ao Comandante",
-            "url": reverse(
-                "abrir_documento_solicitacao",
-                args=[solicitacao.id, "comandante"]
-            ),
+            "tipo": "comandante",
             "arquivo": solicitacao.oficio_comandante,
         },
         {
             "nome": "Documento Corpo de Bombeiros",
-            "url": reverse(
-                "abrir_documento_solicitacao",
-                args=[solicitacao.id, "bombeiro"]
-            ),
+            "tipo": "bombeiro",
             "arquivo": solicitacao.oficio_bombeiro,
         },
     ]
