@@ -146,11 +146,7 @@ urlpatterns = [
         gerar_opo,
         name="gerar_opo",
     ),
-    path(
-        "corrigir/<int:id>/",
-        solicitar_correcao,
-        name="solicitar_correcao",
-    ),
+    
 
     path(
         "aprovacoes/",
