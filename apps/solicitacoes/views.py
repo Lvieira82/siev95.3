@@ -181,18 +181,46 @@ def minhas_solicitacoes(request):
             "erro": erro,
         }
     )
-def corrigir_solicitacao(request, protocolo):
+@login_required
+def corrigir_solicitacao(request, id):
 
     solicitacao = get_object_or_404(
         Solicitacao,
-        protocolo=protocolo
+        id=id
     )
+
+    if request.method == "POST":
+
+        form = SolicitacaoForm(
+            request.POST,
+            request.FILES,
+            instance=solicitacao
+        )
+
+        if form.is_valid():
+
+            obj = form.save(commit=False)
+
+            obj.status = "PENDENTE"
+
+            obj.save()
+
+            messages.success(
+                request,
+                "Correções enviadas com sucesso."
+            )
+
+            return redirect("consultar_protocolo")
+
+    else:
+
+        form = SolicitacaoForm(instance=solicitacao)
 
     return render(
         request,
         "nova_solicitacao.html",
         {
-            "modo_correcao": True,
+            "form": form,
             "solicitacao": solicitacao,
         }
     )
