@@ -181,7 +181,21 @@ def minhas_solicitacoes(request):
             "erro": erro,
         }
     )
+def corrigir_solicitacao(request, protocolo):
 
+    solicitacao = get_object_or_404(
+        Solicitacao,
+        protocolo=protocolo
+    )
+
+    return render(
+        request,
+        "nova_solicitacao.html",
+        {
+            "modo_correcao": True,
+            "solicitacao": solicitacao,
+        }
+    )
 
 # =====================================================
 # LOGIN / LOGOUT GESTÃO
