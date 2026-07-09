@@ -268,12 +268,14 @@
             <p>
                 <strong>Status:</strong>
 
-                    {% if solicitacao.status == "CORREÇÃO" %}
-                    
-                    <a href="{% url 'corrigir_solicitacao' solicitacao.protocolo %}"
-                       class="btn-correcao">
-                        ✏ Corrigir Solicitação
+                    {% if solicitacao.status == "CORRECAO" %}
+
+                    <a href="{% url 'corrigir_solicitacao' solicitacao.id %}"
+                       class="btn-principal">
+                        ✏️ Corrigir Solicitação
                     </a>
+                    
+                    {% endif %}
                     
                     {% else %}
                     
