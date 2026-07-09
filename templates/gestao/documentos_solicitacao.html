@@ -7,6 +7,35 @@ Documentos da Solicitação
 {% block content %}
 
 <style>
+.btn-gerar{
+    display:inline-block;
+    padding:14px 26px;
+    background:#28a745;
+    color:white;
+    text-decoration:none;
+    border-radius:10px;
+    font-weight:bold;
+    margin-right:10px;
+    transition:.3s;
+}
+
+.btn-gerar:hover{
+    background:#218838;
+}
+
+.btn-voltar{
+    display:inline-block;
+    padding:14px 26px;
+    background:#6b7280;
+    color:white;
+    text-decoration:none;
+    border-radius:10px;
+    font-weight:bold;
+}
+
+.btn-voltar:hover{
+    background:#4b5563;
+}
 .doc-card{
     background:white;
     max-width:1000px;
@@ -112,7 +141,23 @@ Documentos da Solicitação
 {% endfor %}
 
     </div>
+    <div style="margin-top:30px;">
 
+    {% if solicitacao.status == "CORREÇÃO" %}
+
+        <a href="{% url 'aprovar_solicitacao' solicitacao.id %}"
+           class="btn-gerar">
+            ✔ Gerar OPO
+        </a>
+
+    {% endif %}
+
+    <a href="{% url 'listar_pendentes_opo' %}"
+       class="btn-voltar">
+        ← Voltar para Aprovações
+    </a>
+
+</div>
     <div class="acoes">
         <a href="{% url 'listar_pendentes_opo' %}" class="btn-voltar">
             ← Voltar para Aprovações
