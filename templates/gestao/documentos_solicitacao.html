@@ -159,11 +159,15 @@ Documentos da Solicitação
 
 </div>
     <div class="acoes">
-        <a href="{% url 'listar_pendentes_opo' %}" class="btn-voltar">
+        {% if solicitacao.status == "CORREÇÃO" %}
+        <a href="{% url 'aprovar_solicitacao' solicitacao.id %}"
+           class="btn-gerar">
+            ✔ Gerar OPO
+        </a>
+        {% endif %}
+        
+        <a href="{% url 'listar_pendentes_opo' %}"
+           class="btn-voltar">
             ← Voltar para Aprovações
         </a>
-    </div>
-
-</div>
-
 {% endblock %}
