@@ -267,7 +267,21 @@
             <p><strong>Solicitante:</strong> {{ solicitacao.solicitante }}</p><br>
             <p>
                 <strong>Status:</strong>
-                <span class="status">{{ solicitacao.status }}</span>
+
+                    {% if solicitacao.status == "CORREÇÃO" %}
+                    
+                    <a href="{% url 'corrigir_solicitacao' solicitacao.protocolo %}"
+                       class="btn-correcao">
+                        ✏ Corrigir Solicitação
+                    </a>
+                    
+                    {% else %}
+                    
+                    <span class="status">
+                        {{ solicitacao.status }}
+                    </span>
+                    
+                    {% endif %}
             </p>
         </div>
 
