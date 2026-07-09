@@ -27,6 +27,7 @@ from apps.solicitacoes.views import (
     detalhe_opo_publica,
     solicitar_correcao,
     importar_matriculas_painel,
+    corrigir_solicitacao,
 )
 
 urlpatterns = [
