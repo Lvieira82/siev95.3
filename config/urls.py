@@ -59,7 +59,11 @@ urlpatterns = [
         detalhe_opo,
         name="detalhe_opo",
     ),
-
+    path(
+        "corrigir/<str:protocolo>/",
+        corrigir_solicitacao,
+        name="corrigir_solicitacao",
+    ),
     path("", home, name="home"),
 
     path(
