@@ -184,7 +184,11 @@ textarea{
 <div class="form-card">
 
     <h1 class="form-title">
-        Informação de Evento
+        {% if solicitacao %}
+            Corrigir Solicitação
+        {% else %}
+            Informação de Evento
+        {% endif %}
     </h1>
 
     <div class="termos-lei">
@@ -278,6 +282,12 @@ textarea{
     <div id="areaFormulario">
 
         <form method="post" enctype="multipart/form-data">
+            
+            {% csrf_token %}
+            
+            {% if solicitacao %}
+                <input type="hidden" name="correcao" value="1">
+            {% endif %}
 
             {% csrf_token %}
 
@@ -491,7 +501,11 @@ textarea{
                     type="submit"
                     class="btn-submit"
                 >
-                    Enviar Informação
+                    {% if solicitacao %}
+                        Salvar Correções
+                    {% else %}
+                        Enviar Informação
+                    {% endif %}
                 </button>
 
             </div>
