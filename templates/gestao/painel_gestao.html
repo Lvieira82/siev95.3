@@ -20,6 +20,32 @@ Painel de Gestão
     justify-content:center;
     min-height:205px;
 }
+.acoes-eventos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+.btn-ver-todos,
+.btn-mapa-eventos {
+    display: inline-block;
+    padding: 13px 24px;
+    background: #907C64;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: 0.25s;
+}
+
+.btn-ver-todos:hover,
+.btn-mapa-eventos:hover {
+    background: #111827;
+    transform: translateY(-2px);
+}
 
 .card-menu:hover{
     transform:translateY(-5px);
@@ -413,9 +439,12 @@ Painel de Gestão
 
         </div>
 
-        <div class="area-ver-todos">
-            <a href="/gestao/agenda/" class="btn-ver-todos">
-                🗂️ Ver todos os eventos →
+        <div class="acoes-eventos">
+            <a href="{% url 'agenda_gestao' %}" class="btn-ver-todos">
+                📁 Ver todos os eventos →
+            </a>
+            <a href="{% url 'mapa_eventos' %}" class="btn-mapa-eventos">
+                🗺️ Mapa de Eventos
             </a>
         </div>
 
