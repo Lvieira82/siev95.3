@@ -188,7 +188,7 @@ def corrigir_solicitacao(request, id):
         id=id
     )
 
-    # Só permite edição quando a solicitação estiver em correção
+    # Só permite editar solicitações marcadas para correção
     if solicitacao.status != "CORRECAO":
         messages.error(
             request,
@@ -208,8 +208,8 @@ def corrigir_solicitacao(request, id):
 
             obj = form.save(commit=False)
 
-            # Mantém o mesmo ID e protocolo
-            # e devolve a solicitação para nova análise
+            # Mantém o mesmo registro e protocolo
+            # e devolve para nova análise
             obj.status = "PENDENTE"
 
             obj.save()
