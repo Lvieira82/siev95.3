@@ -887,3 +887,49 @@ def importar_matriculas_painel(request):
         return redirect("importar_matriculas_painel")
 
     return render(request, "gestao/importar_matriculas.html")
+
+@login_required
+def mapa_eventos(request):
+
+    data_inicio = request.GET.get("data_inicio")
+    data_fim = request.GET.get("data_fim")
+
+    eventos = Solicitacao.objects.none()
+
+    if data_inicio and data_fim:
+
+        try:
+            inicio = datetime.strptime(
+                data_inicio,
+                "%Y-%m-%d"
+            ).date()
+
+            fim = datetime.strptime(
+                data_fim,
+                "%Y-%m-%d"
+            ).date()
+
+            if inicio <= fim:
+
+                eventos = Solicitacao.objects.filter(
+                    data_evento__range=(inicio, fim),
+                    status="APROVADO"
+                ).order_by(
+                    "data_evento",
+                    "hora_inicio"
+                )
+
+        except ValueError:
+            eventos = Solicitacao.objects.none()
+
+    context = {
+        "eventos": eventos,
+        "data_inicio": data_inicio,
+        "data_fim": data_fim,
+    }
+
+    return render(
+        request,
+        "gestao/mapa_eventos.html",
+        context
+    )
