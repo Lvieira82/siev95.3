@@ -825,7 +825,7 @@ Seção de Planejamento Operacional
     )
 
     solicitacao.status = "CORRECAO"
-    solicitacao.save()
+    solicitacao.save(update_fields=["status"])
 
     messages.success(
         request,
