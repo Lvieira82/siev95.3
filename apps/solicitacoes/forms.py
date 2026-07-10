@@ -208,8 +208,16 @@ class SolicitacaoManualForm(SolicitacaoForm):
                 "maxlength": "11",
             })
 
+        # Remove a restrição visual de data mínima no HTML
         if "data_evento" in self.fields:
             self.fields["data_evento"].widget.attrs.pop("min", None)
+
+    def clean_data_evento(self):
+        """
+        No lançamento manual, aceita qualquer data:
+        passada, atual ou futura.
+        """
+        return self.cleaned_data.get("data_evento")
 
     def clean_telefone(self):
         telefone = self.cleaned_data.get("telefone", "")
