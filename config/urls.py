@@ -61,9 +61,9 @@ urlpatterns = [
         name="detalhe_opo",
     ),
     path(
-        "corrigir/<str:protocolo>/",
-        corrigir_solicitacao,
-        name="corrigir_solicitacao",
+        "corrigir/<int:id>/",
+        views.corrigir_solicitacao,
+        name="corrigir_solicitacao"
     ),
     path("", home, name="home"),
 
