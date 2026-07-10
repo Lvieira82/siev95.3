@@ -181,13 +181,20 @@ def minhas_solicitacoes(request):
             "erro": erro,
         }
     )
-@login_required
 def corrigir_solicitacao(request, id):
 
     solicitacao = get_object_or_404(
         Solicitacao,
         id=id
     )
+
+    # Permite editar apenas quando estiver aguardando correção
+    if solicitacao.status != "CORRIGIR":
+        messages.error(
+            request,
+            "Esta solicitação não está disponível para correção."
+        )
+        return redirect("consultar_protocolo")
 
     if request.method == "POST":
 
@@ -201,8 +208,11 @@ def corrigir_solicitacao(request, id):
 
             obj = form.save(commit=False)
 
+            # volta para análise
             obj.status = "PENDENTE"
 
+            # NÃO altera protocolo
+            # NÃO altera número da OPO
             obj.save()
 
             messages.success(
@@ -214,17 +224,19 @@ def corrigir_solicitacao(request, id):
 
     else:
 
-        form = SolicitacaoForm(instance=solicitacao)
+        form = SolicitacaoForm(
+            instance=solicitacao
+        )
 
     return render(
         request,
-        "nova_solicitacao.html",
+        "solicitacoes/nova_solicitacao.html",
         {
             "form": form,
             "solicitacao": solicitacao,
+            "modo_correcao": True,
         }
     )
-
 # =====================================================
 # LOGIN / LOGOUT GESTÃO
 # =====================================================
