@@ -404,7 +404,7 @@ def lancamento_manual(request):
 
     if request.method == "POST":
 
-        form = SolicitacaoForm(
+        form = SolicitacaoManualForm(
             request.POST,
             request.FILES
         )
@@ -427,7 +427,7 @@ def lancamento_manual(request):
 
     else:
 
-        form = SolicitacaoForm()
+        form = SolicitacaoManualForm()
 
     return render(
         request,
