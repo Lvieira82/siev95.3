@@ -188,8 +188,8 @@ def corrigir_solicitacao(request, id):
         id=id
     )
 
-    # Permite editar apenas quando estiver aguardando correção
-    if solicitacao.status != "CORRIGIR":
+    # Só permite edição quando a solicitação estiver em correção
+    if solicitacao.status != "CORRECAO":
         messages.error(
             request,
             "Esta solicitação não está disponível para correção."
@@ -208,19 +208,21 @@ def corrigir_solicitacao(request, id):
 
             obj = form.save(commit=False)
 
-            # volta para análise
+            # Mantém o mesmo ID e protocolo
+            # e devolve a solicitação para nova análise
             obj.status = "PENDENTE"
 
-            # NÃO altera protocolo
-            # NÃO altera número da OPO
             obj.save()
 
             messages.success(
                 request,
-                "Correções enviadas com sucesso."
+                "Correções enviadas com sucesso. "
+                "Sua solicitação será analisada novamente."
             )
 
-            return redirect("consultar_protocolo")
+            return redirect(
+                f"/consultar/?protocolo={obj.protocolo}"
+            )
 
     else:
 
@@ -230,7 +232,7 @@ def corrigir_solicitacao(request, id):
 
     return render(
         request,
-        "solicitacoes/nova_solicitacao.html",
+        "solicitacoes/corrigir_solicitacao.html",
         {
             "form": form,
             "solicitacao": solicitacao,
