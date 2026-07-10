@@ -377,10 +377,8 @@ def dashboard_operacional(request):
 @login_required
 def agenda_gestao(request):
 
-    hoje = date.today()
-
     eventos = Solicitacao.objects.filter(
-        data_evento__gte=hoje
+        status__in=["APROVADO", "CORRECAO"]
     ).order_by(
         "data_evento",
         "hora_inicio"
@@ -390,7 +388,7 @@ def agenda_gestao(request):
         request,
         "gestao/agenda.html",
         {
-            "eventos": eventos
+            "eventos": eventos,
         }
     )
 
