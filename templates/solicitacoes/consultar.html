@@ -271,9 +271,13 @@
                 </div>
 
             {% endfor %}
-
+        
         </div>
-
+        <div class="area-voltar">
+            <a href="{% url 'home' %}" class="btn-voltar">
+                ← Voltar
+            </a>
+        </div>
     </div>
 
     {% if solicitacao %}
@@ -312,10 +316,7 @@
 
     {% endif %}
 
-    <a href="{% url 'home' %}" class="btn-voltar">
-        ← Voltar
-    </a>
-
+    
 </div>
 
 </body>
