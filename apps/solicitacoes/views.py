@@ -181,20 +181,22 @@ def minhas_solicitacoes(request):
             "erro": erro,
         }
     )
-def corrigir_solicitacao(request, id):
+def corrigir_solicitacao(request, protocolo):
 
     solicitacao = get_object_or_404(
         Solicitacao,
-        id=id
+        protocolo=protocolo
     )
 
-    # Só permite editar solicitações marcadas para correção
+    # Só permite corrigir se estiver realmente aguardando correção
     if solicitacao.status != "CORRECAO":
         messages.error(
             request,
             "Esta solicitação não está disponível para correção."
         )
-        return redirect("consultar_protocolo")
+        return redirect(
+            f"/consultar/?protocolo={solicitacao.protocolo}"
+        )
 
     if request.method == "POST":
 
@@ -208,8 +210,7 @@ def corrigir_solicitacao(request, id):
 
             obj = form.save(commit=False)
 
-            # Mantém o mesmo registro e protocolo
-            # e devolve para nova análise
+            # Mantém o mesmo protocolo e devolve para nova análise
             obj.status = "PENDENTE"
 
             obj.save()
@@ -232,7 +233,7 @@ def corrigir_solicitacao(request, id):
 
     return render(
         request,
-        "solicitacoes/corrigir_solicitacao.html",
+        "solicitacoes/nova.html",
         {
             "form": form,
             "solicitacao": solicitacao,
