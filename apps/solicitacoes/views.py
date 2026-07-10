@@ -13,7 +13,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.http import FileResponse, Http404
-from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from .models import Solicitacao
@@ -22,7 +21,19 @@ import openpyxl
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from .models import MatriculaAutorizada
-
+from datetime import datetime
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import cm
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Table,
+    TableStyle,
+    Paragraph,
+    Spacer,
+)
 
 
 # =====================================================
@@ -898,38 +909,358 @@ def mapa_eventos(request):
 
     if data_inicio and data_fim:
 
-        try:
-            inicio = datetime.strptime(
-                data_inicio,
-                "%Y-%m-%d"
-            ).date()
-
-            fim = datetime.strptime(
-                data_fim,
-                "%Y-%m-%d"
-            ).date()
-
-            if inicio <= fim:
-
-                eventos = Solicitacao.objects.filter(
-                    data_evento__range=(inicio, fim),
-                    status="APROVADO"
-                ).order_by(
-                    "data_evento",
-                    "hora_inicio"
-                )
-
-        except ValueError:
-            eventos = Solicitacao.objects.none()
-
-    context = {
-        "eventos": eventos,
-        "data_inicio": data_inicio,
-        "data_fim": data_fim,
-    }
+        eventos = Solicitacao.objects.filter(
+            data_evento__range=[data_inicio, data_fim],
+            status__in=["APROVADO", "CORRECAO"]
+        ).order_by(
+            "data_evento",
+            "hora_inicio"
+        )
 
     return render(
         request,
         "gestao/mapa_eventos.html",
-        context
+        {
+            "eventos": eventos,
+            "data_inicio": data_inicio,
+            "data_fim": data_fim,
+        }
     )
+
+@login_required
+def gerar_mapa_eventos_pdf(request):
+
+    data_inicio = request.GET.get("data_inicio")
+    data_fim = request.GET.get("data_fim")
+
+    if not data_inicio or not data_fim:
+        return HttpResponse(
+            "Informe a data inicial e a data final.",
+            status=400
+        )
+
+    try:
+        inicio = datetime.strptime(
+            data_inicio,
+            "%Y-%m-%d"
+        ).date()
+
+        fim = datetime.strptime(
+            data_fim,
+            "%Y-%m-%d"
+        ).date()
+
+    except ValueError:
+        return HttpResponse(
+            "Datas inválidas.",
+            status=400
+        )
+
+    if inicio > fim:
+        return HttpResponse(
+            "A data inicial não pode ser posterior à data final.",
+            status=400
+        )
+
+    # IMPORTANTE:
+    # O PDF recebe SOMENTE eventos aprovados.
+    eventos = Solicitacao.objects.filter(
+        data_evento__range=[inicio, fim],
+        status="APROVADO"
+    ).order_by(
+        "data_evento",
+        "hora_inicio"
+    )
+
+    buffer = BytesIO()
+
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=landscape(A4),
+        rightMargin=1 * cm,
+        leftMargin=1 * cm,
+        topMargin=1 * cm,
+        bottomMargin=1 * cm,
+    )
+
+    styles = getSampleStyleSheet()
+
+    titulo_style = ParagraphStyle(
+        "TituloMapa",
+        parent=styles["Title"],
+        fontName="Helvetica-Bold",
+        fontSize=15,
+        leading=18,
+        alignment=TA_CENTER,
+        spaceAfter=5,
+    )
+
+    subtitulo_style = ParagraphStyle(
+        "SubtituloMapa",
+        parent=styles["Normal"],
+        fontName="Helvetica",
+        fontSize=10,
+        leading=13,
+        alignment=TA_CENTER,
+    )
+
+    cabecalho_style = ParagraphStyle(
+        "CabecalhoTabela",
+        parent=styles["Normal"],
+        fontName="Helvetica-Bold",
+        fontSize=8,
+        leading=9,
+        alignment=TA_CENTER,
+        textColor=colors.white,
+    )
+
+    celula_style = ParagraphStyle(
+        "CelulaTabela",
+        parent=styles["Normal"],
+        fontName="Helvetica",
+        fontSize=7,
+        leading=8,
+    )
+
+    celula_centro_style = ParagraphStyle(
+        "CelulaCentro",
+        parent=celula_style,
+        alignment=TA_CENTER,
+    )
+
+    elementos = []
+
+    elementos.append(
+        Paragraph(
+            "POLÍCIA MILITAR DA BAHIA",
+            titulo_style
+        )
+    )
+
+    elementos.append(
+        Paragraph(
+            "95ª COMPANHIA INDEPENDENTE DE POLÍCIA MILITAR",
+            subtitulo_style
+        )
+    )
+
+    elementos.append(Spacer(1, 0.25 * cm))
+
+    elementos.append(
+        Paragraph(
+            "<b>MAPA DE EVENTOS</b>",
+            titulo_style
+        )
+    )
+
+    elementos.append(
+        Paragraph(
+            f"Período: {inicio.strftime('%d/%m/%Y')} "
+            f"a {fim.strftime('%d/%m/%Y')}",
+            subtitulo_style
+        )
+    )
+
+    elementos.append(Spacer(1, 0.5 * cm))
+
+    dados = [
+        [
+            Paragraph("DATA", cabecalho_style),
+            Paragraph("HORA", cabecalho_style),
+            Paragraph("EVENTO", cabecalho_style),
+            Paragraph("LOCAL", cabecalho_style),
+            Paragraph("SOLICITANTE", cabecalho_style),
+            Paragraph("PROTOCOLO", cabecalho_style),
+        ]
+    ]
+
+    for evento in eventos:
+
+        hora = ""
+
+        if evento.hora_inicio:
+            hora = evento.hora_inicio.strftime("%H:%M")
+
+        dados.append(
+            [
+                Paragraph(
+                    evento.data_evento.strftime("%d/%m/%Y"),
+                    celula_centro_style
+                ),
+
+                Paragraph(
+                    hora,
+                    celula_centro_style
+                ),
+
+                Paragraph(
+                    str(evento.nome_evento or ""),
+                    celula_style
+                ),
+
+                Paragraph(
+                    str(evento.local or ""),
+                    celula_style
+                ),
+
+                Paragraph(
+                    str(evento.solicitante or ""),
+                    celula_style
+                ),
+
+                Paragraph(
+                    str(evento.protocolo or ""),
+                    celula_centro_style
+                ),
+            ]
+        )
+
+    if eventos.exists():
+
+        tabela = Table(
+            dados,
+            colWidths=[
+                2.2 * cm,   # Data
+                1.6 * cm,   # Hora
+                5.2 * cm,   # Evento
+                6.0 * cm,   # Local
+                5.0 * cm,   # Solicitante
+                3.0 * cm,   # Protocolo
+            ],
+            repeatRows=1,
+        )
+
+        tabela.setStyle(
+            TableStyle(
+                [
+                    (
+                        "BACKGROUND",
+                        (0, 0),
+                        (-1, 0),
+                        colors.HexColor("#907C64"),
+                    ),
+
+                    (
+                        "TEXTCOLOR",
+                        (0, 0),
+                        (-1, 0),
+                        colors.white,
+                    ),
+
+                    (
+                        "GRID",
+                        (0, 0),
+                        (-1, -1),
+                        0.5,
+                        colors.grey,
+                    ),
+
+                    (
+                        "VALIGN",
+                        (0, 0),
+                        (-1, -1),
+                        "MIDDLE",
+                    ),
+
+                    (
+                        "LEFTPADDING",
+                        (0, 0),
+                        (-1, -1),
+                        5,
+                    ),
+
+                    (
+                        "RIGHTPADDING",
+                        (0, 0),
+                        (-1, -1),
+                        5,
+                    ),
+
+                    (
+                        "TOPPADDING",
+                        (0, 0),
+                        (-1, -1),
+                        5,
+                    ),
+
+                    (
+                        "BOTTOMPADDING",
+                        (0, 0),
+                        (-1, -1),
+                        5,
+                    ),
+
+                    (
+                        "ROWBACKGROUNDS",
+                        (0, 1),
+                        (-1, -1),
+                        [
+                            colors.white,
+                            colors.HexColor("#F5F5F5"),
+                        ],
+                    ),
+                ]
+            )
+        )
+
+        elementos.append(tabela)
+
+    else:
+
+        elementos.append(
+            Paragraph(
+                "Nenhum evento aprovado encontrado "
+                "no período selecionado.",
+                subtitulo_style
+            )
+        )
+
+    elementos.append(Spacer(1, 1.5 * cm))
+
+    assinatura_style = ParagraphStyle(
+        "Assinatura",
+        parent=styles["Normal"],
+        fontName="Helvetica",
+        fontSize=10,
+        leading=14,
+        alignment=TA_CENTER,
+    )
+
+    elementos.append(
+        Paragraph(
+            "____________________________________________",
+            assinatura_style
+        )
+    )
+
+    elementos.append(
+        Paragraph(
+            "<b>Responsável pela Seção de Operações</b>",
+            assinatura_style
+        )
+    )
+
+    elementos.append(
+        Paragraph(
+            "95ª CIPM",
+            assinatura_style
+        )
+    )
+
+    doc.build(elementos)
+
+    pdf = buffer.getvalue()
+    buffer.close()
+
+    response = HttpResponse(
+        pdf,
+        content_type="application/pdf"
+    )
+
+    response["Content-Disposition"] = (
+        f'inline; filename="mapa_eventos_'
+        f'{inicio.strftime("%d-%m-%Y")}_'
+        f'a_{fim.strftime("%d-%m-%Y")}.pdf"'
+    )
+
+    return response
