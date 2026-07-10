@@ -27,12 +27,51 @@
     <h1 style="color:#907C64;margin-bottom:25px;">🗓️ Agenda de Eventos</h1>
 
     {% for evento in eventos %}
+        <div class="evento-item">
 
-        <div style="padding:15px;border-bottom:1px solid #eee;">
-            <strong>{{ evento.data_evento|date:"d/m/Y" }}</strong><br>
-            📌 {{ evento.nome_evento }}<br>
-            📍 {{ evento.local }}
+            <div class="evento-data">
+                {{ evento.data_evento|date:"d/m/Y" }}
+            </div>
+        
+            <div class="evento-nome">
+                📌 {{ evento.nome_evento }}
+            </div>
+        
+            <div class="evento-local">
+                📍 {{ evento.local }}
+            </div>
+        
+            <div class="evento-info">
+        
+                <span class="protocolo">
+                    🔖 Protocolo: <strong>{{ evento.protocolo }}</strong>
+                </span>
+        
+                {% if evento.status == "APROVADO" %}
+        
+                    <span class="status status-aprovado">
+                        ✓ APROVADO
+                    </span>
+        
+                {% elif evento.status == "CORRECAO" %}
+        
+                    <span class="status status-correcao">
+                        ✏️ EM CORREÇÃO
+                    </span>
+        
+                {% else %}
+        
+                    <span class="status">
+                        {{ evento.get_status_display }}
+                    </span>
+        
+                {% endif %}
+        
+            </div>
+        
         </div>
+
+      
 
     {% empty %}
 
