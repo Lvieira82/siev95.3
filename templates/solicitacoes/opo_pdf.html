@@ -105,7 +105,9 @@ body{
     margin:0 0 7px 0;
     line-height:1.35;
 }
-
+.campo-observacao {
+    font-weight: bold;
+}
 .rodape{
     margin-top:20px;
     text-align:center;
@@ -244,8 +246,12 @@ body{
 
         <p>¤ Constar o desenvolvimento desta OPO no relatório de serviço.</p>
 
-        {% if solicitacao.observacoes %}
-            <p>¤ {{ solicitacao.observacoes }}</p>
+        {% if solicitacao.observacao %}
+            <div class="campo-observacao">
+                <strong>
+                    OBSERVAÇÃO: {{ solicitacao.observacao|linebreaksbr }}
+                </strong>
+            </div>
         {% endif %}
     </div>
 
