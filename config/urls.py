@@ -29,6 +29,7 @@ from apps.solicitacoes.views import (
     importar_matriculas_painel,
     corrigir_solicitacao,
     mapa_eventos,
+    gerar_mapa_eventos_pdf,
 )
 
 urlpatterns = [
@@ -53,6 +54,12 @@ urlpatterns = [
         "gestao/mapa-eventos/",
         mapa_eventos,
         name="mapa_eventos"
+    ),
+    
+    path(
+        "gestao/mapa-eventos/pdf/",
+        gerar_mapa_eventos_pdf,
+        name="gerar_mapa_eventos_pdf"
     ),
     path(
         "gestao/opos-geradas/",
