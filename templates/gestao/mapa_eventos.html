@@ -1,5 +1,3 @@
-{% load static %}
-
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -20,12 +18,12 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         body {
-            font-family: Arial, Helvetica, sans-serif;
             background: #f1f3f6;
-            color: #111;
+            min-height: 100vh;
         }
 
         .menu {
@@ -41,260 +39,150 @@
             color: white;
             text-decoration: none;
             font-weight: bold;
+            font-size: 16px;
             padding: 10px 16px;
             border-radius: 8px;
         }
 
-        .menu a:hover {
-            background: #111827;
-        }
-
         .container {
-            max-width: 1500px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .filtro-card {
-            max-width: 850px;
-            margin: 0 auto 30px;
+            width: 95%;
+            max-width: 1300px;
+            margin: 45px auto;
             background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 8px 22px rgba(0,0,0,.08);
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0,0,0,.10);
         }
 
-        .filtro-card h1 {
+        h1 {
             color: #907C64;
-            text-align: center;
             margin-bottom: 25px;
         }
 
-        .form-periodo {
+        .filtros {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             align-items: end;
             flex-wrap: wrap;
+            margin-bottom: 30px;
         }
 
         .campo {
-            flex: 1;
-            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
         }
 
         .campo label {
-            display: block;
             font-weight: bold;
-            margin-bottom: 8px;
             color: #374151;
         }
 
         .campo input {
-            width: 100%;
-            padding: 13px;
-            border: 1px solid #ccc;
+            padding: 12px;
+            border: 1px solid #d1d5db;
             border-radius: 8px;
-            font-size: 16px;
-        }
-
-        .btn-gerar {
-            border: none;
-            padding: 14px 25px;
-            background: #907C64;
-            color: white;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
             font-size: 15px;
         }
 
-        .btn-gerar:hover {
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #907C64;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn:hover {
             background: #111827;
         }
 
-        .mapa-documento {
-            background: white;
-            padding: 35px 25px;
-            box-shadow: 0 8px 22px rgba(0,0,0,.08);
+        .btn-pdf {
+            background: #b91c1c;
         }
 
-        .cabecalho-oficial {
-            text-align: center;
-            margin-bottom: 35px;
+        .btn-pdf:hover {
+            background: #7f1d1d;
         }
 
-        .logo-pm {
-            max-height: 85px;
-            margin-bottom: 10px;
-        }
-
-        .cabecalho-oficial h2 {
-            font-family: "Times New Roman", serif;
-            font-size: 20px;
-            line-height: 1.25;
-        }
-
-        .titulo-mapa {
-            margin-top: 25px;
-            font-family: "Times New Roman", serif;
-            font-size: 20px;
-            font-weight: normal;
-        }
-
-        .tabela-container {
-            width: 100%;
+        .tabela-wrapper {
             overflow-x: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-family: "Times New Roman", serif;
-            font-size: 14px;
-        }
-
-        th,
-        td {
-            border: 1px solid #000;
-            padding: 7px 5px;
-            text-align: center;
-            vertical-align: middle;
+            min-width: 850px;
         }
 
         th {
-            font-weight: bold;
+            background: #111827;
+            color: white;
+            padding: 14px 12px;
+            text-align: left;
         }
 
-        .evento-nome {
-            font-weight: bold;
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e5e7eb;
         }
 
-        .assinatura {
-            margin-top: 100px;
-            text-align: center;
-            font-family: "Times New Roman", serif;
+        tr:hover td {
+            background: #f9fafb;
         }
 
-        .assinatura-img {
-            max-width: 220px;
-            max-height: 80px;
-            display: block;
-            margin: 0 auto -5px;
-        }
-
-        .assinatura strong {
-            display: block;
-            font-size: 18px;
-        }
-
-        .assinatura span {
-            font-size: 17px;
-        }
-
-        .rodape-oficial {
-            margin-top: 15px;
-            border-top: 4px double #555;
-            text-align: center;
-            padding-top: 5px;
-            font-family: "Times New Roman", serif;
+        .status {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 7px;
             font-size: 13px;
+            font-weight: bold;
+        }
+
+        .status-aprovado {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+        }
+
+        .status-correcao {
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fbbf24;
         }
 
         .acoes {
+            margin-top: 30px;
             display: flex;
-            justify-content: center;
             gap: 15px;
-            margin: 25px 0;
             flex-wrap: wrap;
         }
 
-        .btn-acao {
-            display: inline-block;
-            border: none;
-            padding: 13px 24px;
-            border-radius: 8px;
-            background: #907C64;
-            color: white;
-            font-weight: bold;
-            text-decoration: none;
-            cursor: pointer;
-            font-size: 15px;
-        }
-
-        .btn-acao:hover {
-            background: #111827;
-        }
-
         .sem-eventos {
-            text-align: center;
             padding: 30px;
+            text-align: center;
             color: #6b7280;
-            font-weight: bold;
         }
 
-        @media print {
-
-            @page {
-                size: A4 landscape;
-                margin: 8mm;
-            }
-
-            body {
-                background: white;
-            }
-
-            .menu,
-            .filtro-card,
-            .acoes {
-                display: none !important;
-            }
+        @media(max-width: 768px) {
 
             .container {
-                margin: 0;
-                padding: 0;
-                max-width: none;
-            }
-
-            .mapa-documento {
-                box-shadow: none;
-                padding: 0;
-            }
-
-            table {
-                font-size: 10px;
-            }
-
-            th,
-            td {
-                padding: 4px 3px;
-            }
-
-            .assinatura {
-                margin-top: 65px;
-            }
-        }
-
-        @media (max-width: 768px) {
-
-            .container {
-                padding: 0 10px;
-                margin-top: 20px;
-            }
-
-            .filtro-card {
+                width: 95%;
+                margin: 20px auto;
                 padding: 20px;
             }
 
-            .form-periodo {
+            .filtros {
                 flex-direction: column;
                 align-items: stretch;
             }
 
-            .campo {
-                width: 100%;
-            }
-
-            .btn-gerar {
+            .campo input,
+            .btn {
                 width: 100%;
             }
         }
@@ -305,34 +193,34 @@
 
 <body>
 
-<nav class="menu">
+    <nav class="menu">
 
-    <a href="{% url 'home' %}">
-        Início
-    </a>
+        <a href="{% url 'home' %}">
+            Início
+        </a>
 
-    <a href="{% url 'nova_solicitacao' %}">
-        Nova Informação
-    </a>
+        <a href="{% url 'nova_solicitacao' %}">
+            Nova Informação
+        </a>
 
-    <a href="{% url 'consultar_protocolo' %}">
-        Consultar
-    </a>
+        <a href="{% url 'consultar_protocolo' %}">
+            Consultar
+        </a>
 
-    <a href="{% url 'painel_gestao' %}">
-        Gestão
-    </a>
+        <a href="{% url 'painel_gestao' %}">
+            Gestão
+        </a>
 
-</nav>
+    </nav>
 
-
-<div class="container">
-
-    <div class="filtro-card">
+    <main class="container">
 
         <h1>🗺️ Mapa de Eventos</h1>
 
-        <form method="get" class="form-periodo">
+        <form
+            method="get"
+            class="filtros"
+        >
 
             <div class="campo">
 
@@ -366,195 +254,141 @@
 
             </div>
 
-            <button type="submit" class="btn-gerar">
-                🔎 Gerar Mapa
+            <button
+                type="submit"
+                class="btn"
+            >
+                🔍 Consultar período
             </button>
 
         </form>
 
-    </div>
 
-
-    {% if data_inicio and data_fim %}
-
-        <div class="mapa-documento">
-
-            <div class="cabecalho-oficial">
-
-                <!-- Ajuste o caminho abaixo para sua logo real -->
-                <img
-                    src="{% static 'logos/logo_pm_200.png' %}"
-                    class="logo-pm"
-                    alt="Polícia Militar da Bahia"
-                >
-
-                <h2>
-                    POLÍCIA MILITAR DA BAHIA
-                    <br>
-                    COMANDO DE POLICIAMENTO DA REGIÃO LITORAL NORTE
-                    <br>
-                    95ª CIPM / CATU
-                </h2>
-
-                <div class="titulo-mapa">
-                    MAPA DE EVENTOS
-                </div>
-
-            </div>
-
-
-            {% if eventos %}
-
-                <div class="tabela-container">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-                                <th>Evento</th>
-                                <th>Data</th>
-                                <th>Hora<br>Início</th>
-                                <th>Hora<br>Término</th>
-                                <th>Endereço</th>
-                                <th>OPM/Município</th>
-                                <th>Público<br>Estimado</th>
-                                <th>Telefone Solicitante</th>
-                                <th>Telefone</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            {% for evento in eventos %}
-
-                                <tr>
-
-                                    <td class="evento-nome">
-                                        {{ evento.nome_evento }}
-                                    </td>
-
-                                    <td>
-                                        {{ evento.data_evento|date:"d/m/Y" }}
-                                    </td>
-
-                                    <td>
-                                        {{ evento.hora_inicio|time:"H\h" }}
-                                    </td>
-
-                                    <td>
-                                        {{ evento.hora_fim|time:"H\h" }}
-                                    </td>
-
-                                    <td>
-                                        {{ evento.local }}
-                                    </td>
-
-                                    <td>
-                                        95ª CIPM/Catu
-                                    </td>
-
-                                    <td>
-                                        {% if evento.publico_estimado %}
-                                            {{ evento.publico_estimado }} pessoas
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-
-                                    <td>
-                                        {{ evento.telefone|default:"-" }}
-                                    </td>
-
-                                    <td>
-                                        (71) 9 9985-9364
-                                    </td>
-
-                                </tr>
-
-                            {% endfor %}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-
-                <div class="assinatura">
-
-                    <!--
-                    Se você já possui a imagem da assinatura,
-                    descomente e ajuste o caminho:
-
-                    <img
-                        src="{% static 'assinaturas/helo_nery.png' %}"
-                        class="assinatura-img"
-                        alt="Assinatura"
-                    >
-                    -->
-
-                    <strong>
-                        HÉLO NERY DOS SANTOS JUNIOR – CAP PM
-                    </strong>
-
-                    <span>
-                        Chefe da SPO
-                    </span>
-
-                </div>
-
-
-                <div class="rodape-oficial">
-
-                    95ª CIPM / Catu – Rua Simões Filho, S/Nº,
-                    Boa Vista, Catu BA. CEP 48.110-00
-
-                    <br>
-
-                    Telefax: 071 3641-2674.
-                    e-mail: cipm95.srhsp@pm.ba.gov.br
-
-                </div>
-
-            {% else %}
-
-                <div class="sem-eventos">
-                    Nenhum evento aprovado encontrado no período selecionado.
-                </div>
-
-            {% endif %}
-
-        </div>
-
-
-        {% if eventos %}
+        {% if data_inicio and data_fim %}
 
             <div class="acoes">
 
-                <button
-                    type="button"
-                    class="btn-acao"
-                    onclick="window.print()"
-                >
-                    🖨️ Imprimir Mapa
-                </button>
-
                 <a
-                    href="{% url 'painel_gestao' %}"
-                    class="btn-acao"
+                    href="{% url 'gerar_mapa_eventos_pdf' %}?data_inicio={{ data_inicio }}&data_fim={{ data_fim }}"
+                    class="btn btn-pdf"
+                    target="_blank"
                 >
-                    ← Voltar ao Painel
+                    📄 Gerar PDF — somente aprovadas
                 </a>
 
             </div>
 
+            <br>
+
         {% endif %}
 
-    {% endif %}
 
-</div>
+        <div class="tabela-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Data</th>
+                        <th>Hora</th>
+                        <th>Evento</th>
+                        <th>Local</th>
+                        <th>Solicitante</th>
+                        <th>Protocolo</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for evento in eventos %}
+
+                        <tr>
+
+                            <td>
+                                {{ evento.data_evento|date:"d/m/Y" }}
+                            </td>
+
+                            <td>
+                                {{ evento.hora_inicio|time:"H:i" }}
+                            </td>
+
+                            <td>
+                                {{ evento.nome_evento }}
+                            </td>
+
+                            <td>
+                                {{ evento.local }}
+                            </td>
+
+                            <td>
+                                {{ evento.solicitante }}
+                            </td>
+
+                            <td>
+                                {{ evento.protocolo }}
+                            </td>
+
+                            <td>
+
+                                {% if evento.status == "APROVADO" %}
+
+                                    <span class="status status-aprovado">
+                                        APROVADO
+                                    </span>
+
+                                {% elif evento.status == "CORRECAO" %}
+
+                                    <span class="status status-correcao">
+                                        CORREÇÃO
+                                    </span>
+
+                                {% else %}
+
+                                    {{ evento.status }}
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="sem-eventos"
+                            >
+                                Selecione um período para visualizar os eventos.
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="acoes">
+
+            <a
+                href="{% url 'painel_gestao' %}"
+                class="btn"
+            >
+                ← Voltar ao Painel
+            </a>
+
+        </div>
+
+    </main>
 
 </body>
+</html>
 </html>
