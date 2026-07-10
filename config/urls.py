@@ -62,8 +62,8 @@ urlpatterns = [
     ),
     path(
         "corrigir/<int:id>/",
-        views.corrigir_solicitacao,
-        name="corrigir_solicitacao"
+        corrigir_solicitacao,
+        name="corrigir_solicitacao",
     ),
     path("", home, name="home"),
 
