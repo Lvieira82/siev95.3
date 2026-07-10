@@ -12,7 +12,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
-from django.http import FileResponse, Http404
+from django.http import FileResponse, HttpResponse, Http404
 from django.urls import reverse
 from django.utils import timezone
 from .models import Solicitacao
