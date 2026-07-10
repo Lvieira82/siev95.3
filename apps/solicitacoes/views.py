@@ -925,337 +925,566 @@ def mapa_eventos(request):
 @login_required
 def gerar_mapa_eventos_pdf(request):
 
-    data_inicio = request.GET.get("data_inicio")
-    data_fim = request.GET.get("data_fim")
+    import os
+    from datetime import datetime
 
-    if not data_inicio or not data_fim:
+    from django.conf import settings
+    from django.http import HttpResponse
+
+    from reportlab.lib import colors
+    from reportlab.lib.enums import TA_CENTER
+    from reportlab.lib.pagesizes import A4, landscape
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import cm
+
+    from reportlab.platypus import (
+        SimpleDocTemplate,
+        Table,
+        TableStyle,
+        Paragraph,
+        Spacer,
+        Image,
+    )
+
+    # =====================================================
+    # 1. RECEBER E VALIDAR AS DATAS
+    # =====================================================
+
+    data_inicio_str = request.GET.get("data_inicio")
+    data_fim_str = request.GET.get("data_fim")
+
+    if not data_inicio_str or not data_fim_str:
         return HttpResponse(
             "Informe a data inicial e a data final.",
             status=400
         )
 
     try:
-        inicio = datetime.strptime(
-            data_inicio,
+        data_inicio = datetime.strptime(
+            data_inicio_str,
             "%Y-%m-%d"
         ).date()
 
-        fim = datetime.strptime(
-            data_fim,
+        data_fim = datetime.strptime(
+            data_fim_str,
             "%Y-%m-%d"
         ).date()
 
     except ValueError:
         return HttpResponse(
-            "Datas inválidas.",
+            "Formato de data inválido.",
             status=400
         )
 
-    if inicio > fim:
+    if data_inicio > data_fim:
         return HttpResponse(
-            "A data inicial não pode ser posterior à data final.",
+            "A data inicial não pode ser maior que a data final.",
             status=400
         )
 
-    # IMPORTANTE:
-    # O PDF recebe SOMENTE eventos aprovados.
+    # =====================================================
+    # 2. BUSCAR SOMENTE EVENTOS APROVADOS
+    # =====================================================
+
     eventos = Solicitacao.objects.filter(
-        data_evento__range=[inicio, fim],
+        data_evento__range=[
+            data_inicio,
+            data_fim
+        ],
         status="APROVADO"
     ).order_by(
         "data_evento",
         "hora_inicio"
     )
 
-    buffer = BytesIO()
+    # =====================================================
+    # 3. CRIAR A RESPOSTA PDF
+    # =====================================================
+
+    response = HttpResponse(
+        content_type="application/pdf"
+    )
+
+    response["Content-Disposition"] = (
+        'inline; filename="mapa_de_eventos.pdf"'
+    )
+
+    # =====================================================
+    # 4. CONFIGURAR DOCUMENTO A4 PAISAGEM
+    # =====================================================
 
     doc = SimpleDocTemplate(
-        buffer,
+        response,
         pagesize=landscape(A4),
-        rightMargin=1 * cm,
-        leftMargin=1 * cm,
-        topMargin=1 * cm,
-        bottomMargin=1 * cm,
-    )
-
-    styles = getSampleStyleSheet()
-
-    titulo_style = ParagraphStyle(
-        "TituloMapa",
-        parent=styles["Title"],
-        fontName="Helvetica-Bold",
-        fontSize=15,
-        leading=18,
-        alignment=TA_CENTER,
-        spaceAfter=5,
-    )
-
-    subtitulo_style = ParagraphStyle(
-        "SubtituloMapa",
-        parent=styles["Normal"],
-        fontName="Helvetica",
-        fontSize=10,
-        leading=13,
-        alignment=TA_CENTER,
-    )
-
-    cabecalho_style = ParagraphStyle(
-        "CabecalhoTabela",
-        parent=styles["Normal"],
-        fontName="Helvetica-Bold",
-        fontSize=8,
-        leading=9,
-        alignment=TA_CENTER,
-        textColor=colors.white,
-    )
-
-    celula_style = ParagraphStyle(
-        "CelulaTabela",
-        parent=styles["Normal"],
-        fontName="Helvetica",
-        fontSize=7,
-        leading=8,
-    )
-
-    celula_centro_style = ParagraphStyle(
-        "CelulaCentro",
-        parent=celula_style,
-        alignment=TA_CENTER,
+        rightMargin=1.2 * cm,
+        leftMargin=1.2 * cm,
+        topMargin=0.8 * cm,
+        bottomMargin=1.0 * cm,
     )
 
     elementos = []
 
-    elementos.append(
-        Paragraph(
-            "POLÍCIA MILITAR DA BAHIA",
-            titulo_style
-        )
+    # =====================================================
+    # 5. ESTILOS
+    # =====================================================
+
+    styles = getSampleStyleSheet()
+
+    estilo_centro = ParagraphStyle(
+        "Centro",
+        parent=styles["Normal"],
+        alignment=TA_CENTER,
+        fontSize=9,
+        leading=11,
     )
 
-    elementos.append(
-        Paragraph(
-            "95ª COMPANHIA INDEPENDENTE DE POLÍCIA MILITAR",
-            subtitulo_style
-        )
+    estilo_titulo = ParagraphStyle(
+        "TituloMapa",
+        parent=styles["Heading1"],
+        alignment=TA_CENTER,
+        fontSize=16,
+        leading=19,
+        spaceAfter=4,
     )
 
-    elementos.append(Spacer(1, 0.25 * cm))
+    estilo_cabecalho = ParagraphStyle(
+        "CabecalhoInstitucional",
+        parent=styles["Normal"],
+        alignment=TA_CENTER,
+        fontSize=14,
+        leading=18,
+    )
+
+    estilo_tabela = ParagraphStyle(
+        "TextoTabela",
+        parent=styles["Normal"],
+        fontSize=7,
+        leading=8,
+    )
+
+    estilo_tabela_centro = ParagraphStyle(
+        "TextoTabelaCentro",
+        parent=styles["Normal"],
+        alignment=TA_CENTER,
+        fontSize=7,
+        leading=8,
+    )
+
+    # =====================================================
+    # 6. CAMINHOS DAS LOGOS E DA ASSINATURA
+    # =====================================================
+
+    caminho_logo_pmba = os.path.join(
+        settings.BASE_DIR,
+        "static",
+        "logos",
+        "logo_pmba.png"
+    )
+
+    caminho_logo_95 = os.path.join(
+        settings.BASE_DIR,
+        "static",
+        "logos",
+        "logo95.png"
+    )
+
+    caminho_assinatura = os.path.join(
+        settings.BASE_DIR,
+        "static",
+        "logos",
+        "assinatura_helio.png"
+    )
+
+    # =====================================================
+    # 7. LOGO PMBA À ESQUERDA
+    # =====================================================
+
+    if os.path.exists(caminho_logo_pmba):
+
+        logo_pmba = Image(
+            caminho_logo_pmba,
+            width=2.2 * cm,
+            height=2.2 * cm
+        )
+
+        logo_pmba.hAlign = "LEFT"
+
+    else:
+        logo_pmba = ""
+
+    # =====================================================
+    # 8. LOGO 95ª CIPM À DIREITA
+    # =====================================================
+
+    if os.path.exists(caminho_logo_95):
+
+        logo_95 = Image(
+            caminho_logo_95,
+            width=2.2 * cm,
+            height=2.2 * cm
+        )
+
+        logo_95.hAlign = "RIGHT"
+
+    else:
+        logo_95 = ""
+
+    # =====================================================
+    # 9. TEXTO CENTRAL DO CABEÇALHO
+    # =====================================================
+
+    texto_cabecalho = Paragraph(
+        """
+        <b>POLÍCIA MILITAR DA BAHIA</b><br/>
+        <font size="9">
+            95ª COMPANHIA INDEPENDENTE DE POLÍCIA MILITAR
+        </font>
+        """,
+        estilo_cabecalho
+    )
+
+    # =====================================================
+    # 10. CABEÇALHO EM TRÊS COLUNAS
+    # =====================================================
+
+    tabela_cabecalho = Table(
+        [
+            [
+                logo_pmba,
+                texto_cabecalho,
+                logo_95
+            ]
+        ],
+        colWidths=[
+            3 * cm,
+            18 * cm,
+            3 * cm
+        ]
+    )
+
+    tabela_cabecalho.setStyle(
+        TableStyle([
+            (
+                "VALIGN",
+                (0, 0),
+                (-1, -1),
+                "MIDDLE"
+            ),
+            (
+                "ALIGN",
+                (0, 0),
+                (0, 0),
+                "LEFT"
+            ),
+            (
+                "ALIGN",
+                (1, 0),
+                (1, 0),
+                "CENTER"
+            ),
+            (
+                "ALIGN",
+                (2, 0),
+                (2, 0),
+                "RIGHT"
+            ),
+            (
+                "LEFTPADDING",
+                (0, 0),
+                (-1, -1),
+                0
+            ),
+            (
+                "RIGHTPADDING",
+                (0, 0),
+                (-1, -1),
+                0
+            ),
+            (
+                "TOPPADDING",
+                (0, 0),
+                (-1, -1),
+                0
+            ),
+            (
+                "BOTTOMPADDING",
+                (0, 0),
+                (-1, -1),
+                0
+            ),
+        ])
+    )
+
+    elementos.append(tabela_cabecalho)
+
+    elementos.append(
+        Spacer(1, 0.3 * cm)
+    )
+
+    # =====================================================
+    # 11. TÍTULO DO MAPA
+    # =====================================================
 
     elementos.append(
         Paragraph(
             "<b>MAPA DE EVENTOS</b>",
-            titulo_style
+            estilo_titulo
         )
     )
 
     elementos.append(
         Paragraph(
-            f"Período: {inicio.strftime('%d/%m/%Y')} "
-            f"a {fim.strftime('%d/%m/%Y')}",
-            subtitulo_style
+            (
+                f"Período: "
+                f"{data_inicio.strftime('%d/%m/%Y')} "
+                f"a "
+                f"{data_fim.strftime('%d/%m/%Y')}"
+            ),
+            estilo_centro
         )
     )
 
-    elementos.append(Spacer(1, 0.5 * cm))
+    elementos.append(
+        Spacer(1, 0.5 * cm)
+    )
+
+    # =====================================================
+    # 12. DADOS DA TABELA
+    # =====================================================
 
     dados = [
         [
-            Paragraph("DATA", cabecalho_style),
-            Paragraph("HORA", cabecalho_style),
-            Paragraph("EVENTO", cabecalho_style),
-            Paragraph("LOCAL", cabecalho_style),
-            Paragraph("SOLICITANTE", cabecalho_style),
-            Paragraph("PROTOCOLO", cabecalho_style),
+            "DATA",
+            "HORA",
+            "EVENTO",
+            "LOCAL",
+            "SOLICITANTE",
+            "PROTOCOLO",
         ]
     ]
 
     for evento in eventos:
 
-        hora = ""
+        data_formatada = ""
+
+        if evento.data_evento:
+            data_formatada = evento.data_evento.strftime(
+                "%d/%m/%Y"
+            )
+
+        hora_formatada = ""
 
         if evento.hora_inicio:
-            hora = evento.hora_inicio.strftime("%H:%M")
-
-        dados.append(
-            [
-                Paragraph(
-                    evento.data_evento.strftime("%d/%m/%Y"),
-                    celula_centro_style
-                ),
-
-                Paragraph(
-                    hora,
-                    celula_centro_style
-                ),
-
-                Paragraph(
-                    str(evento.nome_evento or ""),
-                    celula_style
-                ),
-
-                Paragraph(
-                    str(evento.local or ""),
-                    celula_style
-                ),
-
-                Paragraph(
-                    str(evento.solicitante or ""),
-                    celula_style
-                ),
-
-                Paragraph(
-                    str(evento.protocolo or ""),
-                    celula_centro_style
-                ),
-            ]
-        )
-
-    if eventos.exists():
-
-        tabela = Table(
-            dados,
-            colWidths=[
-                2.2 * cm,   # Data
-                1.6 * cm,   # Hora
-                5.2 * cm,   # Evento
-                6.0 * cm,   # Local
-                5.0 * cm,   # Solicitante
-                3.0 * cm,   # Protocolo
-            ],
-            repeatRows=1,
-        )
-
-        tabela.setStyle(
-            TableStyle(
-                [
-                    (
-                        "BACKGROUND",
-                        (0, 0),
-                        (-1, 0),
-                        colors.HexColor("#907C64"),
-                    ),
-
-                    (
-                        "TEXTCOLOR",
-                        (0, 0),
-                        (-1, 0),
-                        colors.white,
-                    ),
-
-                    (
-                        "GRID",
-                        (0, 0),
-                        (-1, -1),
-                        0.5,
-                        colors.grey,
-                    ),
-
-                    (
-                        "VALIGN",
-                        (0, 0),
-                        (-1, -1),
-                        "MIDDLE",
-                    ),
-
-                    (
-                        "LEFTPADDING",
-                        (0, 0),
-                        (-1, -1),
-                        5,
-                    ),
-
-                    (
-                        "RIGHTPADDING",
-                        (0, 0),
-                        (-1, -1),
-                        5,
-                    ),
-
-                    (
-                        "TOPPADDING",
-                        (0, 0),
-                        (-1, -1),
-                        5,
-                    ),
-
-                    (
-                        "BOTTOMPADDING",
-                        (0, 0),
-                        (-1, -1),
-                        5,
-                    ),
-
-                    (
-                        "ROWBACKGROUNDS",
-                        (0, 1),
-                        (-1, -1),
-                        [
-                            colors.white,
-                            colors.HexColor("#F5F5F5"),
-                        ],
-                    ),
-                ]
+            hora_formatada = evento.hora_inicio.strftime(
+                "%H:%M"
             )
-        )
 
-        elementos.append(tabela)
-
-    else:
-
-        elementos.append(
+        dados.append([
             Paragraph(
-                "Nenhum evento aprovado encontrado "
-                "no período selecionado.",
-                subtitulo_style
-            )
+                data_formatada,
+                estilo_tabela_centro
+            ),
+
+            Paragraph(
+                hora_formatada,
+                estilo_tabela_centro
+            ),
+
+            Paragraph(
+                str(evento.nome_evento or ""),
+                estilo_tabela
+            ),
+
+            Paragraph(
+                str(evento.local or ""),
+                estilo_tabela
+            ),
+
+            Paragraph(
+                str(evento.solicitante or ""),
+                estilo_tabela
+            ),
+
+            Paragraph(
+                str(evento.protocolo or ""),
+                estilo_tabela_centro
+            ),
+        ])
+
+    # =====================================================
+    # 13. CASO NÃO EXISTAM EVENTOS APROVADOS
+    # =====================================================
+
+    if not eventos.exists():
+
+        dados.append([
+            Paragraph(
+                "Nenhum evento aprovado no período selecionado.",
+                estilo_centro
+            ),
+            "",
+            "",
+            "",
+            "",
+            "",
+        ])
+
+    # =====================================================
+    # 14. CRIAR A TABELA DE EVENTOS
+    # =====================================================
+
+    tabela_eventos = Table(
+        dados,
+        colWidths=[
+            2.2 * cm,   # DATA
+            1.5 * cm,   # HORA
+            5.2 * cm,   # EVENTO
+            6.0 * cm,   # LOCAL
+            5.0 * cm,   # SOLICITANTE
+            3.0 * cm,   # PROTOCOLO
+        ],
+        repeatRows=1
+    )
+
+    tabela_eventos.setStyle(
+        TableStyle([
+
+            # Cabeçalho da tabela
+            (
+                "BACKGROUND",
+                (0, 0),
+                (-1, 0),
+                colors.HexColor("#907C64")
+            ),
+
+            (
+                "TEXTCOLOR",
+                (0, 0),
+                (-1, 0),
+                colors.white
+            ),
+
+            (
+                "FONTNAME",
+                (0, 0),
+                (-1, 0),
+                "Helvetica-Bold"
+            ),
+
+            (
+                "ALIGN",
+                (0, 0),
+                (-1, 0),
+                "CENTER"
+            ),
+
+            # Corpo da tabela
+            (
+                "VALIGN",
+                (0, 0),
+                (-1, -1),
+                "MIDDLE"
+            ),
+
+            (
+                "GRID",
+                (0, 0),
+                (-1, -1),
+                0.5,
+                colors.grey
+            ),
+
+            (
+                "ROWBACKGROUNDS",
+                (0, 1),
+                (-1, -1),
+                [
+                    colors.white,
+                    colors.HexColor("#F2F2F2")
+                ]
+            ),
+
+            (
+                "TOPPADDING",
+                (0, 0),
+                (-1, -1),
+                5
+            ),
+
+            (
+                "BOTTOMPADDING",
+                (0, 0),
+                (-1, -1),
+                5
+            ),
+
+            (
+                "LEFTPADDING",
+                (0, 0),
+                (-1, -1),
+                5
+            ),
+
+            (
+                "RIGHTPADDING",
+                (0, 0),
+                (-1, -1),
+                5
+            ),
+        ])
+    )
+
+    elementos.append(tabela_eventos)
+
+    # =====================================================
+    # 15. ASSINATURA DIGITAL
+    # =====================================================
+
+    elementos.append(
+        Spacer(1, 1.2 * cm)
+    )
+
+    if os.path.exists(caminho_assinatura):
+
+        assinatura = Image(
+            caminho_assinatura,
+            width=5.5 * cm,
+            height=1.0 * cm
         )
 
-    elementos.append(Spacer(1, 1.5 * cm))
+        assinatura.hAlign = "CENTER"
 
-    assinatura_style = ParagraphStyle(
-        "Assinatura",
-        parent=styles["Normal"],
-        fontName="Helvetica",
-        fontSize=10,
-        leading=14,
-        alignment=TA_CENTER,
+        elementos.append(assinatura)
+
+    # =====================================================
+    # 16. IDENTIFICAÇÃO DO OFICIAL
+    # =====================================================
+
+    elementos.append(
+        Paragraph(
+            "_______________________________________________",
+            estilo_centro
+        )
     )
 
     elementos.append(
         Paragraph(
-            "____________________________________________",
-            assinatura_style
+            "<b>HÉLO NERY DOS SANTOS JUNIOR – CAP PM</b>",
+            estilo_centro
         )
     )
 
     elementos.append(
         Paragraph(
-            "<b>Responsável pela Seção de Operações</b>",
-            assinatura_style
+            "Chefe da SPO",
+            estilo_centro
         )
     )
 
-    elementos.append(
-        Paragraph(
-            "95ª CIPM",
-            assinatura_style
-        )
-    )
+    # =====================================================
+    # 17. GERAR O PDF
+    # =====================================================
 
     doc.build(elementos)
-
-    pdf = buffer.getvalue()
-    buffer.close()
-
-    response = HttpResponse(
-        pdf,
-        content_type="application/pdf"
-    )
-
-    response["Content-Disposition"] = (
-        f'inline; filename="mapa_eventos_'
-        f'{inicio.strftime("%d-%m-%Y")}_'
-        f'a_{fim.strftime("%d-%m-%Y")}.pdf"'
-    )
 
     return response
