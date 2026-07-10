@@ -794,20 +794,19 @@ def solicitar_correcao(request, id):
 Prezado(a) {solicitacao.solicitante},
 
 Após análise da documentação referente ao evento:
-
 {solicitacao.nome_evento}
 
-informamos que sua Ordem de Policiamento Operacional (OPO)
+Informamos que sua Ordem de Policiamento Operacional (OPO)
 não pôde ser gerada.
 
 Motivo:
 
 • erro no cadastro;
+• Data no ofício diferente da solicitação;
 • duplicidade da solicitação;
 • ausência de documentos obrigatórios.
 
 Solicitamos que compareça à sede da 95ª CIPM para regularizar as pendências.
-
 Após a regularização, uma nova análise será realizada.
 
 Atenciosamente,
