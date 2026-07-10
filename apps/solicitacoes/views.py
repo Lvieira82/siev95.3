@@ -404,7 +404,7 @@ def lancamento_manual(request):
 
     if request.method == "POST":
 
-        form = SolicitacaoManualForm(
+        form = SolicitacaoForm(
             request.POST,
             request.FILES
         )
@@ -412,33 +412,28 @@ def lancamento_manual(request):
         if form.is_valid():
 
             solicitacao = form.save(commit=False)
-            solicitacao.status = "PENDENTE"
-            solicitacao.usuario = request.user
 
-            if not solicitacao.publico_estimado:
-                solicitacao.publico_estimado = 0
+            # Lançamento manual feito pela gestão
+            solicitacao.status = "APROVADO"
 
             solicitacao.save()
 
             messages.success(
                 request,
-                f"Lançamento manual salvo. Protocolo: {solicitacao.protocolo}"
+                "Evento cadastrado manualmente com sucesso."
             )
 
-            return redirect("listar_pendentes_opo")
-
-        else:
-            print("ERROS DO FORMULÁRIO MANUAL:")
-            print(form.errors)
+            return redirect("painel_gestao")
 
     else:
-        form = SolicitacaoManualForm()
+
+        form = SolicitacaoForm()
 
     return render(
         request,
         "gestao/lancamento_manual.html",
         {
-            "form": form
+            "form": form,
         }
     )
 # =====================================================
