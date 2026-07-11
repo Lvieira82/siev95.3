@@ -131,24 +131,27 @@ PMBA - Uma força a serviço do cidadão.
 # CONSULTAR PROTOCOLO
 # =====================================================
 
+
 def consultar_protocolo(request):
 
-    protocolo = request.GET.get("protocolo")
+    hoje = timezone.localdate()
+
+    eventos_hoje = Solicitacao.objects.filter(
+        data_evento=hoje,
+        status="APROVADO"
+    ).order_by(
+        "hora_inicio"
+    )
 
     solicitacao = None
     erro = None
 
-    eventos_hoje = Solicitacao.objects.filter(
-        data_evento=date.today()
-    ).order_by(
-        "hora_inicio",
-        "nome_evento"
-    )
+    protocolo = request.GET.get("protocolo")
 
     if protocolo:
 
         solicitacao = Solicitacao.objects.filter(
-            protocolo=protocolo.upper()
+            protocolo=protocolo
         ).first()
 
         if not solicitacao:
@@ -156,14 +159,13 @@ def consultar_protocolo(request):
 
     return render(
         request,
-        "solicitacoes/consultar.html",
+        "consulta/consultar.html",
         {
+            "eventos_hoje": eventos_hoje,
             "solicitacao": solicitacao,
             "erro": erro,
-            "eventos_hoje": eventos_hoje,
         }
     )
-
 # =====================================================
 # MINHAS SOLICITAÇÕES
 # =====================================================
