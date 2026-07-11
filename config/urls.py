@@ -118,12 +118,13 @@ urlpatterns = [
         name="nova_solicitacao",
     ),
     path(
-        "consulta/opo/<int:id>/matricula/",
+        "consulta/opo/<str:protocolo>/matricula/",
         validar_matricula_opo_publica,
         name="validar_matricula_opo_publica"
     ),
+    
     path(
-        "consulta/opo/<int:id>/detalhes/",
+        "consulta/opo/<str:protocolo>/detalhes/",
         detalhe_opo_publica,
         name="detalhe_opo_publica"
     ),
