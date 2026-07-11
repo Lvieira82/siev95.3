@@ -757,6 +757,47 @@ def verificar_autenticidade(request, protocolo):
         }
     )
 
+
+
+def validar_matricula_opo_publica(request, id):
+
+    solicitacao = get_object_or_404(
+        Solicitacao,
+        id=id
+    )
+
+    erro = None
+
+    if request.method == "POST":
+
+        matricula = request.POST.get("matricula", "").strip()
+
+        matricula_autorizada = MatriculaAutorizada.objects.filter(
+            matricula=matricula
+        ).exists()
+
+        if matricula_autorizada:
+
+            # Autoriza temporariamente esta OPO específica
+            request.session[
+                f"opo_autorizada_{solicitacao.id}"
+            ] = True
+
+            return redirect(
+                "detalhe_opo_publica",
+                id=solicitacao.id
+            )
+
+        erro = "Matrícula não autorizada."
+
+    return render(
+        request,
+        "consulta/validar_matricula_opo.html",
+        {
+            "solicitacao": solicitacao,
+            "erro": erro,
+        }
+    )
 def validar_matricula_opo_publica(request, id):
 
     solicitacao = get_object_or_404(
