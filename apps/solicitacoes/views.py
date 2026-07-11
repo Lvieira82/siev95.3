@@ -757,12 +757,14 @@ def verificar_autenticidade(request, protocolo):
         }
     )
 
-def validar_matricula_opo_publica(request, protocolo):
+def validar_matricula_opo_publica(request, id):
 
     solicitacao = get_object_or_404(
         Solicitacao,
-        protocolo=protocolo
+        id=id
     )
+
+    erro = None
 
     if request.method == "POST":
 
@@ -777,29 +779,19 @@ def validar_matricula_opo_publica(request, protocolo):
 
         if autorizada:
 
-            request.session[
-                f"opo_autorizada_{solicitacao.protocolo}"
-            ] = True
-
             return redirect(
-                "detalhe_opo_publica",
-                protocolo=solicitacao.protocolo
+                "detalhe_opo",
+                id=solicitacao.id
             )
 
-        return render(
-            request,
-            "consulta/validar_matricula_opo.html",
-            {
-                "solicitacao": solicitacao,
-                "erro": "Matrícula não autorizada."
-            }
-        )
+        erro = "Matrícula não autorizada para acessar esta OPO."
 
     return render(
         request,
         "consulta/validar_matricula_opo.html",
         {
-            "solicitacao": solicitacao
+            "solicitacao": solicitacao,
+            "erro": erro,
         }
     )
 def detalhe_opo_publica(request, protocolo):
