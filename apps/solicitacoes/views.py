@@ -809,50 +809,52 @@ def verificar_autenticidade(request, protocolo):
 
 def validar_matricula_opo_publica(request, id):
 
+    # Aceita somente POST
+    if request.method != "POST":
+        return redirect("consultar_protocolo")
+
+    # Localiza exatamente o evento clicado
     solicitacao = get_object_or_404(
         Solicitacao,
         id=id,
         status="APROVADO"
     )
 
-    if request.method == "POST":
+    # Recebe a matrícula digitada
+    matricula = request.POST.get(
+        "matricula",
+        ""
+    ).strip()
 
-        matricula = request.POST.get(
-            "matricula",
-            ""
-        ).strip()
+    # Verifica se a matrícula existe e está ativa
+    autorizado = MatriculaAutorizada.objects.filter(
+        matricula=matricula,
+        ativo=True
+    ).exists()
 
-        if MatriculaAutorizada.objects.filter(
-            matricula=matricula,
-            ativo=True
-        ).exists():
+    if autorizado:
 
-            # Autoriza esta OPO específica na sessão
-            request.session[
-                f"opo_publica_autorizada_{id}"
-            ] = True
+        # Autoriza especificamente esta OPO na sessão
+        request.session[
+            f"opo_publica_autorizada_{id}"
+        ] = True
 
-            # Vai diretamente para a mesma OPO
-            # aberta pelo botão "Abrir OPO Gerada"
-            return redirect(
-                "gerar_opo",
-                id=id
-            )
-
-        messages.error(
-            request,
-            "Matrícula não autorizada."
+        # Abre exatamente a mesma OPO do botão
+        # "Abrir OPO Gerada"
+        return redirect(
+            "gerar_opo",
+            id=id
         )
 
-    return render(
+    # Matrícula inválida
+    messages.error(
         request,
-        "consulta/validar_matricula_opo.html",
-        {
-            "solicitacao": solicitacao
-        }
+        "Matrícula não autorizada."
     )
 
-
+    return redirect(
+        "consultar_protocolo"
+    )
 def detalhe_opo_publica(request, id):
     if not request.session.get(f"opo_publica_autorizada_{id}"):
         return redirect("validar_matricula_opo_publica", id=id)
