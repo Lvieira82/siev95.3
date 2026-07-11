@@ -260,10 +260,31 @@
                             {% endif %}
                         </div>
 
-                        <a href="{% url 'validar_matricula_opo_publica' evento.id %}"
-                           class="btn-detalhes-evento">
-                            Detalhes
-                        </a>
+                        <form
+                            method="post"
+                            action="{% url 'validar_matricula_opo_publica' evento.id %}"
+                            class="form-matricula"
+                        >
+                    
+                        {% csrf_token %}
+                    
+                        <input
+                            type="text"
+                            name="matricula"
+                            class="input-matricula"
+                            placeholder="Matrícula"
+                            required
+                            autocomplete="off"
+                        >
+                    
+                        <button
+                            type="submit"
+                            class="btn-detalhes-evento"
+                        >
+                            📄 Abrir OPO
+                        </button>
+                    
+                    </form>
 
                     </div>
 
