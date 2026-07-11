@@ -521,11 +521,29 @@ PMBA - Uma força a serviço do cidadão.
 @login_required
 def gerar_opo(request, id):
 
+    def gerar_opo(request, id):
+
     solicitacao = get_object_or_404(
         Solicitacao,
         id=id,
         status="APROVADO"
     )
+
+    acesso_publico_autorizado = request.session.get(
+        f"opo_publica_autorizada_{solicitacao.id}",
+        False
+    )
+
+    gestor_autenticado = request.user.is_authenticated
+
+    if not gestor_autenticado and not acesso_publico_autorizado:
+        return redirect(
+            "validar_matricula_opo_publica",
+            id=solicitacao.id
+        )
+
+    # A partir daqui permanece todo o restante
+    # da sua lógica atual de geração da OPO
 
     data_geracao = timezone.localtime()
 
