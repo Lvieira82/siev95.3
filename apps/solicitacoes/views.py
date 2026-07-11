@@ -520,9 +520,6 @@ PMBA - Uma força a serviço do cidadão.
 
 @login_required
 def gerar_opo(request, id):
-
-    def gerar_opo(request, id):
-
     solicitacao = get_object_or_404(
         Solicitacao,
         id=id,
@@ -544,6 +541,8 @@ def gerar_opo(request, id):
 
     # A partir daqui permanece todo o restante
     # da sua lógica atual de geração da OPO
+
+
 
     data_geracao = timezone.localtime()
 
