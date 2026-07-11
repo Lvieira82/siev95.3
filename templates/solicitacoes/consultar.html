@@ -188,6 +188,36 @@
             background: #596170;
             color: white;
         }
+        .form-matricula{
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+            min-width:150px;
+        }
+        
+        .input-matricula{
+            width:150px;
+            padding:10px 12px;
+            margin:0;
+            border:1px solid #907C64;
+            border-radius:8px;
+            font-size:15px;
+            text-align:center;
+            background:#fff;
+        }
+        
+        .input-matricula:focus{
+            outline:none;
+            border-color:#111827;
+            box-shadow:0 0 0 3px rgba(144,124,100,.18);
+        }
+        
+        .form-matricula .btn-detalhes-evento{
+            width:150px;
+            border:none;
+            cursor:pointer;
+            text-align:center;
+        }
         @media(max-width:768px){
             .card{
                 padding:25px;
