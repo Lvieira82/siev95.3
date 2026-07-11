@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Consultar Protocolo - SiEv</title>
 
     <style>
+
         *{
             margin:0;
             padding:0;
@@ -30,6 +34,7 @@
             text-align:center;
             box-shadow:0 15px 40px rgba(0,0,0,.25);
         }
+
         .btn-corrigir{
             display:inline-block;
             margin-top:10px;
@@ -41,12 +46,12 @@
             font-weight:bold;
             transition:.3s;
         }
-        
+
         .btn-corrigir:hover{
             background:#d97706;
             transform:translateY(-2px);
         }
-        
+
         .logo{
             font-size:60px;
             font-weight:bold;
@@ -139,6 +144,7 @@
             text-decoration:none;
             font-weight:bold;
             white-space:nowrap;
+            display:inline-block;
         }
 
         .btn-detalhes-evento:hover{
@@ -167,28 +173,30 @@
             color:#111827;
         }
 
-        .area-voltar {
-            display: flex;
-            justify-content: center;
-            margin-top: 25px;
+        .area-voltar{
+            display:flex;
+            justify-content:center;
+            margin-top:25px;
         }
-        
-        .btn-voltar {
-            display: inline-block;
-            background: #6f7786;
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            padding: 12px 25px;
-            border-radius: 9px;
-            transition: 0.2s;
+
+        .btn-voltar{
+            display:inline-block;
+            background:#6f7786;
+            color:white;
+            text-decoration:none;
+            font-weight:bold;
+            padding:12px 25px;
+            border-radius:9px;
+            transition:.2s;
         }
-        
-        .btn-voltar:hover {
-            background: #596170;
-            color: white;
+
+        .btn-voltar:hover{
+            background:#596170;
+            color:white;
         }
+
         @media(max-width:768px){
+
             .card{
                 padding:25px;
             }
@@ -206,36 +214,53 @@
                 width:100%;
                 text-align:center;
             }
+
         }
+
     </style>
+
 </head>
 
 <body>
 
 <div class="card">
 
-    <div class="logo">SiEv</div>
+    <div class="logo">
+        SiEv
+    </div>
 
     <div class="subtitulo">
         Sistema para Informações de Eventos
     </div>
 
-    <h2>Consultar Informação</h2>
+    <h2>
+        Consultar Informação
+    </h2>
 
     <form method="get">
+
         <input
             type="text"
             name="protocolo"
             placeholder="Digite o protocolo"
+            value="{{ request.GET.protocolo|default:'' }}"
             required
         >
 
-        <button type="submit">Consultar</button>
+        <button type="submit">
+            Consultar
+        </button>
+
     </form>
+
+
+    <!-- EVENTOS DO DIA -->
 
     <div class="eventos-dia-card">
 
-        <h2>📢 Eventos do Dia</h2>
+        <h2>
+            📢 Eventos do Dia
+        </h2>
 
         <div class="eventos-dia-lista">
 
@@ -244,23 +269,41 @@
                 <div class="evento-dia-item">
 
                     <strong>
-                        {{ evento.hora_inicio|time:"H:i" }} - {{ evento.nome_evento }}
+                        {{ evento.hora_inicio|time:"H:i" }}
+                        -
+                        {{ evento.nome_evento }}
                     </strong>
 
                     <div class="evento-dia-info">
 
                         <div>
-                            📍 {{ evento.local }}<br>
-                            👤 {{ evento.solicitante }}<br>
+
+                            📍 {{ evento.local }}
+
+                            <br>
+
+                            👤 {{ evento.solicitante }}
+
+                            <br>
+
                             ⚑
+
                             {% if evento.status == "APROVADO" %}
+
                                 Ordem de Policiamento Criada
+
                             {% else %}
+
                                 {{ evento.status }}
+
                             {% endif %}
+
                         </div>
 
-                        <a href="{% url 'validar_matricula_opo_publica' evento.protocolo %}">
+                        <a
+                            href="{% url 'validar_matricula_opo_publica' evento.id %}"
+                            class="btn-detalhes-evento"
+                        >
                             📄 Detalhes
                         </a>
 
@@ -275,53 +318,98 @@
                 </div>
 
             {% endfor %}
-        
+
         </div>
-        <div class="area-voltar">
-            <a href="{% url 'home' %}" class="btn-voltar">
-                ← Voltar
-            </a>
-        </div>
+
     </div>
+
+
+    <!-- RESULTADO DA CONSULTA POR PROTOCOLO -->
 
     {% if solicitacao %}
 
         <div class="resultado">
-            <p><strong>Protocolo:</strong> {{ solicitacao.protocolo }}</p><br>
-            <p><strong>Evento:</strong> {{ solicitacao.nome_evento }}</p><br>
-            <p><strong>Solicitante:</strong> {{ solicitacao.solicitante }}</p><br>
+
+            <p>
+                <strong>Protocolo:</strong>
+                {{ solicitacao.protocolo }}
+            </p>
+
+            <br>
+
+            <p>
+                <strong>Evento:</strong>
+                {{ solicitacao.nome_evento }}
+            </p>
+
+            <br>
+
+            <p>
+                <strong>Solicitante:</strong>
+                {{ solicitacao.solicitante }}
+            </p>
+
+            <br>
+
             <p>
                 <strong>Status:</strong>
 
-                    {% if solicitacao.status == "CORRECAO" %}
+                {% if solicitacao.status == "CORRECAO" %}
 
-                    <a href="{% url 'corrigir_solicitacao' solicitacao.protocolo %}"
-                       class="btn-corrigir">
+                    <br>
+
+                    <a
+                        href="{% url 'corrigir_solicitacao' solicitacao.protocolo %}"
+                        class="btn-corrigir"
+                    >
                         ✏️ Corrigir Solicitação
                     </a>
-                    
-                    {% endif %}
-                    
-                    {% else %}
-                    
+
+                {% else %}
+
                     <span class="status">
                         {{ solicitacao.status }}
                     </span>
-                    
-                    {% endif %}
+
+                {% endif %}
+
             </p>
-        </div>
 
-    {% if erro %}
-
-        <div class="resultado">
-            <strong style="color:red;">{{ erro }}</strong>
         </div>
 
     {% endif %}
 
-    
+
+    <!-- MENSAGEM DE ERRO -->
+
+    {% if erro %}
+
+        <div class="resultado">
+
+            <strong style="color:red;">
+                {{ erro }}
+            </strong>
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- VOLTAR -->
+
+    <div class="area-voltar">
+
+        <a
+            href="{% url 'home' %}"
+            class="btn-voltar"
+        >
+            ← Voltar
+        </a>
+
+    </div>
+
 </div>
 
 </body>
+
 </html>
