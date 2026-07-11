@@ -882,14 +882,16 @@ Após análise da documentação referente ao evento:
 Informamos que sua Ordem de Policiamento Operacional (OPO)
 não pôde ser gerada.
 
-Motivo:
+Motivos prováveis:
 
 • erro no cadastro;
 • Data no ofício diferente da solicitação;
 • duplicidade da solicitação;
 • ausência de documentos obrigatórios.
 
-Solicitamos que compareça à sede da 95ª CIPM para regularizar as pendências.
+Solicitamos que acesse a página de consula com seu protocolo e corrija
+ou anexe os documentos corretos. Se preferir compareça à sede da 95ª CIPM
+para regularizar as pendências.
 Após a regularização, uma nova análise será realizada.
 
 Atenciosamente,
