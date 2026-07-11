@@ -131,27 +131,24 @@ PMBA - Uma força a serviço do cidadão.
 # CONSULTAR PROTOCOLO
 # =====================================================
 
-
 def consultar_protocolo(request):
 
-    hoje = timezone.localdate()
-
-    eventos_hoje = Solicitacao.objects.filter(
-        data_evento=hoje,
-        status="APROVADO"
-    ).order_by(
-        "hora_inicio"
-    )
+    protocolo = request.GET.get("protocolo")
 
     solicitacao = None
     erro = None
 
-    protocolo = request.GET.get("protocolo")
+    eventos_hoje = Solicitacao.objects.filter(
+        data_evento=date.today()
+    ).order_by(
+        "hora_inicio",
+        "nome_evento"
+    )
 
     if protocolo:
 
         solicitacao = Solicitacao.objects.filter(
-            protocolo=protocolo
+            protocolo=protocolo.upper()
         ).first()
 
         if not solicitacao:
@@ -159,13 +156,14 @@ def consultar_protocolo(request):
 
     return render(
         request,
-        "consulta/consultar.html",
+        "solicitacoes/consultar.html",
         {
-            "eventos_hoje": eventos_hoje,
             "solicitacao": solicitacao,
             "erro": erro,
+            "eventos_hoje": eventos_hoje,
         }
     )
+
 # =====================================================
 # MINHAS SOLICITAÇÕES
 # =====================================================
@@ -520,29 +518,12 @@ PMBA - Uma força a serviço do cidadão.
 
 @login_required
 def gerar_opo(request, id):
+
     solicitacao = get_object_or_404(
         Solicitacao,
         id=id,
         status="APROVADO"
     )
-
-    acesso_publico_autorizado = request.session.get(
-        f"opo_publica_autorizada_{solicitacao.id}",
-        False
-    )
-
-    gestor_autenticado = request.user.is_authenticated
-
-    if not gestor_autenticado and not acesso_publico_autorizado:
-        return redirect(
-            "validar_matricula_opo_publica",
-            id=solicitacao.id
-        )
-
-    # A partir daqui permanece todo o restante
-    # da sua lógica atual de geração da OPO
-
-
 
     data_geracao = timezone.localtime()
 
@@ -777,107 +758,41 @@ def verificar_autenticidade(request, protocolo):
 
 
 def validar_matricula_opo_publica(request, id):
-
     solicitacao = get_object_or_404(
         Solicitacao,
-        id=id
+        id=id,
+        status="APROVADO"
     )
 
-    erro = None
-
     if request.method == "POST":
-
         matricula = request.POST.get("matricula", "").strip()
 
-        matricula_autorizada = MatriculaAutorizada.objects.filter(
-            matricula=matricula
-        ).exists()
+        if MatriculaAutorizada.objects.filter(
+            matricula=matricula,
+            ativo=True
+        ).exists():
+            request.session[f"opo_publica_autorizada_{id}"] = True
+            return redirect("detalhe_opo_publica", id=id)
 
-        if matricula_autorizada:
+        messages.error(request, "Matrícula não autorizada.")
 
-            # Autoriza temporariamente esta OPO específica
-            request.session[
-                f"opo_autorizada_{solicitacao.id}"
-            ] = True
-
-            return redirect(
-                "detalhe_opo_publica",
-                id=solicitacao.id
-            )
-
-        erro = "Matrícula não autorizada."
-
-    return render(
-        request,
-        "consulta/validar_matricula_opo.html",
-        {
-            "solicitacao": solicitacao,
-            "erro": erro,
-        }
-    )
-def validar_matricula_opo_publica(request, id):
+    return render(request, "consulta/validar_matricula_opo.html", {
+        "solicitacao": solicitacao
+    })
+def detalhe_opo_publica(request, id):
+    if not request.session.get(f"opo_publica_autorizada_{id}"):
+        return redirect("validar_matricula_opo_publica", id=id)
 
     solicitacao = get_object_or_404(
         Solicitacao,
-        id=id
+        id=id,
+        status="APROVADO"
     )
 
-    erro = None
+    return render(request, "consulta/detalhe_opo_publica.html", {
+        "solicitacao": solicitacao
+    })
 
-    if request.method == "POST":
-
-        matricula = request.POST.get(
-            "matricula",
-            ""
-        ).strip()
-
-        autorizada = MatriculaAutorizada.objects.filter(
-            matricula=matricula
-        ).exists()
-
-        if autorizada:
-
-            return redirect(
-                "detalhe_opo",
-                id=solicitacao.id
-            )
-
-        erro = "Matrícula não autorizada para acessar esta OPO."
-
-    return render(
-        request,
-        "consulta/validar_matricula_opo.html",
-        {
-            "solicitacao": solicitacao,
-            "erro": erro,
-        }
-    )
-def detalhe_opo_publica(request, protocolo):
-
-    solicitacao = get_object_or_404(
-        Solicitacao,
-        protocolo=protocolo
-    )
-
-    autorizado = request.session.get(
-        f"opo_autorizada_{solicitacao.protocolo}",
-        False
-    )
-
-    if not autorizado:
-
-        return redirect(
-            "validar_matricula_opo_publica",
-            protocolo=solicitacao.protocolo
-        )
-
-    return render(
-        request,
-        "consulta/detalhe_opo_publica.html",
-        {
-            "solicitacao": solicitacao
-        }
-    )
 def solicitar_correcao(request, id):
 
     solicitacao = get_object_or_404(Solicitacao, id=id)
