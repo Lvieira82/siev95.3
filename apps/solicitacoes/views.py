@@ -516,13 +516,63 @@ PMBA - Uma força a serviço do cidadão.
 # GERAR OPO
 # =====================================================
 
-@login_required
 def gerar_opo(request, id):
 
     solicitacao = get_object_or_404(
         Solicitacao,
         id=id,
         status="APROVADO"
+    )
+
+    # Verifica se é gestor autenticado
+    gestor_autenticado = request.user.is_authenticated
+
+    # Verifica se o policial validou a matrícula
+    # especificamente para esta OPO
+    acesso_publico_autorizado = request.session.get(
+        f"opo_publica_autorizada_{id}",
+        False
+    )
+
+    # Se não for gestor e também não tiver
+    # validado matrícula, bloqueia o acesso direto
+    if not gestor_autenticado and not acesso_publico_autorizado:
+
+        return redirect(
+            "validar_matricula_opo_publica",
+            id=id
+        )
+
+    data_geracao = timezone.localtime()
+
+    url_verificacao = request.build_absolute_uri(
+        f"/verificar/{solicitacao.protocolo}/"
+    )
+
+    qr_img = qrcode.make(url_verificacao)
+
+    buffer = BytesIO()
+
+    qr_img.save(
+        buffer,
+        format="PNG"
+    )
+
+    qr_base64 = base64.b64encode(
+        buffer.getvalue()
+    ).decode("utf-8")
+
+    qr_base64 = f"data:image/png;base64,{qr_base64}"
+
+    return render(
+        request,
+        "solicitacoes/opo_pdf.html",
+        {
+            "solicitacao": solicitacao,
+            "data_geracao": data_geracao,
+            "qr_base64": qr_base64,
+            "url_verificacao": url_verificacao,
+        }
     )
 
     data_geracao = timezone.localtime()
@@ -758,6 +808,7 @@ def verificar_autenticidade(request, protocolo):
 
 
 def validar_matricula_opo_publica(request, id):
+
     solicitacao = get_object_or_404(
         Solicitacao,
         id=id,
@@ -765,20 +816,43 @@ def validar_matricula_opo_publica(request, id):
     )
 
     if request.method == "POST":
-        matricula = request.POST.get("matricula", "").strip()
+
+        matricula = request.POST.get(
+            "matricula",
+            ""
+        ).strip()
 
         if MatriculaAutorizada.objects.filter(
             matricula=matricula,
             ativo=True
         ).exists():
-            request.session[f"opo_publica_autorizada_{id}"] = True
-            return redirect("detalhe_opo_publica", id=id)
 
-        messages.error(request, "Matrícula não autorizada.")
+            # Autoriza esta OPO específica na sessão
+            request.session[
+                f"opo_publica_autorizada_{id}"
+            ] = True
 
-    return render(request, "consulta/validar_matricula_opo.html", {
-        "solicitacao": solicitacao
-    })
+            # Vai diretamente para a mesma OPO
+            # aberta pelo botão "Abrir OPO Gerada"
+            return redirect(
+                "gerar_opo",
+                id=id
+            )
+
+        messages.error(
+            request,
+            "Matrícula não autorizada."
+        )
+
+    return render(
+        request,
+        "consulta/validar_matricula_opo.html",
+        {
+            "solicitacao": solicitacao
+        }
+    )
+
+
 def detalhe_opo_publica(request, id):
     if not request.session.get(f"opo_publica_autorizada_{id}"):
         return redirect("validar_matricula_opo_publica", id=id)
