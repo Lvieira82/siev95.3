@@ -60,11 +60,28 @@ def nova_solicitacao(request):
         if form.is_valid():
 
             try:
-                solicitacao = form.save(commit=False)
+
+                # Verifica se o formulário detectou
+                # múltiplas datas no ofício.
+                aviso_multiplas_datas = getattr(
+                    form,
+                    "aviso_multiplas_datas",
+                    False
+                )
+
+                solicitacao = form.save(
+                    commit=False
+                )
+
                 solicitacao.status = "PENDENTE"
+
                 solicitacao.save()
 
-                assunto = "Solicitação de Evento Recebida"
+
+                assunto = (
+                    "Solicitação de Evento Recebida"
+                )
+
 
                 mensagem = f"""
 Olá, {solicitacao.solicitante}!
@@ -88,7 +105,9 @@ Guarde este protocolo para futuras consultas.
 PMBA - Uma força a serviço do cidadão.
 """
 
+
                 try:
+
                     send_mail(
                         assunto,
                         mensagem,
@@ -98,25 +117,46 @@ PMBA - Uma força a serviço do cidadão.
                     )
 
                 except Exception as erro_email:
-                    print("ERRO AO ENVIAR EMAIL:")
+
+                    print(
+                        "ERRO AO ENVIAR EMAIL:"
+                    )
+
                     print(erro_email)
+
 
                 return render(
                     request,
                     "solicitacoes/sucesso.html",
                     {
-                        "protocolo": solicitacao.protocolo
+                        "protocolo": solicitacao.protocolo,
+
+                        "aviso_multiplas_datas": (
+                            aviso_multiplas_datas
+                        ),
+
+                        "datas_encontradas": getattr(
+                            form,
+                            "datas_encontradas_oficio",
+                            []
+                        ),
                     }
                 )
 
+
             except Exception as erro:
+
                 form.add_error(
                     None,
-                    f"Ocorreu um erro ao salvar a solicitação: {erro}"
+                    f"Ocorreu um erro ao salvar a "
+                    f"solicitação: {erro}"
                 )
 
+
     else:
+
         form = SolicitacaoForm()
+
 
     return render(
         request,
@@ -125,7 +165,6 @@ PMBA - Uma força a serviço do cidadão.
             "form": form
         }
     )
-
 
 # =====================================================
 # CONSULTAR PROTOCOLO
