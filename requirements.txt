@@ -54,3 +54,7 @@ PyMuPDF
 dateparser
 Pillow
 pytesseract
+pytesseract==0.3.13
+PyMuPDF==1.28.0
+Pillow==12.2.0
+dateparser==1.4.1
