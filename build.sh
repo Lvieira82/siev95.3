@@ -10,8 +10,22 @@ pip install -r requirements.txt
 
 
 echo "======================================"
+echo "Atualizando lista de pacotes APT"
+echo "======================================"
+
+apt-get update
+
+echo "======================================"
 echo "Baixando pacotes do Tesseract OCR"
 echo "======================================"
+
+mkdir -p .apt-packages
+cd .apt-packages
+
+apt-get download \
+    tesseract-ocr \
+    tesseract-ocr-por \
+    libtesseract5
 
 mkdir -p .apt-packages
 cd .apt-packages
