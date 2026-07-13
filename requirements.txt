@@ -52,5 +52,4 @@ whitenoise
 openpyxl
 PyMuPDF
 dateparser
-pytesseract
 Pillow
