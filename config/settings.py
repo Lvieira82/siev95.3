@@ -22,6 +22,7 @@ DEBUG = config(
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
+    "siev95-3.onrender.com",
     "siev2.onrender.com",
     "siev95.com.br",
     "www.siev95.com.br",
