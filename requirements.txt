@@ -50,3 +50,7 @@ python-decouple
 gunicorn
 whitenoise
 openpyxl
+PyMuPDF
+dateparser
+pytesseract
+Pillow
