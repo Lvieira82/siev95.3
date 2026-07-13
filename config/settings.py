@@ -160,5 +160,5 @@ CSRF_TRUSTED_ORIGINS = [
     "https://siev95.com.br",
     "https://www.siev95.com.br",
     "https://siev2.onrender.com",
-    "siev95-3.onrender.com",
+    "https://siev95-3.onrender.com",
 ]
