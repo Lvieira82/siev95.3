@@ -53,3 +53,4 @@ openpyxl
 PyMuPDF
 dateparser
 Pillow
+pytesseract
