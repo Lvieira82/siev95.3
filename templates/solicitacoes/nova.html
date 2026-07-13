@@ -78,6 +78,11 @@ textarea{
     font-weight:bold;
 }
 
+.btn-submit:disabled{
+    opacity:.65;
+    cursor:not-allowed;
+}
+
 .btn-back{
     background:#6b7280;
     color:white;
@@ -170,6 +175,93 @@ textarea{
     font-weight:bold;
 }
 
+
+/* =========================================================
+   TELA DE AGUARDE DURANTE A ANÁLISE OCR
+========================================================= */
+
+.overlay-analise{
+    display:none;
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    background:rgba(17, 24, 39, .90);
+    z-index:99999;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.overlay-analise.ativo{
+    display:flex;
+}
+
+.caixa-analise{
+    width:100%;
+    max-width:460px;
+    background:#ffffff;
+    border-radius:20px;
+    padding:40px 30px;
+    text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+    animation:aparecerCaixa .3s ease;
+}
+
+.caixa-analise h2{
+    color:#907C64;
+    margin:20px 0 12px;
+    font-size:24px;
+}
+
+.caixa-analise p{
+    color:#374151;
+    font-size:17px;
+    line-height:1.5;
+    margin-bottom:15px;
+    font-weight:bold;
+}
+
+.caixa-analise small{
+    display:block;
+    color:#6b7280;
+    font-size:14px;
+    line-height:1.5;
+}
+
+.spinner-analise{
+    width:65px;
+    height:65px;
+    margin:0 auto;
+    border:7px solid #e5e7eb;
+    border-top-color:#907C64;
+    border-radius:50%;
+    animation:girarSpinner .8s linear infinite;
+}
+
+@keyframes girarSpinner{
+    from{
+        transform:rotate(0deg);
+    }
+
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+@keyframes aparecerCaixa{
+    from{
+        opacity:0;
+        transform:translateY(15px) scale(.97);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+
+
 @media(max-width:768px){
     .grid{
         grid-template-columns:1fr;
@@ -178,18 +270,22 @@ textarea{
     .form-card{
         padding:20px;
     }
+
+    .caixa-analise{
+        padding:30px 20px;
+    }
 }
 </style>
+
 
 <div class="form-card">
 
     <h1 class="form-title">
-        {% if solicitacao %}
-            Corrigir Solicitação
-        {% else %}
-            Informação de Evento
-        {% endif %}
+        Informação de Evento
     </h1>
+
+
+    <!-- DECLARAÇÃO DE VERACIDADE -->
 
     <div class="termos-lei">
 
@@ -216,6 +312,9 @@ textarea{
         </label>
 
     </div>
+
+
+    <!-- PARTICIPAÇÃO DE ANIMAIS -->
 
     <div class="termos-lei">
 
@@ -256,6 +355,9 @@ textarea{
 
     </div>
 
+
+    <!-- ERROS DO FORMULÁRIO -->
+
     {% if form.errors %}
     <div class="erro">
 
@@ -279,15 +381,16 @@ textarea{
     </div>
     {% endif %}
 
+
+    <!-- ÁREA DO FORMULÁRIO -->
+
     <div id="areaFormulario">
 
-        <form method="post" enctype="multipart/form-data">
-            
-            {% csrf_token %}
-            
-            {% if solicitacao %}
-                <input type="hidden" name="correcao" value="1">
-            {% endif %}
+        <form
+            method="post"
+            enctype="multipart/form-data"
+            id="form-solicitacao"
+        >
 
             {% csrf_token %}
 
@@ -304,6 +407,7 @@ textarea{
                     {% endif %}
                 </div>
 
+
                 <div>
                     <label>CPF *</label>
                     {{ form.cpf }}
@@ -314,6 +418,7 @@ textarea{
                         </div>
                     {% endif %}
                 </div>
+
 
                 <div>
                     <label>Telefone *</label>
@@ -326,6 +431,7 @@ textarea{
                     {% endif %}
                 </div>
 
+
                 <div>
                     <label>E-mail *</label>
                     {{ form.email }}
@@ -336,6 +442,7 @@ textarea{
                         </div>
                     {% endif %}
                 </div>
+
 
                 <div class="full">
                     <label>Nome do Evento *</label>
@@ -348,6 +455,7 @@ textarea{
                     {% endif %}
                 </div>
 
+
                 <div class="full">
                     <label>Local do Evento *</label>
                     {{ form.local }}
@@ -359,6 +467,7 @@ textarea{
                     {% endif %}
                 </div>
 
+
                 <div>
                     <label>Data do Evento *</label>
                     {{ form.data_evento }}
@@ -369,6 +478,7 @@ textarea{
                         </div>
                     {% endif %}
                 </div>
+
 
                 <div>
                     <label>
@@ -405,6 +515,7 @@ textarea{
                     {% endif %}
                 </div>
 
+
                 <div>
                     <label>Hora Início *</label>
                     {{ form.hora_inicio }}
@@ -415,6 +526,7 @@ textarea{
                         </div>
                     {% endif %}
                 </div>
+
 
                 <div>
                     <label>Hora Fim *</label>
@@ -427,6 +539,7 @@ textarea{
                     {% endif %}
                 </div>
 
+
                 <div class="full">
                     <label>Observações</label>
                     {{ form.observacoes }}
@@ -437,6 +550,7 @@ textarea{
                         </div>
                     {% endif %}
                 </div>
+
 
                 <div class="upload-box full">
                     <label>Documento Sanitário (PDF) *</label>
@@ -449,6 +563,7 @@ textarea{
                     {% endif %}
                 </div>
 
+
                 <div class="upload-box full">
                     <label>Documento do Meio Ambiente (PDF) *</label>
                     {{ form.documento_meio_ambiente }}
@@ -460,6 +575,7 @@ textarea{
                     {% endif %}
                 </div>
 
+
                 <div class="upload-box full">
                     <label>Ofício ao Comandante da Unidade (PDF) *</label>
                     {{ form.oficio_comandante }}
@@ -470,6 +586,7 @@ textarea{
                         </div>
                     {% endif %}
                 </div>
+
 
                 <div
                     id="campo_bombeiro"
@@ -488,6 +605,7 @@ textarea{
 
             </div>
 
+
             <div class="btn-area">
 
                 <a
@@ -500,12 +618,9 @@ textarea{
                 <button
                     type="submit"
                     class="btn-submit"
+                    id="btn-enviar-solicitacao"
                 >
-                    {% if solicitacao %}
-                        Salvar Correções
-                    {% else %}
-                        Enviar Informação
-                    {% endif %}
+                    Enviar Informação
                 </button>
 
             </div>
@@ -516,13 +631,42 @@ textarea{
 
 </div>
 
+
+<!-- =====================================================
+     OVERLAY DE ANÁLISE DOS DOCUMENTOS
+===================================================== -->
+
+<div id="overlay-analise" class="overlay-analise">
+
+    <div class="caixa-analise">
+
+        <div class="spinner-analise"></div>
+
+        <h2>Analisando documentos</h2>
+
+        <p>
+            Aguarde, estamos analisando os documentos anexados...
+        </p>
+
+        <small>
+            Este processo pode levar alguns segundos.<br>
+            Não feche ou atualize esta página.
+        </small>
+
+    </div>
+
+</div>
+
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
+
 <script>
 $('#id_telefone').mask('(00) 00000-0000');
 $('#id_cpf').mask('000.000.000-00');
+
 
 const aceite = document.getElementById('aceite_termos');
 const formulario = document.getElementById('areaFormulario');
@@ -532,6 +676,7 @@ const radiosAnimais = document.querySelectorAll(
 );
 
 const avisoAnimais = document.getElementById('avisoAnimais');
+
 
 function atualizarFormulario(){
 
@@ -547,11 +692,13 @@ function atualizarFormulario(){
     const marcouSimAnimais =
         animalSelecionado && animalSelecionado.value === "SIM";
 
+
     if(marcouSimAnimais){
         avisoAnimais.style.display = "block";
     }else{
         avisoAnimais.style.display = "none";
     }
+
 
     if(aceitouTermos && marcouNaoAnimais){
         formulario.style.opacity = "1";
@@ -562,21 +709,82 @@ function atualizarFormulario(){
     }
 }
 
+
 aceite.addEventListener('change', atualizarFormulario);
 
+
 radiosAnimais.forEach(function(radio){
+
     radio.addEventListener('change', atualizarFormulario);
+
 });
 
+
 atualizarFormulario();
+
 
 $('input[name="publico_estimado"]').on('change', function(){
 
     if($(this).val() === '1'){
+
         $('#campo_bombeiro').show();
+
     }else{
+
         $('#campo_bombeiro').hide();
         $('#id_oficio_bombeiro').val('');
+
+    }
+
+});
+
+
+/* =========================================================
+   MOSTRAR TELA DE AGUARDE DURANTE ANÁLISE OCR
+========================================================= */
+
+const formSolicitacao = document.getElementById('form-solicitacao');
+const overlayAnalise = document.getElementById('overlay-analise');
+const botaoEnviar = document.getElementById('btn-enviar-solicitacao');
+
+
+if(formSolicitacao && overlayAnalise){
+
+    formSolicitacao.addEventListener('submit', function(){
+
+        /*
+         * Exibe imediatamente a tela de análise.
+         * O envio normal do formulário continua normalmente.
+         */
+        overlayAnalise.classList.add('ativo');
+
+
+        /*
+         * Evita envio duplicado enquanto o OCR está trabalhando.
+         */
+        if(botaoEnviar){
+            botaoEnviar.disabled = true;
+            botaoEnviar.textContent = 'Analisando...';
+        }
+
+    });
+
+}
+
+
+/*
+ * Se o usuário voltar para esta página usando o botão
+ * "voltar" do navegador, garante que o overlay seja ocultado.
+ */
+window.addEventListener('pageshow', function(){
+
+    if(overlayAnalise){
+        overlayAnalise.classList.remove('ativo');
+    }
+
+    if(botaoEnviar){
+        botaoEnviar.disabled = false;
+        botaoEnviar.textContent = 'Enviar Informação';
     }
 
 });
