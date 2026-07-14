@@ -788,6 +788,42 @@ window.addEventListener('pageshow', function(){
     }
 
 });
+
+/* =========================================================
+   CONVERTER SOLICITANTE E NOME DO EVENTO PARA MAIÚSCULAS
+========================================================= */
+
+const camposMaiusculos = [
+    'id_solicitante',
+    'id_nome_evento'
+];
+
+camposMaiusculos.forEach(function(id) {
+
+    const campo = document.getElementById(id);
+
+    if (campo) {
+
+        campo.addEventListener('input', function() {
+
+            const inicio = this.selectionStart;
+            const fim = this.selectionEnd;
+
+            this.value = this.value.toUpperCase();
+
+            if (
+                typeof this.setSelectionRange === 'function' &&
+                inicio !== null &&
+                fim !== null
+            ) {
+                this.setSelectionRange(inicio, fim);
+            }
+
+        });
+
+    }
+
+});
 </script>
 
 {% endblock %}
