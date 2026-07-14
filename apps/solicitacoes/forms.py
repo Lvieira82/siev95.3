@@ -32,6 +32,9 @@ def validar_pdf(arquivo):
 # FORMULÁRIO DE SOLICITAÇÃO EXTERNA
 # ==========================================================
 
+
+    #
+  
 class SolicitacaoForm(forms.ModelForm):
 
     class Meta:
@@ -99,6 +102,23 @@ class SolicitacaoForm(forms.ModelForm):
             "type": "date",
             "min": data_minima.strftime("%Y-%m-%d"),
         })
+
+ =====================================================
+    # CONVERTE NOME DO SOLICITANTE PARA MAIÚSCULAS
+    # =====================================================
+
+    def clean_solicitante(self):
+        valor = self.cleaned_data.get("solicitante", "")
+        return valor.strip().upper()
+
+
+    # =====================================================
+    # CONVERTE NOME DO EVENTO PARA MAIÚSCULAS
+    # =====================================================
+
+    def clean_nome_evento(self):
+        valor = self.cleaned_data.get("nome_evento", "")
+        return valor.strip().upper()
 
 
     # ======================================================
@@ -327,7 +347,7 @@ class SolicitacaoForm(forms.ModelForm):
 
                 raise forms.ValidationError(
                     "A data do ofício está diferente da data "
-                    "informada. Confira as informações. "
+                    "informada. Confira a documentação!  "
                     f"Data(s) identificada(s) no documento: "
                     f"{datas_lidas}."
                 )
