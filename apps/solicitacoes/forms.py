@@ -103,7 +103,7 @@ class SolicitacaoForm(forms.ModelForm):
             "min": data_minima.strftime("%Y-%m-%d"),
         })
 
- =====================================================
+    #=====================================================
     # CONVERTE NOME DO SOLICITANTE PARA MAIÚSCULAS
     # =====================================================
 
