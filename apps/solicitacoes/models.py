@@ -126,6 +126,10 @@ class Solicitacao(models.Model):
 
     hora_fim = models.TimeField()
 
+    local = models.TextField(
+        blank=True,
+        null=True
+    )
     rua = models.CharField(
         max_length=200,
         blank=True,
