@@ -126,7 +126,29 @@ class Solicitacao(models.Model):
 
     hora_fim = models.TimeField()
 
-    local = models.TextField()
+    rua = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True
+    )
+    
+    numero = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True
+    )
+    
+    bairro_distrito = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True
+    )
+    
+    ponto_referencia = models.CharField(
+        max_length=250,
+        blank=True,
+        null=True
+    )
 
     publico_estimado = models.IntegerField()
 
