@@ -556,6 +556,21 @@ PMBA - Uma força a serviço do cidadão.
 # =====================================================
 
 def gerar_opo(request, id):
+    """
+    Exibe a Ordem de Policiamento (OPO) de uma solicitação aprovada.
+
+    Regras de acesso:
+    - Gestores autenticados podem acessar diretamente.
+    - Usuários não autenticados precisam validar uma matrícula autorizada.
+    - Quando um gestor autenticado gera a OPO pela primeira vez,
+      seu usuário é registrado permanentemente no campo 'gerado_por'.
+
+    O nome completo do usuário é enviado ao template para aparecer
+    abaixo da mensagem 'Ordem de policiamento gerada por'.
+
+    Template:
+        solicitacoes/opo_pdf.html
+    """
 
     solicitacao = get_object_or_404(
         Solicitacao,
@@ -563,30 +578,69 @@ def gerar_opo(request, id):
         status="APROVADO"
     )
 
-    # Verifica se é gestor autenticado
+    # -----------------------------------------------------
+    # VERIFICAÇÃO DE ACESSO
+    # -----------------------------------------------------
+
     gestor_autenticado = request.user.is_authenticated
 
-    # Verifica se o policial validou a matrícula
-    # especificamente para esta OPO
     acesso_publico_autorizado = request.session.get(
         f"opo_publica_autorizada_{id}",
         False
     )
 
-    # Se não for gestor e também não tiver
-    # validado matrícula, bloqueia o acesso direto
     if not gestor_autenticado and not acesso_publico_autorizado:
-
         return redirect(
             "validar_matricula_opo_publica",
             id=id
         )
 
+    # -----------------------------------------------------
+    # REGISTRA QUEM GEROU A OPO
+    # -----------------------------------------------------
+    # Registra apenas na primeira geração.
+    # Assim, uma consulta posterior feita por outro gestor
+    # não altera o nome do usuário original que gerou a OPO.
+
+    if gestor_autenticado and solicitacao.gerado_por is None:
+
+        solicitacao.gerado_por = request.user
+
+        solicitacao.save(
+            update_fields=["gerado_por"]
+        )
+
+    # -----------------------------------------------------
+    # DEFINE O NOME COMPLETO DE QUEM GEROU A OPO
+    # -----------------------------------------------------
+
+    if solicitacao.gerado_por:
+
+        nome_gerador = (
+            solicitacao.gerado_por.get_full_name().strip()
+            or solicitacao.gerado_por.username
+        )
+
+    else:
+        nome_gerador = "Usuário não identificado"
+
+    # -----------------------------------------------------
+    # DATA DE GERAÇÃO
+    # -----------------------------------------------------
+
     data_geracao = timezone.localtime()
+
+    # -----------------------------------------------------
+    # URL PÚBLICA DE VERIFICAÇÃO
+    # -----------------------------------------------------
 
     url_verificacao = request.build_absolute_uri(
         f"/verificar/{solicitacao.protocolo}/"
     )
+
+    # -----------------------------------------------------
+    # GERAÇÃO DO QR CODE
+    # -----------------------------------------------------
 
     qr_img = qrcode.make(url_verificacao)
 
@@ -603,37 +657,9 @@ def gerar_opo(request, id):
 
     qr_base64 = f"data:image/png;base64,{qr_base64}"
 
-    return render(
-        request,
-        "solicitacoes/opo_pdf.html",
-        {
-            "solicitacao": solicitacao,
-            "data_geracao": data_geracao,
-            "qr_base64": qr_base64,
-            "url_verificacao": url_verificacao,
-        }
-    )
-
-    data_geracao = timezone.localtime()
-
-    url_verificacao = request.build_absolute_uri(
-        f"/verificar/{solicitacao.protocolo}/"
-    )
-
-    qr_img = qrcode.make(url_verificacao)
-
-    buffer = BytesIO()
-
-    qr_img.save(
-        buffer,
-        format="PNG"
-    )
-
-    qr_base64 = base64.b64encode(
-        buffer.getvalue()
-    ).decode("utf-8")
-
-    qr_base64 = f"data:image/png;base64,{qr_base64}"
+    # -----------------------------------------------------
+    # RENDERIZA A OPO
+    # -----------------------------------------------------
 
     return render(
         request,
@@ -643,9 +669,9 @@ def gerar_opo(request, id):
             "data_geracao": data_geracao,
             "qr_base64": qr_base64,
             "url_verificacao": url_verificacao,
+            "nome_gerador": nome_gerador,
         }
     )
-
 
 # =====================================================
 # DOCUMENTOS ANEXOS
