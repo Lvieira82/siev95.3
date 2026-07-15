@@ -92,7 +92,14 @@ class Solicitacao(models.Model):
         null=True,
         blank=True
     )
-
+        gerado_por = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="opos_geradas",
+        verbose_name="OPO gerada por"
+    )
     nome_evento = models.CharField(
         max_length=200
     )
