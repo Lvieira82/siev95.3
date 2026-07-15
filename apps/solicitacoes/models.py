@@ -92,7 +92,7 @@ class Solicitacao(models.Model):
         null=True,
         blank=True
     )
-        gerado_por = models.ForeignKey(
+    gerado_por = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
