@@ -255,9 +255,10 @@ body{
         {% endif %}
     </div>
 
-    <div class="rodape">
+    <div class="gerado-por">
         Ordem de policiamento gerada por
-        <strong>{{ solicitacao.comandante_opo }}</strong>
+        <br>
+        <strong>{{ nome_gerador }}</strong>
     </div>
 
    {% if qr_base64 %}
