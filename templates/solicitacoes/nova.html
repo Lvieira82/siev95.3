@@ -433,7 +433,12 @@ textarea{
 
 
                 <div>
-                    <label>E-mail *</label>
+                    <label>
+                        E-mail * 
+                        <span style="font-weight:normal;">
+                            (Insira um email para receber o protocolo)
+                        </span>
+                    </label>
                     {{ form.email }}
 
                     {% if form.email.errors %}
@@ -456,13 +461,62 @@ textarea{
                 </div>
 
 
-                <div class="full">
-                    <label>Local do Evento *</label>
-                    {{ form.local }}
+                <!-- ENDEREÇO DO EVENTO -->
 
-                    {% if form.local.errors %}
+                <div class="full">
+                    <h3 style="color:#907C64; margin-bottom:5px;">
+                        📍 Local do Evento
+                    </h3>
+                
+                    <p style="color:#6b7280; margin-bottom:15px; font-size:14px;">
+                        Informe os dados disponíveis sobre o local. Os campos abaixo são opcionais.
+                    </p>
+                </div>
+                
+                
+                <div>
+                    <label>Rua</label>
+                    {{ form.rua }}
+                
+                    {% if form.rua.errors %}
                         <div class="erro-campo">
-                            {{ form.local.errors.0 }}
+                            {{ form.rua.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                
+                <div>
+                    <label>Número</label>
+                    {{ form.numero }}
+                
+                    {% if form.numero.errors %}
+                        <div class="erro-campo">
+                            {{ form.numero.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                
+                <div>
+                    <label>Bairro ou Distrito</label>
+                    {{ form.bairro_distrito }}
+                
+                    {% if form.bairro_distrito.errors %}
+                        <div class="erro-campo">
+                            {{ form.bairro_distrito.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                
+                <div>
+                    <label>Ponto de Referência <span style="font-weight:normal;">(se houver)</span></label>
+                    {{ form.ponto_referencia }}
+                
+                    {% if form.ponto_referencia.errors %}
+                        <div class="erro-campo">
+                            {{ form.ponto_referencia.errors.0 }}
                         </div>
                     {% endif %}
                 </div>
