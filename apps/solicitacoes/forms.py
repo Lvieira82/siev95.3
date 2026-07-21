@@ -109,6 +109,7 @@ class SolicitacaoForm(forms.ModelForm):
             "min": data_minima.strftime("%Y-%m-%d"),
         })
 
+<<<<<<< HEAD
         # ==================================================
         # CAMPOS OPCIONAIS DO ENDEREÇO
         # ==================================================
@@ -126,6 +127,9 @@ class SolicitacaoForm(forms.ModelForm):
 
 
     # ======================================================
+=======
+ =====================================================
+>>>>>>> parent of affc408 (Maiuscula)
     # CONVERTE NOME DO SOLICITANTE PARA MAIÚSCULAS
     # ======================================================
 
