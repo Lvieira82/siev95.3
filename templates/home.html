@@ -6,9 +6,83 @@
 {% block content %}
 
 <style>
+
+/* ==========================================================
+   HOME
+========================================================== */
+
+.home-box{
+    background:#fff;
+    border-radius:28px;
+    padding:50px;
+    box-shadow:0 8px 25px rgba(0,0,0,.10);
+    margin-top:35px;
+}
+
+.home-conteudo{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:40px;
+}
+
+.home-logo{
+    flex:0 0 auto;
+    text-align:center;
+}
+
+.logo-pmba{
+    max-width:220px;
+    width:100%;
+    height:auto;
+}
+
+.logo-95{
+    max-width:170px;
+    width:100%;
+    height:auto;
+}
+
+.home-centro{
+    flex:1;
+    text-align:center;
+}
+
+.home-centro h1{
+    font-size:82px;
+    font-weight:700;
+    color:#111827;
+    margin-bottom:20px;
+}
+
+.home-centro p{
+    font-size:24px;
+    line-height:1.5;
+    color:#333;
+    margin-bottom:40px;
+}
+
+.home-botoes{
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    flex-wrap:wrap;
+}
+
+.home-botoes .btn{
+    min-width:250px;
+    padding:15px;
+    font-size:22px;
+    border-radius:15px;
+}
+
+/* ==========================================================
+   SATISFAÇÃO
+========================================================== */
+
 .satisfacao-box{
 
-margin-top:45px;
+margin-top:50px;
 
 background:white;
 
@@ -120,482 +194,343 @@ padding:15px;
 
 }
 
-@media(max-width:900px){
-
-.satisfacao-grid{
-
-grid-template-columns:1fr;
-
-}
-
-}
-
-.satisfacao-box{
-
-margin-top:45px;
-
-background:white;
-
-border-radius:28px;
-
-padding:45px;
-
-box-shadow:0 8px 25px rgba(0,0,0,.10);
-
-}
-
-.satisfacao-box h2{
-
-text-align:center;
-
-margin-bottom:35px;
-
-color:#003F82;
-
-}
-
-.satisfacao-grid{
-
-display:grid;
-
-grid-template-columns:320px 1fr;
-
-gap:40px;
-
-align-items:center;
-
-}
-
-.lado-esquerdo{
-
-text-align:center;
-
-}
-
-.media-nota{
-
-font-size:90px;
-
-font-weight:bold;
-
-color:#003F82;
-
-}
-
-.estrelas{
-
-font-size:34px;
-
-color:#FFC107;
-
-margin:15px 0;
-
-}
-
-.lado-direito{
-
-height:260px;
-
-overflow:hidden;
-
-position:relative;
-
-}
-
-.comentario{
-
-padding:18px;
-
-border-bottom:1px solid #eee;
-
-animation:fade .8s;
-
-}
-
-.nota{
-
-color:#FFC107;
-
-font-size:22px;
-
-margin-bottom:8px;
-
-}
-
-@keyframes fade{
-
-from{
-
-opacity:0;
-
-transform:translateY(20px);
-
-}
-
-to{
-
-opacity:1;
-
-transform:translateY(0);
-
-}
-
-}
-
-@media(max-width:900px){
-
-.satisfacao-grid{
-
-grid-template-columns:1fr;
-
-}
-
-.media-nota{
-
-font-size:70px;
-
-}
-
-}
-.home-box{
-    background:white;
-    border-radius:28px;
-    padding:70px;
-    box-shadow:0 8px 25px rgba(0,0,0,.10);
-}
-
-.home-conteudo{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:35px;
-}
-
-.logo-pmba{
-    width:320px;
-    height:auto;
-}
-
-.logo-95{
-    width:220px;
-    height:auto;
-}
-
-.home-centro{
-    flex:1;
-    text-align:center;
-    height:auto;
-}
-
-.home-centro h1{
-    font-size:78px;
-    margin-bottom:20px;
-    color:#111827;
-    font-weight:bold;
-}
-
-.home-centro p{
-    font-size:24px;
-    color:#111827;
-    margin-bottom:40px;
-    line-height:1.4;
-}
-
-.home-botoes{
-    display:flex;
-    justify-content:center;
-    gap:20px;
-    flex-wrap:wrap;
-}
-
-/* ===========================
+/* ==========================================================
    RESPONSIVO
-=========================== */
+========================================================== */
 
 @media (max-width:900px){
 
-    .home-box{
-        padding:35px 20px;
-    }
+.home-box{
 
-    .home-conteudo{
-        flex-direction:column;
-    }
+padding:35px 20px;
 
-    .home-logo{
-        width:130%;
-    }
+}
 
-    .home-logo img{
-        width:130px;
-    }
+.home-conteudo{
 
-    .home-centro h1{
-        font-size:60px;
-    }
+flex-direction:column;
 
-    .home-centro p{
-        font-size:22px;
-    }
+}
+
+.logo-pmba{
+
+max-width:150px;
+
+}
+
+.logo-95{
+
+max-width:120px;
+
+}
+
+.home-centro h1{
+
+font-size:60px;
+
+}
+
+.home-centro p{
+
+font-size:21px;
+
+}
+
+.satisfacao-grid{
+
+grid-template-columns:1fr;
+
+}
 
 }
 
 @media (max-width:600px){
 
-    .home-box{
-        padding:25px 15px;
-        border-radius:20px;
-    }
+.home-box{
 
-    .home-logo img{
-        width:110px;
-    }
+padding:25px 15px;
 
-    .home-centro h1{
-        font-size:52px;
-        margin-bottom:15px;
-    }
+}
 
-    .home-centro p{
-        font-size:18px;
-        margin-bottom:25px;
-    }
+.logo-pmba{
 
-    .home-botoes{
-        flex-direction:column;
-        align-items:center;
-        gap:12px;
-    }
+max-width:110px;
 
-    .home-botoes a{
-        width:100%;
-        max-width:300px;
-    }
+}
+
+.logo-95{
+
+max-width:90px;
+
+}
+
+.home-centro h1{
+
+font-size:52px;
+
+}
+
+.home-centro p{
+
+font-size:18px;
+
+}
+
+.home-botoes{
+
+flex-direction:column;
+
+}
+
+.home-botoes .btn{
+
+width:100%;
+
+max-width:320px;
+
+}
 
 }
 
 </style>
 
-    <div class="home-conteudo">
+<div class="home-box">
 
-        <div class="home-logo">
-            <img class="logo-pmba"
-                 src="{% static 'logos/logo_pmba.png' %}"
-                 alt="Logo PMBA">
-        </div>
+<div class="home-conteudo">
 
+<div class="home-logo">
 
+<img
+class="logo-pmba"
+src="{% static 'logos/logo_pmba.png' %}"
+alt="PMBA">
 
+</div>
 
-        <div class="home-centro">
+<div class="home-centro">
 
-            <h1>SiEv</h1>
+<h1>SiEv</h1>
+
+<p>
+
+Plataforma oficial para informação e acompanhamento de eventos.
+
+</p>
+
+<div class="home-botoes">
+
+<a href="/nova/" class="btn btn-primary">
+
+Nova Informação
+
+</a>
+
+<a href="/consultar/" class="btn btn-success">
+
+Consultar Informação
+
+</a>
+
+<a href="/gestao/" class="btn btn-dark">
+
+Gestão
+
+</a>
+
+</div>
+
+</div>
+
+<div class="home-logo">
+
+<img
+class="logo-95"
+src="{% static 'logos/logo95.png' %}"
+alt="95ª CIPM">
+
+</div>
+
+</div>
+
+</div>
+<div class="satisfacao-box">
+
+    <h2>
+        ⭐ Avalie este serviço! ⭐
+    </h2>
+
+    <div class="satisfacao-grid">
+
+        <!-- COLUNA ESQUERDA -->
+
+        <div class="lado-esquerdo">
+
+            <div class="nota-geral">
+                {{ media|floatformat:1 }}
+            </div>
+
+            <div class="estrelas">
+                ★★★★★
+            </div>
 
             <p>
-                Plataforma oficial para informação e acompanhamento de eventos.
+                <strong>{{ total }}</strong> avaliações
             </p>
 
-            <div class="home-botoes">
+            <p>
+                <strong>{{ percentual }}%</strong>
+                recomendam o SiEv
+            </p>
 
-                <a href="/nova/" class="btn btn-primary">
-                    Nova Informação
-                </a>
+        </div>
 
-                <a href="/consultar/" class="btn btn-success">
-                    Consultar Informação
-                </a>
+        <!-- COLUNA DIREITA -->
 
-                <a href="/gestao/" class="btn btn-dark">
-                    Gestão
-                </a>
+        <div class="lado-direito">
+
+            <div class="swiper comentariosSwiper">
+
+                <div class="swiper-wrapper">
+
+                    {% for c in comentarios %}
+
+                    <div class="swiper-slide">
+
+                        <div class="card-comentario">
+
+                            <div>
+
+                                <div class="nota">
+
+                                    {% if c.nota_satisfacao == 5 %}
+                                        ★★★★★
+                                    {% elif c.nota_satisfacao == 4 %}
+                                        ★★★★☆
+                                    {% elif c.nota_satisfacao == 3 %}
+                                        ★★★☆☆
+                                    {% elif c.nota_satisfacao == 2 %}
+                                        ★★☆☆☆
+                                    {% else %}
+                                        ★☆☆☆☆
+                                    {% endif %}
+
+                                </div>
+
+                                <p>
+
+                                    "{{ c.comentario_satisfacao }}"
+
+                                </p>
+
+                            </div>
+
+                            <div>
+
+                                <h4>
+
+                                    {{ c.solicitante }}
+
+                                </h4>
+
+                                <small>
+
+                                    {{ c.nome_evento }}
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {% empty %}
+
+                    <div class="swiper-slide">
+
+                        <div class="card-comentario">
+
+                            <div class="nota">
+
+                                ★★★★★
+
+                            </div>
+
+                            <p>
+
+                                Ainda não existem avaliações cadastradas.
+
+                            </p>
+
+                            <h4>
+
+                                SiEv
+
+                            </h4>
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
 
             </div>
 
         </div>
 
-        <div class="home-logo">
-            <img class="logo-95"
-                 src="{% static 'logos/logo95.png' %}"
-                 alt="Logo 95ª CIPM">
-        </div>
-
     </div>
 
 </div>
-<div class="home-box">
-    <br><br>
-
-<div class="satisfacao-box">
-
-<h2>
-
-⭐Avalie este serviço!⭐
-
-</h2>
-
-<div class="satisfacao-grid">
-
-<div class="lado-esquerdo">
-
-<div class="nota-geral">
-
-{{ media|floatformat:1 }}
-
-</div>
-
-<div class="estrelas">
-
-★★★★★
-
-</div>
-
-<p>
-
-<b>{{ total }}</b> avaliações
-
-</p>
-
-<p>
-
-<b>{{ percentual }}%</b>
-
-recomendam o SiEv
-
-</p>
-
-</div>
-
-<div class="lado-direito">
-
-<div class="swiper comentariosSwiper">
-
-<div class="swiper-wrapper">
-
-{% for c in comentarios %}
-
-<div class="swiper-slide">
-
-<div class="card-comentario">
-
-<div class="nota">
-
-{% if c.nota_satisfacao == 5 %}
-★★★★★
-{% elif c.nota_satisfacao == 4 %}
-★★★★☆
-{% elif c.nota_satisfacao == 3 %}
-★★★☆☆
-{% elif c.nota_satisfacao == 2 %}
-★★☆☆☆
-{% else %}
-★☆☆☆☆
-{% endif %}
-
-</div>
-
-<p>
-
-"{{ c.comentario_satisfacao }}"
-
-</p>
-
-<h4>
-
-{{ c.solicitante }}
-
-</h4>
-
-<small>
-
-{{ c.nome_evento }}
-
-</small>
-
-</div>
-
-</div>
-
-{% endfor %}
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
 <script>
 
-let indice=0;
+document.addEventListener("DOMContentLoaded", function(){
 
-const comentarios=document.querySelectorAll(".comentario");
+    if(document.querySelector(".comentariosSwiper")){
 
-function mostrarComentario(){
+        new Swiper(".comentariosSwiper",{
 
-comentarios.forEach(c=>c.style.display="none");
+            loop:true,
 
-comentarios[indice].style.display="block";
+            spaceBetween:25,
 
-indice++;
+            speed:800,
 
-if(indice>=comentarios.length){
+            autoplay:{
 
-indice=0;
+                delay:5000,
 
-}
+                disableOnInteraction:false,
 
-}
+            },
 
-if(comentarios.length){
+            grabCursor:true,
 
-mostrarComentario();
+            slidesPerView:1,
 
-setInterval(mostrarComentario,5000);
+            breakpoints:{
 
-}
+                768:{
 
-</script>
-<script>
+                    slidesPerView:2
 
-new Swiper(".comentariosSwiper",{
+                },
 
-loop:true,
+                1200:{
 
-spaceBetween:25,
+                    slidesPerView:3
 
-autoplay:{
+                }
 
-delay:5000,
+            }
 
-disableOnInteraction:false,
+        });
 
-},
-
-speed:900,
-
-grabCursor:true,
-
-slidesPerView:1,
-
-breakpoints:{
-
-768:{
-
-slidesPerView:2
-
-},
-
-1200:{
-
-slidesPerView:3
-
-}
-
-}
+    }
 
 });
 
 </script>
+
 {% endblock %}
