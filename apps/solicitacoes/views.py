@@ -1,6 +1,29 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Solicitacao, MatriculaAutorizada
+from .models import (Solicitacao, MatriculaAutorizada,)
 import os
+from django.shortcuts import render, get_object_or_404
+import csv
+import os
+from datetime import datetime
+
+from django.conf import settings
+from django.http import HttpResponse
+
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import cm
+
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Table,
+    TableStyle,
+    Paragraph,
+    Spacer,
+    Image,
+)
+from apps.solicitacoes.models import Solicitacao
 import base64
 from io import BytesIO
 from datetime import date, timedelta
@@ -18,6 +41,7 @@ from django.utils import timezone
 from .models import Solicitacao
 from .forms import SolicitacaoForm, SolicitacaoManualForm
 import openpyxl
+import secrets
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from .models import MatriculaAutorizada
@@ -40,8 +64,47 @@ from reportlab.platypus import (
 # HOME
 # =====================================================
 
+from django.db.models import Avg
+from .models import Solicitacao
+
+
 def home(request):
-    return render(request, "home.html")
+
+    respondidas = Solicitacao.objects.filter(
+        pesquisa_respondida=True
+    )
+
+    media = (
+        respondidas.aggregate(
+            Avg("nota_satisfacao")
+        )["nota_satisfacao__avg"] or 0
+    )
+
+    total = respondidas.count()
+
+    cinco = respondidas.filter(nota_satisfacao=5).count()
+
+    percentual = 0
+
+    if total > 0:
+        percentual = round((cinco / total) * 100)
+
+    comentarios = respondidas.exclude(
+        comentario_satisfacao=""
+    ).order_by(
+        "-data_resposta_pesquisa"
+    )[:10]
+
+    return render(
+        request,
+        "home.html",
+        {
+            "media": media,
+            "total": total,
+            "percentual": percentual,
+            "comentarios": comentarios,
+        }
+    )
 
 
 # =====================================================
@@ -452,7 +515,18 @@ def lancamento_manual(request):
 
             # Lançamento manual feito pela gestão
             solicitacao.status = "APROVADO"
+            solicitacao = form.save(commit=False)
 
+            # Guarda quem gerou a OPO
+            solicitacao.gerado_por = request.user
+
+            # Guarda quem aprovou
+            solicitacao.aprovado_por = request.user.get_full_name()
+            solicitacao.assinado_por = request.user.get_full_name()
+
+            solicitacao.data_aprovacao = timezone.now()
+
+        
             solicitacao.save()
 
             messages.success(
@@ -505,10 +579,23 @@ def aprovar_solicitacao(request, id):
     )
 
     solicitacao.status = "APROVADO"
-    solicitacao.aprovado_por = request.user.username
+
+    # Guarda quem aprovou e gerou a OPO
+    solicitacao.gerado_por = request.user
+
+    nome_operador = (
+        request.user.get_full_name()
+    )
+
+    solicitacao.aprovado_por = nome_operador
+    solicitacao.assinado_por = nome_operador
+
     solicitacao.data_aprovacao = timezone.now()
     solicitacao.data_assinatura = timezone.now()
-    solicitacao.assinado_por = request.user.username
+
+    if not solicitacao.pesquisa_token:
+        solicitacao.pesquisa_token = secrets.token_urlsafe(32)
+
     solicitacao.save()
 
     assunto = "Ordem de Policiamento Criada"
@@ -534,6 +621,7 @@ PMBA - Uma força a serviço do cidadão.
 """
 
     try:
+
         send_mail(
             assunto,
             mensagem,
@@ -543,34 +631,22 @@ PMBA - Uma força a serviço do cidadão.
         )
 
     except Exception as erro:
-        print("ERRO AO ENVIAR EMAIL DE APROVAÇÃO:", erro)
+
+        print(
+            "ERRO AO ENVIAR EMAIL DE APROVAÇÃO:",
+            erro
+        )
 
     return redirect(
         "gerar_opo",
         id=solicitacao.id
     )
 
-
 # =====================================================
 # GERAR OPO
 # =====================================================
 
 def gerar_opo(request, id):
-    """
-    Exibe a Ordem de Policiamento (OPO) de uma solicitação aprovada.
-
-    Regras de acesso:
-    - Gestores autenticados podem acessar diretamente.
-    - Usuários não autenticados precisam validar uma matrícula autorizada.
-    - Quando um gestor autenticado gera a OPO pela primeira vez,
-      seu usuário é registrado permanentemente no campo 'gerado_por'.
-
-    O nome completo do usuário é enviado ao template para aparecer
-    abaixo da mensagem 'Ordem de policiamento gerada por'.
-
-    Template:
-        solicitacoes/opo_pdf.html
-    """
 
     solicitacao = get_object_or_404(
         Solicitacao,
@@ -578,69 +654,30 @@ def gerar_opo(request, id):
         status="APROVADO"
     )
 
-    # -----------------------------------------------------
-    # VERIFICAÇÃO DE ACESSO
-    # -----------------------------------------------------
-
+    # Verifica se é gestor autenticado
     gestor_autenticado = request.user.is_authenticated
 
+    # Verifica se o policial validou a matrícula
+    # especificamente para esta OPO
     acesso_publico_autorizado = request.session.get(
         f"opo_publica_autorizada_{id}",
         False
     )
 
+    # Se não for gestor e também não tiver
+    # validado matrícula, bloqueia o acesso direto
     if not gestor_autenticado and not acesso_publico_autorizado:
+
         return redirect(
             "validar_matricula_opo_publica",
             id=id
         )
 
-    # -----------------------------------------------------
-    # REGISTRA QUEM GEROU A OPO
-    # -----------------------------------------------------
-    # Registra apenas na primeira geração.
-    # Assim, uma consulta posterior feita por outro gestor
-    # não altera o nome do usuário original que gerou a OPO.
-
-    if gestor_autenticado and solicitacao.gerado_por is None:
-
-        solicitacao.gerado_por = request.user
-
-        solicitacao.save(
-            update_fields=["gerado_por"]
-        )
-
-    # -----------------------------------------------------
-    # DEFINE O NOME COMPLETO DE QUEM GEROU A OPO
-    # -----------------------------------------------------
-
-    if solicitacao.gerado_por:
-
-        nome_gerador = (
-            solicitacao.gerado_por.get_full_name().strip()
-            or solicitacao.gerado_por.username
-        )
-
-    else:
-        nome_gerador = "Usuário não identificado"
-
-    # -----------------------------------------------------
-    # DATA DE GERAÇÃO
-    # -----------------------------------------------------
-
     data_geracao = timezone.localtime()
-
-    # -----------------------------------------------------
-    # URL PÚBLICA DE VERIFICAÇÃO
-    # -----------------------------------------------------
 
     url_verificacao = request.build_absolute_uri(
         f"/verificar/{solicitacao.protocolo}/"
     )
-
-    # -----------------------------------------------------
-    # GERAÇÃO DO QR CODE
-    # -----------------------------------------------------
 
     qr_img = qrcode.make(url_verificacao)
 
@@ -657,9 +694,37 @@ def gerar_opo(request, id):
 
     qr_base64 = f"data:image/png;base64,{qr_base64}"
 
-    # -----------------------------------------------------
-    # RENDERIZA A OPO
-    # -----------------------------------------------------
+    return render(
+        request,
+        "solicitacoes/opo_pdf.html",
+        {
+            "solicitacao": solicitacao,
+            "data_geracao": data_geracao,
+            "qr_base64": qr_base64,
+            "url_verificacao": url_verificacao,
+        }
+    )
+
+    data_geracao = timezone.localtime()
+
+    url_verificacao = request.build_absolute_uri(
+        f"/verificar/{solicitacao.protocolo}/"
+    )
+
+    qr_img = qrcode.make(url_verificacao)
+
+    buffer = BytesIO()
+
+    qr_img.save(
+        buffer,
+        format="PNG"
+    )
+
+    qr_base64 = base64.b64encode(
+        buffer.getvalue()
+    ).decode("utf-8")
+
+    qr_base64 = f"data:image/png;base64,{qr_base64}"
 
     return render(
         request,
@@ -669,9 +734,9 @@ def gerar_opo(request, id):
             "data_geracao": data_geracao,
             "qr_base64": qr_base64,
             "url_verificacao": url_verificacao,
-            "nome_gerador": nome_gerador,
         }
     )
+
 
 # =====================================================
 # DOCUMENTOS ANEXOS
@@ -1066,26 +1131,7 @@ def mapa_eventos(request):
 @login_required
 def gerar_mapa_eventos_pdf(request):
 
-    import os
-    from datetime import datetime
-
-    from django.conf import settings
-    from django.http import HttpResponse
-
-    from reportlab.lib import colors
-    from reportlab.lib.enums import TA_CENTER
-    from reportlab.lib.pagesizes import A4, landscape
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.units import cm
-
-    from reportlab.platypus import (
-        SimpleDocTemplate,
-        Table,
-        TableStyle,
-        Paragraph,
-        Spacer,
-        Image,
-    )
+   
 
     # =====================================================
     # 1. RECEBER E VALIDAR AS DATAS
@@ -1629,3 +1675,77 @@ def gerar_mapa_eventos_pdf(request):
     doc.build(elementos)
 
     return response
+
+
+@login_required
+def exportar_emails(request):
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="emails_siev.csv"'
+
+    writer = csv.writer(response)
+
+    writer.writerow([
+        'Protocolo',
+        'Solicitante',
+        'Evento',
+        'Email'
+    ])
+
+    solicitacoes = (
+        Solicitacao.objects
+        .exclude(email__isnull=True)
+        .exclude(email='')
+        .order_by('nome_evento')
+    )
+
+    for s in solicitacoes:
+
+        writer.writerow([
+            s.protocolo,
+            s.solicitante,
+            s.nome_evento,
+            s.email
+        ])
+
+    return response
+
+
+def responder_pesquisa(request, token):
+
+    solicitacao = get_object_or_404(
+        Solicitacao,
+        pesquisa_token=token
+    )
+
+    if request.method == "POST":
+
+        solicitacao.nota_satisfacao = request.POST.get("nota")
+
+        solicitacao.comentario_satisfacao = request.POST.get(
+            "comentario",
+            ""
+        )
+
+        solicitacao.pesquisa_respondida = True
+
+        solicitacao.data_resposta_pesquisa = timezone.now()
+
+        solicitacao.save()
+
+        return render(
+            request,
+            "pesquisa/obrigado.html"
+        )
+
+    return render(
+        request,
+        "pesquisa/responder.html",
+        {
+            "solicitacao": solicitacao
+        }
+    )
+
+
+
+
