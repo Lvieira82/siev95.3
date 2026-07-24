@@ -30,6 +30,8 @@ from apps.solicitacoes.views import (
     corrigir_solicitacao,
     mapa_eventos,
     gerar_mapa_eventos_pdf,
+    exportar_emails,
+    responder_pesquisa,
 )
 
 urlpatterns = [
@@ -44,7 +46,11 @@ urlpatterns = [
         abrir_documento_solicitacao,
         name="abrir_documento_solicitacao",
     ),
-
+    path(
+        "pesquisa/<str:token>/",
+        responder_pesquisa,
+        name="responder_pesquisa",
+    ),
     path(
         "gestao/lancamento-manual/",
         lancamento_manual,
@@ -65,6 +71,11 @@ urlpatterns = [
         "gestao/opos-geradas/",
         opos_geradas,
         name="opos_geradas",
+    ),
+    path(
+        "pesquisa/exportar-emails/",
+        exportar_emails,
+        name="exportar_emails",
     ),
 
     path(
@@ -178,3 +189,4 @@ urlpatterns = [
         {"document_root": settings.MEDIA_ROOT},
     ),
 ]
+
