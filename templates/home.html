@@ -104,21 +104,115 @@ color:#003F82;
 
 }
 
-.satisfacao-grid{
+.satisfacao-box{
 
-display:grid;
+margin-top:40px;
 
-grid-template-columns:280px 1fr;
+padding:35px;
 
-gap:40px;
+background:white;
 
-align-items:center;
+border-radius:25px;
+
+box-shadow:0 8px 25px rgba(0,0,0,.10);
 
 }
 
-.lado-esquerdo{
+.satisfacao-box h2{
 
 text-align:center;
+
+margin-bottom:25px;
+
+color:#003F82;
+
+}
+
+.nota-mobile{
+
+text-align:center;
+
+margin-bottom:25px;
+
+}
+
+.nota-geral{
+
+font-size:65px;
+
+font-weight:bold;
+
+color:#003F82;
+
+line-height:1;
+
+}
+
+.estrelas{
+
+font-size:30px;
+
+color:#FFC107;
+
+margin:8px 0;
+
+}
+
+.card-comentario{
+
+background:white;
+
+border-radius:18px;
+
+padding:22px;
+
+min-height:180px;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:space-between;
+
+box-shadow:0 4px 15px rgba(0,0,0,.10);
+
+}
+
+.card-comentario .nota{
+
+font-size:24px;
+
+color:#FFC107;
+
+margin-bottom:12px;
+
+}
+
+.card-comentario p{
+
+font-size:18px;
+
+font-style:italic;
+
+line-height:1.5;
+
+color:#444;
+
+margin-bottom:20px;
+
+}
+
+.card-comentario h4{
+
+color:#003F82;
+
+margin:0;
+
+}
+
+.swiper{
+
+padding:10px;
 
 }
 
@@ -198,95 +292,43 @@ padding:15px;
    RESPONSIVO
 ========================================================== */
 
-@media (max-width:900px){
+@media(max-width:600px){
 
-.home-box{
+.satisfacao-box{
 
-padding:35px 20px;
-
-}
-
-.home-conteudo{
-
-flex-direction:column;
+padding:18px;
 
 }
 
-.logo-pmba{
+.satisfacao-box h2{
 
-max-width:150px;
-
-}
-
-.logo-95{
-
-max-width:120px;
+font-size:28px;
 
 }
 
-.home-centro h1{
+.nota-geral{
 
-font-size:60px;
-
-}
-
-.home-centro p{
-
-font-size:21px;
+font-size:48px;
 
 }
 
-.satisfacao-grid{
+.estrelas{
 
-grid-template-columns:1fr;
-
-}
+font-size:24px;
 
 }
 
-@media (max-width:600px){
+.card-comentario{
 
-.home-box{
+padding:18px;
 
-padding:25px 15px;
-
-}
-
-.logo-pmba{
-
-max-width:110px;
+min-height:150px;
 
 }
 
-.logo-95{
+.card-comentario p{
 
-max-width:90px;
-
-}
-
-.home-centro h1{
-
-font-size:52px;
-
-}
-
-.home-centro p{
-
-font-size:18px;
-
-}
-
-.home-botoes{
-
-flex-direction:column;
-
-}
-
-.home-botoes .btn{
-
-width:100%;
-
-max-width:320px;
+font-size:16px;
 
 }
 
@@ -355,128 +397,77 @@ alt="95ª CIPM">
 </div>
 <div class="satisfacao-box">
 
-    <h2>
-        ⭐ Avalie este serviço! ⭐
-    </h2>
+    <h2>⭐ Avalie este serviço! ⭐</h2>
 
-    <div class="satisfacao-grid">
+    <div class="nota-mobile">
 
-        <!-- COLUNA ESQUERDA -->
-
-        <div class="lado-esquerdo">
-
-            <div class="nota-geral">
-                {{ media|floatformat:1 }}
-            </div>
-
-            <div class="estrelas">
-                ★★★★★
-            </div>
-
-            <p>
-                <strong>{{ total }}</strong> avaliações
-            </p>
-
-            <p>
-                <strong>{{ percentual }}%</strong>
-                recomendam o SiEv
-            </p>
-
+        <div class="nota-geral">
+            {{ media|floatformat:1 }}
         </div>
 
-        <!-- COLUNA DIREITA -->
+        <div class="estrelas">
+            ★★★★★
+        </div>
 
-        <div class="lado-direito">
+        <p><strong>{{ total }}</strong> avaliações</p>
 
-            <div class="swiper comentariosSwiper">
+        <p><strong>{{ percentual }}%</strong> recomendam o SiEv</p>
 
-                <div class="swiper-wrapper">
+    </div>
 
-                    {% for c in comentarios %}
+    <div class="swiper comentariosSwiper">
 
-                    <div class="swiper-slide">
+        <div class="swiper-wrapper">
 
-                        <div class="card-comentario">
+            {% for c in comentarios %}
 
-                            <div>
+            <div class="swiper-slide">
 
-                                <div class="nota">
+                <div class="card-comentario">
 
-                                    {% if c.nota_satisfacao == 5 %}
-                                        ★★★★★
-                                    {% elif c.nota_satisfacao == 4 %}
-                                        ★★★★☆
-                                    {% elif c.nota_satisfacao == 3 %}
-                                        ★★★☆☆
-                                    {% elif c.nota_satisfacao == 2 %}
-                                        ★★☆☆☆
-                                    {% else %}
-                                        ★☆☆☆☆
-                                    {% endif %}
+                    <div class="nota">
 
-                                </div>
-
-                                <p>
-
-                                    "{{ c.comentario_satisfacao }}"
-
-                                </p>
-
-                            </div>
-
-                            <div>
-
-                                <h4>
-
-                                    {{ c.solicitante }}
-
-                                </h4>
-
-                                <small>
-
-                                    {{ c.nome_evento }}
-
-                                </small>
-
-                            </div>
-
-                        </div>
+                        {% if c.nota_satisfacao == 5 %}
+                            ★★★★★
+                        {% elif c.nota_satisfacao == 4 %}
+                            ★★★★☆
+                        {% elif c.nota_satisfacao == 3 %}
+                            ★★★☆☆
+                        {% elif c.nota_satisfacao == 2 %}
+                            ★★☆☆☆
+                        {% else %}
+                            ★☆☆☆☆
+                        {% endif %}
 
                     </div>
 
-                    {% empty %}
+                    <p>"{{ c.comentario_satisfacao }}"</p>
 
-                    <div class="swiper-slide">
+                    <h4>{{ c.solicitante }}</h4>
 
-                        <div class="card-comentario">
-
-                            <div class="nota">
-
-                                ★★★★★
-
-                            </div>
-
-                            <p>
-
-                                Ainda não existem avaliações cadastradas.
-
-                            </p>
-
-                            <h4>
-
-                                SiEv
-
-                            </h4>
-
-                        </div>
-
-                    </div>
-
-                    {% endfor %}
+                    <small>{{ c.nome_evento }}</small>
 
                 </div>
 
             </div>
+
+            {% empty %}
+
+            <div class="swiper-slide">
+
+                <div class="card-comentario">
+
+                    <div class="nota">★★★★★</div>
+
+                    <p>Ainda não existem avaliações cadastradas.</p>
+
+                    <h4>SiEv</h4>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
 
         </div>
 
