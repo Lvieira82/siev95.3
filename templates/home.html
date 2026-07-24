@@ -6,7 +6,257 @@
 {% block content %}
 
 <style>
+.satisfacao-box{
 
+margin-top:45px;
+
+background:white;
+
+padding:45px;
+
+border-radius:28px;
+
+box-shadow:0 8px 25px rgba(0,0,0,.10);
+
+}
+
+.satisfacao-box h2{
+
+text-align:center;
+
+margin-bottom:35px;
+
+color:#003F82;
+
+}
+
+.satisfacao-grid{
+
+display:grid;
+
+grid-template-columns:280px 1fr;
+
+gap:40px;
+
+align-items:center;
+
+}
+
+.lado-esquerdo{
+
+text-align:center;
+
+}
+
+.nota-geral{
+
+font-size:80px;
+
+font-weight:bold;
+
+color:#003F82;
+
+}
+
+.estrelas{
+
+font-size:34px;
+
+color:#FFC107;
+
+margin:15px 0;
+
+}
+
+.card-comentario{
+
+background:#fff;
+
+border-radius:18px;
+
+padding:25px;
+
+height:220px;
+
+box-shadow:0 4px 14px rgba(0,0,0,.12);
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:space-between;
+
+}
+
+.card-comentario .nota{
+
+font-size:22px;
+
+color:#FFC107;
+
+}
+
+.card-comentario p{
+
+font-style:italic;
+
+line-height:1.5;
+
+color:#444;
+
+}
+
+.card-comentario h4{
+
+margin-top:10px;
+
+color:#003F82;
+
+}
+
+.swiper{
+
+padding:15px;
+
+}
+
+@media(max-width:900px){
+
+.satisfacao-grid{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+.satisfacao-box{
+
+margin-top:45px;
+
+background:white;
+
+border-radius:28px;
+
+padding:45px;
+
+box-shadow:0 8px 25px rgba(0,0,0,.10);
+
+}
+
+.satisfacao-box h2{
+
+text-align:center;
+
+margin-bottom:35px;
+
+color:#003F82;
+
+}
+
+.satisfacao-grid{
+
+display:grid;
+
+grid-template-columns:320px 1fr;
+
+gap:40px;
+
+align-items:center;
+
+}
+
+.lado-esquerdo{
+
+text-align:center;
+
+}
+
+.media-nota{
+
+font-size:90px;
+
+font-weight:bold;
+
+color:#003F82;
+
+}
+
+.estrelas{
+
+font-size:34px;
+
+color:#FFC107;
+
+margin:15px 0;
+
+}
+
+.lado-direito{
+
+height:260px;
+
+overflow:hidden;
+
+position:relative;
+
+}
+
+.comentario{
+
+padding:18px;
+
+border-bottom:1px solid #eee;
+
+animation:fade .8s;
+
+}
+
+.nota{
+
+color:#FFC107;
+
+font-size:22px;
+
+margin-bottom:8px;
+
+}
+
+@keyframes fade{
+
+from{
+
+opacity:0;
+
+transform:translateY(20px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+}
+
+@media(max-width:900px){
+
+.satisfacao-grid{
+
+grid-template-columns:1fr;
+
+}
+
+.media-nota{
+
+font-size:70px;
+
+}
+
+}
 .home-box{
     background:white;
     border-radius:28px;
@@ -127,8 +377,6 @@
 
 </style>
 
-<div class="home-box">
-
     <div class="home-conteudo">
 
         <div class="home-logo">
@@ -168,5 +416,180 @@
     </div>
 
 </div>
+<div class="home-box">
+    <br><br>
 
+<div class="satisfacao-box">
+
+<h2>
+
+⭐ Satisfação dos Solicitantes
+
+</h2>
+
+<div class="satisfacao-grid">
+
+<div class="lado-esquerdo">
+
+<div class="nota-geral">
+
+{{ media|floatformat:1 }}
+
+</div>
+
+<div class="estrelas">
+
+★★★★★
+
+</div>
+
+<p>
+
+<b>{{ total }}</b> avaliações
+
+</p>
+
+<p>
+
+<b>{{ percentual }}%</b>
+
+recomendam o SiEv
+
+</p>
+
+</div>
+
+<div class="lado-direito">
+
+<div class="swiper comentariosSwiper">
+
+<div class="swiper-wrapper">
+
+{% for c in comentarios %}
+
+<div class="swiper-slide">
+
+<div class="card-comentario">
+
+<div class="nota">
+
+{% if c.nota_satisfacao == 5 %}
+★★★★★
+{% elif c.nota_satisfacao == 4 %}
+★★★★☆
+{% elif c.nota_satisfacao == 3 %}
+★★★☆☆
+{% elif c.nota_satisfacao == 2 %}
+★★☆☆☆
+{% else %}
+★☆☆☆☆
+{% endif %}
+
+</div>
+
+<p>
+
+"{{ c.comentario_satisfacao }}"
+
+</p>
+
+<h4>
+
+{{ c.solicitante }}
+
+</h4>
+
+<small>
+
+{{ c.nome_evento }}
+
+</small>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<script>
+
+let indice=0;
+
+const comentarios=document.querySelectorAll(".comentario");
+
+function mostrarComentario(){
+
+comentarios.forEach(c=>c.style.display="none");
+
+comentarios[indice].style.display="block";
+
+indice++;
+
+if(indice>=comentarios.length){
+
+indice=0;
+
+}
+
+}
+
+if(comentarios.length){
+
+mostrarComentario();
+
+setInterval(mostrarComentario,5000);
+
+}
+
+</script>
+<script>
+
+new Swiper(".comentariosSwiper",{
+
+loop:true,
+
+spaceBetween:25,
+
+autoplay:{
+
+delay:5000,
+
+disableOnInteraction:false,
+
+},
+
+speed:900,
+
+grabCursor:true,
+
+slidesPerView:1,
+
+breakpoints:{
+
+768:{
+
+slidesPerView:2
+
+},
+
+1200:{
+
+slidesPerView:3
+
+}
+
+}
+
+});
+
+</script>
 {% endblock %}

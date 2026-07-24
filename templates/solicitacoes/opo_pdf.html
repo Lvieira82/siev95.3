@@ -255,11 +255,26 @@ body{
         {% endif %}
     </div>
 
-    <div class="gerado-por">
+    <div style="text-align:center; margin-top:20px;">
+
+    <p style="margin-bottom:5px;">
         Ordem de policiamento gerada por
-        <br>
-        <strong>{{ nome_gerador }}</strong>
-    </div>
+    </p>
+
+    <strong>
+
+        {% if solicitacao.gerado_por %}
+
+            {{ solicitacao.gerado_por.get_full_name }}
+
+        {% else %}
+
+            Sistema SiEv
+
+        {% endif %}
+    </strong>
+
+</div>
 
    {% if qr_base64 %}
     <div class="qrcode">

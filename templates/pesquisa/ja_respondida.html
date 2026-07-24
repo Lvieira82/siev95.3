@@ -1,0 +1,37 @@
+from django.utils import timezone
+
+
+def responder_pesquisa(request, token):
+
+    solicitacao = get_object_or_404(
+        Solicitacao,
+        pesquisa_token=token
+    )
+
+    if request.method == "POST":
+
+        solicitacao.nota_satisfacao = request.POST.get("nota")
+
+        solicitacao.comentario_satisfacao = request.POST.get(
+            "comentario",
+            ""
+        )
+
+        solicitacao.pesquisa_respondida = True
+
+        solicitacao.data_resposta_pesquisa = timezone.now()
+
+        solicitacao.save()
+
+        return render(
+            request,
+            "pesquisa/obrigado.html"
+        )
+
+    return render(
+        request,
+        "pesquisa/responder.html",
+        {
+            "solicitacao": solicitacao
+        }
+    )
