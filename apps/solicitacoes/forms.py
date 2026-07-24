@@ -12,9 +12,29 @@ from .utils import analisar_datas_oficio
 
 
 # ==========================================================
+# VALIDAÇÃO DE ARQUIVO PDF
+# ==========================================================
+
+def validar_pdf(arquivo):
+
+    if not arquivo:
+        return
+
+    extensao = arquivo.name.split(".")[-1].lower()
+
+    if extensao != "pdf":
+        raise ValidationError(
+            "Somente arquivos PDF são permitidos."
+        )
+
+
+# ==========================================================
 # FORMULÁRIO DE SOLICITAÇÃO EXTERNA
 # ==========================================================
 
+
+    #
+  
 class SolicitacaoForm(forms.ModelForm):
 
     class Meta:
@@ -28,12 +48,10 @@ class SolicitacaoForm(forms.ModelForm):
             "data_aprovacao",
             "protocolo",
             "usuario",
-            "gerado_por",
             "assinado_por",
             "data_assinatura",
             "criado_em",
             "opo_pdf",
-            "local",
         ]
 
         widgets = {
@@ -48,30 +66,6 @@ class SolicitacaoForm(forms.ModelForm):
                 "class": "form-control",
                 "placeholder": "(99) 99999-9999",
                 "maxlength": "15",
-            }),
-
-            # ==================================================
-            # NOVOS CAMPOS DO ENDEREÇO DO EVENTO
-            # ==================================================
-
-            "rua": forms.TextInput(attrs={
-                "class": "form-control",
-                "placeholder": "Ex.: Rua Principal, Avenida Sete de Setembro..."
-            }),
-
-            "numero": forms.TextInput(attrs={
-                "class": "form-control",
-                "placeholder": "Ex.: 123 ou S/N"
-            }),
-
-            "bairro_distrito": forms.TextInput(attrs={
-                "class": "form-control",
-                "placeholder": "Ex.: Centro ou Distrito de Sítio Novo"
-            }),
-
-            "ponto_referencia": forms.TextInput(attrs={
-                "class": "form-control",
-                "placeholder": "Ex.: Próximo à praça ou em frente à igreja"
             }),
 
             "data_evento": forms.DateInput(attrs={
@@ -109,30 +103,12 @@ class SolicitacaoForm(forms.ModelForm):
             "min": data_minima.strftime("%Y-%m-%d"),
         })
 
-        # ==================================================
-        # CAMPOS OPCIONAIS DO ENDEREÇO
-        # ==================================================
-
-        campos_endereco_opcionais = [
-            "rua",
-            "numero",
-            "bairro_distrito",
-            "ponto_referencia",
-        ]
-
-        for campo in campos_endereco_opcionais:
-            if campo in self.fields:
-                self.fields[campo].required = False
-
-
-    # ======================================================
+    #=====================================================
     # CONVERTE NOME DO SOLICITANTE PARA MAIÚSCULAS
-    # ======================================================
+    # =====================================================
 
     def clean_solicitante(self):
-
         valor = self.cleaned_data.get("solicitante", "")
-
         return valor.strip().upper()
 
 
@@ -141,9 +117,7 @@ class SolicitacaoForm(forms.ModelForm):
     # =====================================================
 
     def clean_nome_evento(self):
-
         valor = self.cleaned_data.get("nome_evento", "")
-
         return valor.strip().upper()
 
 
@@ -395,8 +369,32 @@ class SolicitacaoForm(forms.ModelForm):
         return cleaned_data
 
 
-class SolicitacaoManualForm(SolicitacaoForm):
+def validar_pdf(arquivo):
 
+    if not arquivo:
+        return
+
+    extensao = arquivo.name.split(".")[-1].lower()
+
+    if extensao != "pdf":
+        raise ValidationError(
+            "Somente arquivos PDF são permitidos."
+        )
+
+
+
+class SolicitacaoManualForm(SolicitacaoForm):
+    
+    class Meta(SolicitacaoForm.Meta):
+        exclude = SolicitacaoForm.Meta.exclude + [
+            "pesquisa_token",
+            "pesquisa_enviada",
+            "data_envio_pesquisa",
+            "pesquisa_respondida",
+            "data_resposta_pesquisa",
+            "nota_satisfacao",
+            "comentario_satisfacao",
+        ]
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -464,3 +462,4 @@ class SolicitacaoManualForm(SolicitacaoForm):
             cleaned_data["publico_estimado"] = 0
 
         return cleaned_data
+
