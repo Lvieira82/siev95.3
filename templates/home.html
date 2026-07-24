@@ -271,16 +271,14 @@ font-size:70px;
     gap:35px;
 }
 
-.home-logo{
-    width:220px;
-    text-align:center;
-    flex-shrink:0;
+.logo-pmba{
+    width:320px;
+    height:auto;
 }
 
-.home-logo img{
+.logo-95{
     width:220px;
-    text-align:center;
-    flex-shrink:0;
+    height:auto;
 }
 
 .home-centro{
@@ -381,8 +379,13 @@ font-size:70px;
     <div class="home-conteudo">
 
         <div class="home-logo">
-            <img src="{% static 'logos/logo_pmba.png' %}" alt="Logo PMBA">
+            <img class="logo-pmba"
+                 src="{% static 'logos/logo_pmba.png' %}"
+                 alt="Logo PMBA">
         </div>
+
+
+
 
         <div class="home-centro">
 
@@ -411,7 +414,9 @@ font-size:70px;
         </div>
 
         <div class="home-logo">
-            <img src="{% static 'logos/logo95.png' %}" alt="Logo 95ª CIPM">
+            <img class="logo-95"
+                 src="{% static 'logos/logo95.png' %}"
+                 alt="Logo 95ª CIPM">
         </div>
 
     </div>
