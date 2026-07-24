@@ -1,6 +1,5 @@
 import uuid
 import os
-
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
@@ -126,33 +125,7 @@ class Solicitacao(models.Model):
 
     hora_fim = models.TimeField()
 
-    local = models.TextField(
-        blank=True,
-        null=True
-    )
-    rua = models.CharField(
-        max_length=200,
-        blank=True,
-        null=True
-    )
-    
-    numero = models.CharField(
-        max_length=20,
-        blank=True,
-        null=True
-    )
-    
-    bairro_distrito = models.CharField(
-        max_length=150,
-        blank=True,
-        null=True
-    )
-    
-    ponto_referencia = models.CharField(
-        max_length=250,
-        blank=True,
-        null=True
-    )
+    local = models.TextField()
 
     publico_estimado = models.IntegerField()
 
@@ -220,6 +193,43 @@ class Solicitacao(models.Model):
     criado_em = models.DateTimeField(
         auto_now_add=True
     )
+    # ============================
+    # PESQUISA DE SATISFAÇÃO
+    # ============================
+
+    pesquisa_token = models.CharField(
+        max_length=64,
+        blank=True,
+        null=True,
+        unique=True
+    )
+
+    pesquisa_enviada = models.BooleanField(
+        default=False
+    )
+
+    data_envio_pesquisa = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    pesquisa_respondida = models.BooleanField(
+        default=False
+    )
+
+    data_resposta_pesquisa = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    nota_satisfacao = models.PositiveSmallIntegerField(
+        blank=True,
+        null=True
+    )
+
+    comentario_satisfacao = models.TextField(
+        blank=True
+    )
 
     def save(self, *args, **kwargs):
 
@@ -267,3 +277,6 @@ class MatriculaAutorizada(models.Model):
 
     def __str__(self):
         return f"{self.posto} {self.nome} - {self.matricula}"
+
+
+
