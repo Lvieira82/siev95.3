@@ -1,17 +1,10 @@
 import os
-
 from io import BytesIO
-
 from django.conf import settings
-
 from reportlab.lib.pagesizes import A4
-
 from reportlab.pdfgen import canvas
-
 from reportlab.lib.utils import ImageReader
-
 import qrcode
-
 
 def gerar_pdf_autorizacao(solicitacao):
 
@@ -122,3 +115,77 @@ def gerar_pdf_autorizacao(solicitacao):
     c.save()
 
     return nome_arquivo
+
+
+from datetime import timedelta
+import os
+
+from django.utils import timezone
+
+from .models import Solicitacao
+
+
+def limpar_documentos_antigos():
+    """
+    Remove documentos de origem 7 dias após o evento.
+
+    Mantém:
+        - Registro da solicitação
+        - PDF da OPO
+        - Ofício ao Comandante
+    """
+
+    limite = timezone.now().date() - timedelta(days=7)
+
+    solicitacoes = Solicitacao.objects.filter(
+        data_evento__lt=limite
+    )
+
+    campos_para_excluir = [
+
+        "oficio_prefeitura",
+
+        "documento_responsavel",
+
+        "croqui",
+
+        "seguro",
+
+        "bombeiros",
+
+        "outros_documentos",
+
+    ]
+
+    for solicitacao in solicitacoes:
+
+        # Só limpa se a OPO já existir
+        if not solicitacao.opo_pdf:
+            continue
+
+        alterou = False
+
+        for campo in campos_para_excluir:
+
+            if not hasattr(solicitacao, campo):
+                continue
+
+            arquivo = getattr(solicitacao, campo)
+
+            if not arquivo:
+                continue
+
+            try:
+
+                if arquivo.name and os.path.isfile(arquivo.path):
+                    os.remove(arquivo.path)
+
+            except Exception:
+                pass
+
+            setattr(solicitacao, campo, None)
+
+            alterou = True
+
+        if alterou:
+            solicitacao.save()
