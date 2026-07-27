@@ -8,6 +8,8 @@ import qrcode
 from datetime import timedelta
 from django.utils import timezone
 from .models import Solicitacao
+from pathlib import Path
+
 
 def gerar_pdf_autorizacao(solicitacao):
 
@@ -118,7 +120,6 @@ def gerar_pdf_autorizacao(solicitacao):
     c.save()
 
     return nome_arquivo
-
 
 
 
