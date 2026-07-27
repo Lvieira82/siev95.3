@@ -25,7 +25,8 @@ from io import BytesIO
 import qrcode
 from django.http import FileResponse, Http404
 from django.urls import reverse
-   
+from apps.solicitacoes.utils import limpar_documentos_antigos
+
 def minhas_solicitacoes(request):
     return render(
         request,
@@ -392,6 +393,8 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def painel_gestao(request):
+   
+    limpar_documentos_antigos()
 
     return render(
         request,
