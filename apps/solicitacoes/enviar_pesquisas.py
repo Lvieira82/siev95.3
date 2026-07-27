@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
 
-        limite = timezone.now() - timedelta(hours=48)
+        limite = timezone.now() - timedelta(hours=24)
 
         solicitacoes = Solicitacao.objects.filter(
             status="APROVADO",
