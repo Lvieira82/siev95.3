@@ -5,6 +5,9 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 import qrcode
+from datetime import timedelta
+from django.utils import timezone
+from .models import Solicitacao
 
 def gerar_pdf_autorizacao(solicitacao):
 
@@ -117,12 +120,7 @@ def gerar_pdf_autorizacao(solicitacao):
     return nome_arquivo
 
 
-from datetime import timedelta
-import os
 
-from django.utils import timezone
-
-from .models import Solicitacao
 
 
 def limpar_documentos_antigos():
