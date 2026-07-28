@@ -13,17 +13,14 @@ class Command(BaseCommand):
     help = "Envia pesquisas de satisfação"
 
     def handle(self, *args, **kwargs):
-
+        self.stdout.write("INICIOU O COMANDO")
         limite = timezone.now() - timedelta(hours=24)
 
-        solicitacoes = Solicitacao.objects.filter(
-            status="APROVADO",
-            pesquisa_enviada=False,
-            data_evento__lte=limite.date()
-        )
+        solicitacoes = Solicitacao.objects.all()
+        
 
         for s in solicitacoes:
-
+            self.stdout.write(f"Enviando para: {s.email}")
             link = (
                 f"https://siev95.com.br/"
                 f"pesquisa/{s.pesquisa_token}/"
