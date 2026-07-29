@@ -1,49 +1,54 @@
 from datetime import timedelta
-from django.utils import timezone
+
 from django.core.management.base import BaseCommand
+from django.utils import timezone
+
 from apps.solicitacoes.models import Solicitacao
 
 
 class Command(BaseCommand):
-    help = "Remove documentos de solicitações com mais de 7 dias"
+    help = (
+        "Remove os documentos temporários de solicitações "
+        "cujos eventos ocorreram há mais de 7 dias."
+    )
 
     def handle(self, *args, **kwargs):
 
         limite = timezone.localdate() - timedelta(days=7)
+
         solicitacoes = Solicitacao.objects.filter(
             data_evento__lt=limite
         )
+
         total = 0
 
         for s in solicitacoes:
 
-            # Mantém o ofício ao comandante
-        
+            alterou = False
+
             if s.documento_sanitario:
                 s.documento_sanitario.delete(save=False)
                 s.documento_sanitario = None
-        
+                alterou = True
+
             if s.documento_meio_ambiente:
                 s.documento_meio_ambiente.delete(save=False)
                 s.documento_meio_ambiente = None
-        
+                alterou = True
+
             if s.oficio_bombeiro:
                 s.oficio_bombeiro.delete(save=False)
                 s.oficio_bombeiro = None
-        
-            s.save()
+                alterou = True
 
-                arquivo = getattr(s, campo)
+            # Mantém o oficio_comandante
 
-                if arquivo:
-                    arquivo.delete(save=False)
-                    setattr(s, campo, None)
-
-            s.save()
-            total += 1
+            if alterou:
+                s.save()
+                total += 1
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"{total} solicitações processadas."
+                f"{total} solicitações tiveram os documentos temporários removidos."
             )
         )
