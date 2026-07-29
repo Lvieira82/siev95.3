@@ -9,22 +9,29 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
 
-        limite = timezone.now() - timedelta(days=7)
-
+        limite = timezone.localdate() - timedelta(days=7)
         solicitacoes = Solicitacao.objects.filter(
-            data_criacao__lt=limite
+            data_evento__lt=limite
         )
-
         total = 0
 
         for s in solicitacoes:
 
-            for campo in [
-                "oficio_comandante",
-                "documento_sanitario",
-                "documento_meio_ambiente",
-                "oficio_bombeiro",
-            ]:
+            # Mantém o ofício ao comandante
+        
+            if s.documento_sanitario:
+                s.documento_sanitario.delete(save=False)
+                s.documento_sanitario = None
+        
+            if s.documento_meio_ambiente:
+                s.documento_meio_ambiente.delete(save=False)
+                s.documento_meio_ambiente = None
+        
+            if s.oficio_bombeiro:
+                s.oficio_bombeiro.delete(save=False)
+                s.oficio_bombeiro = None
+        
+            s.save()
 
                 arquivo = getattr(s, campo)
 
