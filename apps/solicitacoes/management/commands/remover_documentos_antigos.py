@@ -50,9 +50,10 @@ class Command(BaseCommand):
             # Mantém o oficio_comandante
     
             if alterou:
+                s.documentos_expurgados = True
                 s.save()
                 total += 1
-    
+                
         self.stdout.write(
             self.style.SUCCESS(
                 f"\nConcluído! {total} solicitações tiveram os documentos temporários removidos."
