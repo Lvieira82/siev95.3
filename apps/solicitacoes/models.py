@@ -237,6 +237,11 @@ class Solicitacao(models.Model):
             self.protocolo = gerar_protocolo_unico()
 
         super().save(*args, **kwargs)
+        
+    documentos_expurgados = models.BooleanField(
+        default=False,
+        verbose_name="Documentos temporários removidos"
+    )
 
     def __str__(self):
 
