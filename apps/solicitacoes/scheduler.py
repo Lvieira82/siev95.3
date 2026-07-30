@@ -25,3 +25,5 @@ def iniciar_scheduler():
     scheduler.start()
 
     print("Scheduler iniciado.")
+    for job in scheduler.get_jobs():
+        print(job)
