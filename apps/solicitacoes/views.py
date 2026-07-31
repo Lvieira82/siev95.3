@@ -1027,7 +1027,13 @@ Atenciosamente,
 
 Seção de Planejamento Operacional
 """
-
+    return render(
+        request,
+        "solicitacoes/solicitar_correcao.html",
+        {
+            "solicitacao": solicitacao
+        }
+    )
     send_mail(
         subject="Pendência na Solicitação de Ordem de Policiamento",
         message=mensagem,
