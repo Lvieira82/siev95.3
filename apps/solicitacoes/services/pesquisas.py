@@ -54,31 +54,42 @@ def enviar_pesquisas_pendentes():
                 f"https://siev95.com.br/pesquisa/"
                 f"{s.pesquisa_token}/"
             )
-
+            
             mensagem = f"""
-Olá {s.solicitante},
-
-Esperamos que seu evento tenha ocorrido da melhor forma possível.
-
-Sua opinião é muito importante para nós.
-
-Avalie nosso atendimento acessando:
-
-{link}
-
-Muito obrigado.
-
-95ª CIPM
-Polícia Militar da Bahia
-"""
-
-            send_mail(
-                "Pesquisa de Satisfação - SiEv",
-                mensagem,
-                settings.DEFAULT_FROM_EMAIL,
-                [s.email],
-                fail_silently=False
+            Olá {s.solicitante},
+            
+            Esperamos que seu evento tenha ocorrido da melhor forma possível.
+            
+            Sua opinião é muito importante para nós.
+            
+            Avalie nosso atendimento acessando:
+            
+            {link}
+            
+            Muito obrigado.
+            
+            95ª CIPM
+            Polícia Militar da Bahia
+            """
+            
+            html = render_to_string(
+                "emails/pesquisa_satisfacao.html",
+                {
+                    "nome_solicitante": s.solicitante,
+                    "link_pesquisa": link,
+                    "ano": timezone.now().year,
+                }
             )
+            
+            email = EmailMultiAlternatives(
+                subject="Pesquisa de Satisfação - SiEv",
+                body=mensagem,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[s.email],
+            )
+            
+            email.attach_alternative(html, "text/html")
+            email.send(fail_silently=False)
 
             s.pesquisa_enviada = True
             s.data_envio_pesquisa = agora
