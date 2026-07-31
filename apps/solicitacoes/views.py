@@ -1004,23 +1004,22 @@ def solicitar_correcao(request, id):
     solicitacao = get_object_or_404(Solicitacao, id=id)
 
     mensagem = f"""
-Prezado(a) {solicitacao.solicitante},
+Olá {solicitacao.solicitante},
 
-Após análise da documentação referente ao evento:
-{solicitacao.nome_evento}
+Sua solicitação necessita de correção.
 
-Informamos que sua Ordem de Policiamento Operacional (OPO)
-não pôde ser gerada.
+Motivo informado:
 
-Motivos prováveis:
+{solicitacao.motivo_correcao}
 
-• erro no cadastro;
-• Data no ofício diferente da solicitação;
-• duplicidade da solicitação;
-• ausência de documentos obrigatórios.
+Após realizar as correções,
+acesse novamente o SiEv.
 
-Solicitamos que acesse a página de consula com seu protocolo e corrija
-ou anexe os documentos corretos. Se preferir compareça à sede da 95ª CIPM
+Protocolo:
+{solicitacao.protocolo}
+"""
+
+Se preferir compareça à sede da 95ª CIPM
 para regularizar as pendências.
 Após a regularização, uma nova análise será realizada.
 
