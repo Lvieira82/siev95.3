@@ -193,6 +193,11 @@ class Solicitacao(models.Model):
     criado_em = models.DateTimeField(
         auto_now_add=True
     )
+    motivo_correcao = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Motivo da Correção"
+    )
     # ============================
     # PESQUISA DE SATISFAÇÃO
     # ============================
