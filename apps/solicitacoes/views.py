@@ -502,6 +502,23 @@ def agenda_gestao(request):
 @login_required
 def lancamento_manual(request):
 
+    protocolo = request.GET.get("protocolo_origem", "").strip()
+
+    original = None
+
+    if protocolo:
+
+        original = Solicitacao.objects.filter(
+            protocolo=protocolo
+        ).first()
+
+        if not original:
+
+            messages.error(
+                request,
+                "Protocolo não encontrado."
+            )
+
     if request.method == "POST":
 
         form = SolicitacaoManualForm(
@@ -513,20 +530,13 @@ def lancamento_manual(request):
 
             solicitacao = form.save(commit=False)
 
-            # Lançamento manual feito pela gestão
             solicitacao.status = "APROVADO"
-            solicitacao = form.save(commit=False)
 
-            # Guarda quem gerou a OPO
             solicitacao.gerado_por = request.user
-
-            # Guarda quem aprovou
             solicitacao.aprovado_por = request.user.get_full_name()
             solicitacao.assinado_por = request.user.get_full_name()
-
             solicitacao.data_aprovacao = timezone.now()
 
-        
             solicitacao.save()
 
             messages.success(
@@ -538,13 +548,41 @@ def lancamento_manual(request):
 
     else:
 
-        form = SolicitacaoManualForm()
+        if original:
+
+            form = SolicitacaoManualForm(
+                initial={
+
+                    "nome_evento": original.nome_evento,
+                    "solicitante": original.solicitante,
+                    "cpf": original.cpf,
+                    "email": original.email,
+                    "telefone": original.telefone,
+                    "logradouro": original.logradouro,
+                    "bairro": original.bairro,
+                    "cidade": original.cidade,
+                    "data_evento": original.data_evento,
+                    "hora_inicio": original.hora_inicio,
+                    "hora_fim": original.hora_fim,
+                    "publico_estimado": original.publico_estimado,
+
+                    # acrescente aqui os demais campos
+                    # existentes no SolicitacaoManualForm
+
+                }
+            )
+
+        else:
+
+            form = SolicitacaoManualForm()
 
     return render(
         request,
         "gestao/lancamento_manual.html",
         {
             "form": form,
+            "protocolo_origem": protocolo,
+            "solicitacao_original": original,
         }
     )
 # =====================================================
