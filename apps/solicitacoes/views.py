@@ -1110,7 +1110,96 @@ Seção de Planejamento Operacional
             "solicitacao": solicitacao
         }
     )
+def importar_matriculas_painel(request):
 
+    if request.method == "POST":
+
+        arquivo = request.FILES.get("arquivo")
+
+        if not arquivo:
+
+            messages.error(
+                request,
+                "Selecione um arquivo Excel."
+            )
+
+            return redirect(
+                "importar_matriculas_painel"
+            )
+
+        if not arquivo.name.endswith(".xlsx"):
+
+            messages.error(
+                request,
+                "Envie apenas arquivo .xlsx."
+            )
+
+            return redirect(
+                "importar_matriculas_painel"
+            )
+
+        wb = openpyxl.load_workbook(arquivo)
+
+        ws = wb.active
+
+        criadas = 0
+        atualizadas = 0
+
+        for linha in ws.iter_rows(
+            min_row=2,
+            values_only=True
+        ):
+
+            matricula = linha[0]
+
+            nome = (
+                linha[1]
+                if len(linha) > 1 else ""
+            )
+
+            posto = (
+                linha[2]
+                if len(linha) > 2 else ""
+            )
+
+            unidade = (
+                linha[3]
+                if len(linha) > 3 else "95ª CIPM"
+            )
+
+            if not matricula:
+                continue
+
+            obj, criado = (
+                MatriculaAutorizada.objects.update_or_create(
+                    matricula=str(matricula).strip(),
+                    defaults={
+                        "nome": str(nome).strip() if nome else "",
+                        "posto": str(posto).strip() if posto else "",
+                        "unidade": str(unidade).strip() if unidade else "95ª CIPM",
+                        "ativo": True,
+                    }
+                )
+            )
+
+            if criado:
+                criadas += 1
+            else:
+                atualizadas += 1
+
+        messages.success(
+            request,
+            f"Importação concluída. Criadas: {criadas}. Atualizadas: {atualizadas}."
+        )
+
+        return redirect(
+            "importar_matriculas_painel"
+        )
+
+    return render(
+        request,
+        "gestao/importar_matriculas.html"
+    )
 @login_required
 def mapa_eventos(request):
 
