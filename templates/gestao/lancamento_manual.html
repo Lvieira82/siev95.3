@@ -44,6 +44,7 @@
     grid-column:1 / -1;
 }
 
+
 label{
     display:block;
     margin-bottom:8px;
@@ -60,7 +61,90 @@ select{
     border-radius:8px;
     font-size:15px;
 }
+.protocolo-card{
 
+    margin-bottom:30px;
+
+}
+
+.protocolo-card label{
+
+    display:block;
+    font-weight:700;
+    margin-bottom:8px;
+
+}
+
+.protocolo-card span{
+
+    font-weight:400;
+    color:#6b7280;
+
+}
+
+.protocolo-card input{
+
+    width:100%;
+    padding:14px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    font-size:15px;
+
+}
+
+.btn-buscar{
+
+    margin-top:12px;
+    width:100%;
+    background:#111827;
+    color:#fff;
+    border:none;
+    padding:14px;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+
+}
+
+.btn-buscar:hover{
+
+    background:#1f2937;
+
+}
+
+.protocolo-card small{
+
+    display:block;
+    margin-top:10px;
+    color:#6b7280;
+
+}
+
+@media(min-width:768px){
+
+    .protocolo-card{
+
+        display:grid;
+        grid-template-columns:1fr 220px;
+        gap:15px;
+        align-items:end;
+
+    }
+
+    .protocolo-card label,
+    .protocolo-card small{
+
+        grid-column:1 / -1;
+
+    }
+
+    .btn-buscar{
+
+        margin-top:0;
+
+    }
+
+}
 textarea{
     min-height:120px;
 }
