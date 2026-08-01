@@ -502,7 +502,24 @@ def agenda_gestao(request):
 @login_required
 def lancamento_manual(request):
 
+    protocolo = request.GET.get("protocolo_origem", "").strip()
+
     original = None
+
+    if protocolo:
+
+        try:
+
+            original = Solicitacao.objects.get(
+                protocolo=protocolo
+            )
+
+        except Solicitacao.DoesNotExist:
+
+            messages.error(
+                request,
+                "Protocolo não encontrado."
+            )
 
     if request.method == "POST":
 
@@ -511,17 +528,21 @@ def lancamento_manual(request):
             ""
         ).strip()
 
+        original = None
+
         if protocolo:
 
-            original = Solicitacao.objects.filter(
-                protocolo=protocolo
-            ).first()
+            try:
 
-            if not original:
+                original = Solicitacao.objects.get(
+                    protocolo=protocolo
+                )
+
+            except Solicitacao.DoesNotExist:
 
                 messages.error(
                     request,
-                    "Protocolo não encontrado."
+                    "Protocolo informado não encontrado."
                 )
 
                 return redirect("lancamento_manual")
@@ -537,49 +558,35 @@ def lancamento_manual(request):
             solicitacao = form.save(commit=False)
 
             solicitacao.status = "APROVADO"
+
             solicitacao.gerado_por = request.user
-            solicitacao.aprovado_por = request.user.get_full_name()
-            solicitacao.assinado_por = request.user.get_full_name()
+
+            solicitacao.aprovado_por = (
+                request.user.get_full_name()
+            )
+
+            solicitacao.assinado_por = (
+                request.user.get_full_name()
+            )
+
             solicitacao.data_aprovacao = timezone.now()
 
             solicitacao.save()
 
             messages.success(
                 request,
-                "Evento cadastrado manualmente com sucesso."
+                "Evento salvo com sucesso."
             )
 
-            return redirect("painel_gestao")
+            return redirect(
+                "painel_gestao"
+            )
 
     else:
 
-        protocolo = request.GET.get(
-            "protocolo_origem",
-            ""
-        ).strip()
-
-        if protocolo:
-
-            original = Solicitacao.objects.filter(
-                protocolo=protocolo
-            ).first()
-
-            if not original:
-
-                messages.error(
-                    request,
-                    "Protocolo não encontrado."
-                )
-
-        if original:
-
-            form = SolicitacaoManualForm(
-                instance=original
-            )
-
-        else:
-
-            form = SolicitacaoManualForm()
+        form = SolicitacaoManualForm(
+            instance=original
+        )
 
     return render(
         request,
