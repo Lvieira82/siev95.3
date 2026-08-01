@@ -225,7 +225,41 @@ textarea{
 
             {% csrf_token %}
 
-            {{ form.as_p }}
+                <div style="margin-bottom:25px;">
+                
+                    <label>
+                        <strong>Número do Protocolo (opcional)</strong>
+                    </label>
+                
+                    <div style="display:flex;gap:10px;">
+                
+                        <input
+                            type="text"
+                            name="protocolo_origem"
+                            value="{{ protocolo_origem }}"
+                            placeholder="Informe o protocolo da solicitação">
+                
+                        <button
+                            type="submit"
+                            formmethod="get"
+                            class="btn-voltar">
+                
+                            Buscar
+                
+                        </button>
+                
+                    </div>
+                
+                    <small style="color:#6b7280;">
+                
+                        Se informado, os dados da solicitação serão carregados para edição,
+                        mantendo o mesmo protocolo.
+                
+                    </small>
+                
+                </div>
+                
+                {{ form.as_p }}
 
             <div class="acoes">
                 <a href="{% url 'painel_gestao' %}" class="btn-voltar">
