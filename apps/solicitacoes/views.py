@@ -502,28 +502,34 @@ def agenda_gestao(request):
 @login_required
 def lancamento_manual(request):
 
-    protocolo = request.GET.get("protocolo_origem", "").strip()
-
     original = None
-
-    if protocolo:
-
-        original = Solicitacao.objects.filter(
-            protocolo=protocolo
-        ).first()
-
-        if not original:
-
-            messages.error(
-                request,
-                "Protocolo não encontrado."
-            )
 
     if request.method == "POST":
 
+        protocolo = request.POST.get(
+            "protocolo_origem",
+            ""
+        ).strip()
+
+        if protocolo:
+
+            original = Solicitacao.objects.filter(
+                protocolo=protocolo
+            ).first()
+
+            if not original:
+
+                messages.error(
+                    request,
+                    "Protocolo não encontrado."
+                )
+
+                return redirect("lancamento_manual")
+
         form = SolicitacaoManualForm(
             request.POST,
-            request.FILES
+            request.FILES,
+            instance=original
         )
 
         if form.is_valid():
@@ -531,7 +537,6 @@ def lancamento_manual(request):
             solicitacao = form.save(commit=False)
 
             solicitacao.status = "APROVADO"
-
             solicitacao.gerado_por = request.user
             solicitacao.aprovado_por = request.user.get_full_name()
             solicitacao.assinado_por = request.user.get_full_name()
@@ -548,28 +553,28 @@ def lancamento_manual(request):
 
     else:
 
+        protocolo = request.GET.get(
+            "protocolo_origem",
+            ""
+        ).strip()
+
+        if protocolo:
+
+            original = Solicitacao.objects.filter(
+                protocolo=protocolo
+            ).first()
+
+            if not original:
+
+                messages.error(
+                    request,
+                    "Protocolo não encontrado."
+                )
+
         if original:
 
             form = SolicitacaoManualForm(
-                initial={
-
-                    "nome_evento": original.nome_evento,
-                    "solicitante": original.solicitante,
-                    "cpf": original.cpf,
-                    "email": original.email,
-                    "telefone": original.telefone,
-                    "logradouro": original.logradouro,
-                    "bairro": original.bairro,
-                    "cidade": original.cidade,
-                    "data_evento": original.data_evento,
-                    "hora_inicio": original.hora_inicio,
-                    "hora_fim": original.hora_fim,
-                    "publico_estimado": original.publico_estimado,
-
-                    # acrescente aqui os demais campos
-                    # existentes no SolicitacaoManualForm
-
-                }
+                instance=original
             )
 
         else:
