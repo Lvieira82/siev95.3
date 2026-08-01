@@ -262,7 +262,10 @@ Buscar
 <form method="post" enctype="multipart/form-data">
 
 {% csrf_token %}
-
+<input
+    type="hidden"
+    name="protocolo_origem"
+    value="{{ protocolo_origem }}">
 {{ form.as_p }}
 
 <div class="acoes">
