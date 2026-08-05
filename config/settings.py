@@ -92,15 +92,17 @@ DATABASES = {
         default=config("DATABASE_URL", default="sqlite:///db.sqlite3"),
         conn_max_age=600,
         ssl_require=False,
-    ),
-
-    "ava": dj_database_url.parse(
-        config("AVA_DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=False,
-    ),
+    )
 }
 
+AVA_DATABASE_URL = config("AVA_DATABASE_URL", default=None)
+
+if AVA_DATABASE_URL:
+    DATABASES["ava"] = dj_database_url.parse(
+        AVA_DATABASE_URL,
+        conn_max_age=600,
+        ssl_require=False,
+    )
 # =====================
 # PASSWORDS
 # =====================
