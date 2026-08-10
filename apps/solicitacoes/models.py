@@ -252,6 +252,19 @@ class Solicitacao(models.Model):
 
         return f"{self.protocolo} - {self.nome_evento}"
 
+    
+    @property
+    def nome_publico(self):
+    
+        partes = self.solicitante.strip().split()
+    
+        if len(partes) >= 2:
+            return f"{partes[0]} {partes[-1]}"
+    
+        return self.solicitante
+
+
+
 class MatriculaAutorizada(models.Model):
 
     matricula = models.CharField(
