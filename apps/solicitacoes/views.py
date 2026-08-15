@@ -307,23 +307,32 @@ def corrigir_solicitacao(request, protocolo):
             request,
             "Esta solicitação não está disponível para correção."
         )
+
         return redirect(
             f"/consultar/?protocolo={solicitacao.protocolo}"
         )
+
+    # Guarda a data original.
+    # Ela deverá permanecer a mesma após a correção.
+    data_evento_original = solicitacao.data_evento
 
     if request.method == "POST":
 
         form = SolicitacaoForm(
             request.POST,
             request.FILES,
-            instance=solicitacao
+            instance=solicitacao,
+            modo_correcao=True
         )
 
         if form.is_valid():
 
             obj = form.save(commit=False)
 
-            # Mantém o mesmo protocolo e devolve para nova análise
+            # A data do evento não pode ser alterada na correção.
+            obj.data_evento = data_evento_original
+
+            # Mantém o mesmo protocolo e retorna para análise.
             obj.status = "PENDENTE"
 
             obj.save()
@@ -341,7 +350,8 @@ def corrigir_solicitacao(request, protocolo):
     else:
 
         form = SolicitacaoForm(
-            instance=solicitacao
+            instance=solicitacao,
+            modo_correcao=True
         )
 
     return render(
