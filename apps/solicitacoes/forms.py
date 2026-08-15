@@ -88,20 +88,34 @@ class SolicitacaoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
 
-        super().__init__(*args, **kwargs)
+        self.modo_correcao = kwargs.pop(
+            "modo_correcao",
+            False
+        )
 
-        # Inicializa os atributos usados pela análise do ofício.
-        # Isso evita AttributeError posteriormente na view.
+        super().__init__(*args, **kwargs)
 
         self.aviso_multiplas_datas = False
         self.datas_encontradas_oficio = []
 
-        data_minima = date.today() + timedelta(days=3)
-
         self.fields["data_evento"].widget.attrs.update({
             "type": "date",
-            "min": data_minima.strftime("%Y-%m-%d"),
         })
+
+        if self.modo_correcao:
+
+            # Mantém a data original preenchida
+            # e impede sua alteração.
+            self.fields["data_evento"].disabled = True
+
+        else:
+
+            # Regra de 72 horas para novas solicitações.
+            data_minima = date.today() + timedelta(days=3)
+
+            self.fields["data_evento"].widget.attrs.update({
+                "min": data_minima.strftime("%Y-%m-%d"),
+            })
 
     #=====================================================
     # CONVERTE NOME DO SOLICITANTE PARA MAIÚSCULAS
