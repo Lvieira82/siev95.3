@@ -298,18 +298,24 @@ def corrigir_solicitacao(request, protocolo):
 
     solicitacao = get_object_or_404(
         Solicitacao,
-        protocolo=protocolo
+        protocolo=protocolo.upper()
     )
 
-    # Só permite corrigir se estiver realmente aguardando correção
+    # Somente solicitações devolvidas para correção
     if solicitacao.status != "CORRECAO":
+
         messages.error(
             request,
-            "Esta solicitação não está disponível para correção."
+            "Esta solicitação não está aguardando correção."
         )
+
         return redirect(
-            f"/consultar/?protocolo={solicitacao.protocolo}"
+            "consultar"
         )
+
+    # ==================================================
+    # POST - REENVIO
+    # ==================================================
 
     if request.method == "POST":
 
@@ -321,21 +327,94 @@ def corrigir_solicitacao(request, protocolo):
 
         if form.is_valid():
 
-            obj = form.save(commit=False)
+            # ------------------------------------------
+            # PRESERVA A DATA ORIGINAL
+            # ------------------------------------------
 
-            # Mantém o mesmo protocolo e devolve para nova análise
-            obj.status = "PENDENTE"
+            data_evento_original = solicitacao.data_evento
 
-            obj.save()
+            solicitacao = form.save(
+                commit=False
+            )
+
+            solicitacao.data_evento = (
+                data_evento_original
+            )
+
+            solicitacao.status = "ENVIADA"
+
+            solicitacao.save()
+
+            # ------------------------------------------
+            # HISTÓRICO
+            # ------------------------------------------
+
+            HistoricoSolicitacao.objects.create(
+                solicitacao=solicitacao,
+                usuario=None,
+                status="ENVIADA",
+                observacao=(
+                    "Solicitação corrigida e "
+                    "reenviada pelo solicitante."
+                ),
+            )
+
+            # ------------------------------------------
+            # E-MAIL DE CONFIRMAÇÃO
+            # ------------------------------------------
+
+            mensagem = f"""
+Olá {solicitacao.solicitante},
+
+Sua solicitação foi corrigida e reenviada
+para análise.
+
+Protocolo:
+{solicitacao.protocolo}
+
+Evento:
+{solicitacao.nome_evento}
+
+Data:
+{solicitacao.data_evento.strftime("%d/%m/%Y")}
+
+O pedido será novamente analisado pela
+unidade responsável.
+
+Atenciosamente,
+
+Seção de Planejamento Operacional
+"""
+
+            try:
+
+                send_mail(
+                    subject=(
+                        "Solicitação corrigida e "
+                        "reenviada - SiEv"
+                    ),
+                    message=mensagem,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[
+                        solicitacao.email
+                    ],
+                    fail_silently=False,
+                )
+
+            except Exception as erro_email:
+
+                print(
+                    "ERRO AO ENVIAR EMAIL:",
+                    repr(erro_email)
+                )
 
             messages.success(
                 request,
-                "Correções enviadas com sucesso. "
-                "Sua solicitação será analisada novamente."
+                "Solicitação corrigida e reenviada com sucesso."
             )
 
             return redirect(
-                f"/consultar/?protocolo={obj.protocolo}"
+                "consultar"
             )
 
     else:
@@ -346,11 +425,10 @@ def corrigir_solicitacao(request, protocolo):
 
     return render(
         request,
-        "solicitacoes/nova.html",
+        "solicitacoes/corrigir.html",
         {
             "form": form,
             "solicitacao": solicitacao,
-            "modo_correcao": True,
         }
     )
 # =====================================================
