@@ -389,30 +389,6 @@ def corrigir_solicitacao(request, protocolo):
             "modo_correcao": True,
         }
     )
-
-    # ======================================================
-    # GET - ABRE FORMULÁRIO PREENCHIDO
-    # ======================================================
-
-    else:
-
-        form = SolicitacaoForm(
-            instance=solicitacao
-        )
-
-    # ======================================================
-    # FORMULÁRIO DE CORREÇÃO
-    # ======================================================
-
-    return render(
-        request,
-        "solicitacoes/nova.html",
-        {
-            "form": form,
-            "solicitacao": solicitacao,
-            "modo_correcao": True,
-        }
-    )
 # =====================================================
 # LOGIN / LOGOUT GESTÃO
 # =====================================================
