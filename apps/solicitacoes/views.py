@@ -325,7 +325,8 @@ def corrigir_solicitacao(request, protocolo):
         form = SolicitacaoForm(
             request.POST,
             request.FILES,
-            instance=solicitacao
+            instance=solicitacao,
+            modo_correcao=True
         )
 
         if form.is_valid():
@@ -337,6 +338,14 @@ def corrigir_solicitacao(request, protocolo):
             # ==================================================
 
             obj.protocolo = solicitacao.protocolo
+
+            # ==================================================
+            # MANTÉM A DATA ORIGINAL DO EVENTO
+            #
+            # A CORREÇÃO NÃO ALTERA A DATA DO EVENTO.
+            # ==================================================
+
+            obj.data_evento = solicitacao.data_evento
 
             # ==================================================
             # VOLTA PARA NOVA ANÁLISE
@@ -355,6 +364,31 @@ def corrigir_solicitacao(request, protocolo):
             return redirect(
                 f"/consultar/?protocolo={obj.protocolo}"
             )
+
+    # ======================================================
+    # GET - ABRE FORMULÁRIO PREENCHIDO
+    # ======================================================
+
+    else:
+
+        form = SolicitacaoForm(
+            instance=solicitacao,
+            modo_correcao=True
+        )
+
+    # ======================================================
+    # FORMULÁRIO
+    # ======================================================
+
+    return render(
+        request,
+        "solicitacoes/nova.html",
+        {
+            "form": form,
+            "solicitacao": solicitacao,
+            "modo_correcao": True,
+        }
+    )
 
     # ======================================================
     # GET - ABRE FORMULÁRIO PREENCHIDO
