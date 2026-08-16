@@ -301,8 +301,12 @@ def corrigir_solicitacao(request, protocolo):
         protocolo=protocolo
     )
 
-    # Só permite corrigir se estiver realmente aguardando correção
+    # ======================================================
+    # SÓ PERMITE CORREÇÃO QUANDO O STATUS FOR CORRECAO
+    # ======================================================
+
     if solicitacao.status != "CORRECAO":
+
         messages.error(
             request,
             "Esta solicitação não está disponível para correção."
@@ -312,27 +316,32 @@ def corrigir_solicitacao(request, protocolo):
             f"/consultar/?protocolo={solicitacao.protocolo}"
         )
 
-    # Guarda a data original.
-    # Ela deverá permanecer a mesma após a correção.
-    data_evento_original = solicitacao.data_evento
+    # ======================================================
+    # POST - ENVIO DAS CORREÇÕES
+    # ======================================================
 
     if request.method == "POST":
 
         form = SolicitacaoForm(
             request.POST,
             request.FILES,
-            instance=solicitacao,
-            modo_correcao=True
+            instance=solicitacao
         )
 
         if form.is_valid():
 
             obj = form.save(commit=False)
 
-            # A data do evento não pode ser alterada na correção.
-            obj.data_evento = data_evento_original
+            # ==================================================
+            # MANTÉM O MESMO PROTOCOLO
+            # ==================================================
 
-            # Mantém o mesmo protocolo e retorna para análise.
+            obj.protocolo = solicitacao.protocolo
+
+            # ==================================================
+            # VOLTA PARA NOVA ANÁLISE
+            # ==================================================
+
             obj.status = "PENDENTE"
 
             obj.save()
@@ -347,12 +356,19 @@ def corrigir_solicitacao(request, protocolo):
                 f"/consultar/?protocolo={obj.protocolo}"
             )
 
+    # ======================================================
+    # GET - ABRE FORMULÁRIO PREENCHIDO
+    # ======================================================
+
     else:
 
         form = SolicitacaoForm(
-            instance=solicitacao,
-            modo_correcao=True
+            instance=solicitacao
         )
+
+    # ======================================================
+    # FORMULÁRIO DE CORREÇÃO
+    # ======================================================
 
     return render(
         request,
