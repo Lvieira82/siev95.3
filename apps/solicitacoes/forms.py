@@ -28,13 +28,10 @@ def validar_pdf(arquivo):
         )
 
 
-# ==========================================================
-# FORMULÁRIO DE SOLICITAÇÃO EXTERNA
-# ==========================================================
+# ======================================================
+# INICIALIZAÇÃO DO FORMULÁRIO
+# ======================================================
 
-
-    #
-  
 class SolicitacaoForm(forms.ModelForm):
 
     class Meta:
@@ -83,40 +80,150 @@ class SolicitacaoForm(forms.ModelForm):
 
 
     # ======================================================
-    # INICIALIZAÇÃO DO FORMULÁRIO
+    # INICIALIZAÇÃO
     # ======================================================
 
     def __init__(self, *args, **kwargs):
 
-        self.modo_correcao = kwargs.pop(
-            "modo_correcao",
-            False
-        )
-
         super().__init__(*args, **kwargs)
+
+        # Atributos utilizados pela análise/OCR do ofício
 
         self.aviso_multiplas_datas = False
         self.datas_encontradas_oficio = []
 
-        self.fields["data_evento"].widget.attrs.update({
-            "type": "date",
-        })
+        # ==================================================
+        # CORREÇÃO DE SOLICITAÇÃO
+        # ==================================================
+        #
+        # Se já existe uma solicitação e ela está em
+        # CORRECAO, trata-se de continuidade da solicitação
+        # original.
+        #
+        # Portanto:
+        # - mantém a data original;
+        # - não aplica min no HTML;
+        # - não força nova data.
 
-        if self.modo_correcao:
+        if (
+            self.instance
+            and self.instance.pk
+            and self.instance.status == "CORRECAO"
+        ):
 
-            # Mantém a data original preenchida
-            # e impede sua alteração.
-            self.fields["data_evento"].disabled = True
+            self.fields["data_evento"].widget.attrs.pop(
+                "min",
+                None
+            )
+
+            if self.instance.data_evento:
+
+                self.initial["data_evento"] = (
+                    self.instance.data_evento
+                )
+
+        # ==================================================
+        # NOVA SOLICITAÇÃO
+        # ==================================================
+        #
+        # Somente aqui entra a regra dos 3 dias.
 
         else:
 
-            # Regra de 72 horas para novas solicitações.
-            data_minima = date.today() + timedelta(days=3)
+            data_minima = (
+                date.today() + timedelta(days=3)
+            )
 
             self.fields["data_evento"].widget.attrs.update({
+                "type": "date",
                 "min": data_minima.strftime("%Y-%m-%d"),
             })
 
+
+    # ======================================================
+    # NOME DO SOLICITANTE EM MAIÚSCULAS
+    # ======================================================
+
+    def clean_solicitante(self):
+
+        solicitante = self.cleaned_data.get(
+            "solicitante"
+        )
+
+        if solicitante:
+
+            solicitante = solicitante.upper()
+
+        return solicitante
+
+
+    # ======================================================
+    # NOME DO EVENTO EM MAIÚSCULAS
+    # ======================================================
+
+    def clean_nome_evento(self):
+
+        nome_evento = self.cleaned_data.get(
+            "nome_evento"
+        )
+
+        if nome_evento:
+
+            nome_evento = nome_evento.upper()
+
+        return nome_evento
+
+
+    # ======================================================
+    # DATA DO EVENTO
+    # ======================================================
+
+    def clean_data_evento(self):
+
+        data_evento = self.cleaned_data.get(
+            "data_evento"
+        )
+
+        # ==================================================
+        # CORREÇÃO
+        # ==================================================
+        #
+        # A correção não é uma nova solicitação.
+        #
+        # Mesmo que o evento esteja:
+        # - amanhã;
+        # - depois de amanhã;
+        # - hoje;
+        #
+        # a correção pode ser enviada normalmente.
+
+        if (
+            self.instance
+            and self.instance.pk
+            and self.instance.status == "CORRECAO"
+        ):
+
+            return data_evento
+
+        # ==================================================
+        # NOVA SOLICITAÇÃO
+        # ==================================================
+
+        data_minima = (
+            date.today() + timedelta(days=3)
+        )
+
+        if (
+            data_evento
+            and data_evento < data_minima
+        ):
+
+            raise forms.ValidationError(
+                "A data do evento deve ser, no mínimo, "
+                "3 dias após a data da informação."
+            )
+
+        return data_evento
     #=====================================================
     # CONVERTE NOME DO SOLICITANTE PARA MAIÚSCULAS
     # =====================================================
