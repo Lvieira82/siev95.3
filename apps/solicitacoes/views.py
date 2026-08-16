@@ -5,16 +5,13 @@ from django.shortcuts import render, get_object_or_404
 import csv
 import os
 from datetime import datetime
-
 from django.conf import settings
 from django.http import HttpResponse
-
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
-
 from reportlab.platypus import (
     SimpleDocTemplate,
     Table,
@@ -39,7 +36,7 @@ from django.http import FileResponse, HttpResponse, Http404
 from django.urls import reverse
 from django.utils import timezone
 from .models import Solicitacao
-from .forms import SolicitacaoForm, SolicitacaoManualForm
+from .forms import SolicitacaoForm, SolicitacaoManualForm, CorrecaoSolicitacaoForm
 import openpyxl
 import secrets
 from django.contrib import messages
