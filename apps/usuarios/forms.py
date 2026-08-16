@@ -171,3 +171,95 @@ class SolicitacaoForm(forms.ModelForm):
             validar_pdf(arquivo)
 
         return arquivo
+
+# ==========================================================
+# FORMULÁRIO EXCLUSIVO PARA CORREÇÃO DE SOLICITAÇÃO
+# ==========================================================
+
+class CorrecaoSolicitacaoForm(forms.ModelForm):
+
+    class Meta:
+
+        model = Solicitacao
+
+        exclude = [
+            "status",
+            "parecer_operacional",
+            "aprovado_por",
+            "data_aprovacao",
+            "protocolo",
+            "usuario",
+            "assinado_por",
+            "data_assinatura",
+            "criado_em",
+            "opo_pdf",
+        ]
+
+        widgets = {
+
+            "cpf": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "000.000.000-00",
+                "maxlength": "14",
+            }),
+
+            "telefone": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "(99) 99999-9999",
+                "maxlength": "15",
+            }),
+
+            "data_evento": forms.DateInput(attrs={
+                "type": "date",
+                "readonly": True,
+            }),
+
+            "hora_inicio": forms.TimeInput(attrs={
+                "type": "time",
+            }),
+
+            "hora_fim": forms.TimeInput(attrs={
+                "type": "time",
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        # ==================================================
+        # DATA ORIGINAL DO EVENTO
+        #
+        # Apenas exibe a data que já está no banco.
+        # Não calcula.
+        # Não valida.
+        # Não altera.
+        # ==================================================
+
+        if self.instance and self.instance.pk:
+
+            self.fields["data_evento"].initial = (
+                self.instance.data_evento
+            )
+
+            self.fields["data_evento"].disabled = True
+
+        # ==================================================
+        # NOME DO SOLICITANTE
+        # ==================================================
+
+        if "solicitante" in self.fields:
+
+            self.fields["solicitante"].widget.attrs.update({
+                "oninput": "this.value = this.value.toUpperCase();"
+            })
+
+        # ==================================================
+        # NOME DO EVENTO
+        # ==================================================
+
+        if "nome_evento" in self.fields:
+
+            self.fields["nome_evento"].widget.attrs.update({
+                "oninput": "this.value = this.value.toUpperCase();"
+            })
