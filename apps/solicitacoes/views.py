@@ -302,7 +302,7 @@ def corrigir_solicitacao(request, protocolo):
     )
 
     # ======================================================
-    # SÓ PERMITE CORREÇÃO QUANDO O STATUS FOR CORRECAO
+    # SÓ PERMITE CORREÇÃO QUANDO ESTIVER EM CORRECAO
     # ======================================================
 
     if solicitacao.status != "CORRECAO":
@@ -317,43 +317,54 @@ def corrigir_solicitacao(request, protocolo):
         )
 
     # ======================================================
-    # POST - ENVIO DAS CORREÇÕES
+    # POST
     # ======================================================
 
     if request.method == "POST":
 
-        form = SolicitacaoForm(
+        form = CorrecaoSolicitacaoForm(
             request.POST,
             request.FILES,
-            instance=solicitacao,
-            modo_correcao=True
+            instance=solicitacao
         )
 
         if form.is_valid():
 
+            # ==============================================
+            # SALVA AS CORREÇÕES
+            # ==============================================
+
             obj = form.save(commit=False)
 
-            # ==================================================
-            # MANTÉM O MESMO PROTOCOLO
-            # ==================================================
+            # ==============================================
+            # GARANTE O MESMO PROTOCOLO
+            # ==============================================
 
             obj.protocolo = solicitacao.protocolo
 
-            # ==================================================
-            # MANTÉM A DATA ORIGINAL DO EVENTO
+            # ==============================================
+            # GARANTE A DATA ORIGINAL
             #
-            # A CORREÇÃO NÃO ALTERA A DATA DO EVENTO.
-            # ==================================================
+            # NÃO CALCULA.
+            # NÃO CONVERTE.
+            # NÃO VALIDA.
+            #
+            # Apenas mantém o valor que já estava no banco.
+            # ==============================================
 
             obj.data_evento = solicitacao.data_evento
 
-            # ==================================================
-            # VOLTA PARA NOVA ANÁLISE
-            # ==================================================
+            # ==============================================
+            # VOLTA PARA ANÁLISE
+            # ==============================================
 
             obj.status = "PENDENTE"
 
             obj.save()
+
+            # ==============================================
+            # MENSAGEM
+            # ==============================================
 
             messages.success(
                 request,
@@ -366,18 +377,17 @@ def corrigir_solicitacao(request, protocolo):
             )
 
     # ======================================================
-    # GET - ABRE FORMULÁRIO PREENCHIDO
+    # GET
     # ======================================================
 
     else:
 
-        form = SolicitacaoForm(
-            instance=solicitacao,
-            modo_correcao=True
+        form = CorrecaoSolicitacaoForm(
+            instance=solicitacao
         )
 
     # ======================================================
-    # FORMULÁRIO
+    # FORMULÁRIO DE CORREÇÃO
     # ======================================================
 
     return render(
@@ -387,6 +397,125 @@ def corrigir_solicitacao(request, protocolo):
             "form": form,
             "solicitacao": solicitacao,
             "modo_correcao": True,
+        }
+    )
+
+    # ==================================================
+    # POST - REENVIO
+    # ==================================================
+
+    if request.method == "POST":
+
+        form = SolicitacaoForm(
+            request.POST,
+            request.FILES,
+            instance=solicitacao
+        )
+
+        if form.is_valid():
+
+            # ------------------------------------------
+            # PRESERVA A DATA ORIGINAL
+            # ------------------------------------------
+
+            data_evento_original = solicitacao.data_evento
+
+            solicitacao = form.save(
+                commit=False
+            )
+
+            solicitacao.data_evento = (
+                data_evento_original
+            )
+
+            solicitacao.status = "ENVIADA"
+
+            solicitacao.save()
+
+            # ------------------------------------------
+            # HISTÓRICO
+            # ------------------------------------------
+
+            HistoricoSolicitacao.objects.create(
+                solicitacao=solicitacao,
+                usuario=None,
+                status="ENVIADA",
+                observacao=(
+                    "Solicitação corrigida e "
+                    "reenviada pelo solicitante."
+                ),
+            )
+
+            # ------------------------------------------
+            # E-MAIL DE CONFIRMAÇÃO
+            # ------------------------------------------
+
+            mensagem = f"""
+Olá {solicitacao.solicitante},
+
+Sua solicitação foi corrigida e reenviada
+para análise.
+
+Protocolo:
+{solicitacao.protocolo}
+
+Evento:
+{solicitacao.nome_evento}
+
+Data:
+{solicitacao.data_evento.strftime("%d/%m/%Y")}
+
+O pedido será novamente analisado pela
+unidade responsável.
+
+Atenciosamente,
+
+Seção de Planejamento Operacional
+"""
+
+            try:
+
+                send_mail(
+                    subject=(
+                        "Solicitação corrigida e "
+                        "reenviada - SiEv"
+                    ),
+                    message=mensagem,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[
+                        solicitacao.email
+                    ],
+                    fail_silently=False,
+                )
+
+            except Exception as erro_email:
+
+                print(
+                    "ERRO AO ENVIAR EMAIL:",
+                    repr(erro_email)
+                )
+
+            messages.success(
+                request,
+                "Solicitação corrigida e reenviada com sucesso."
+            )
+
+            return redirect(
+                "consultar"
+            )
+
+    else:
+
+        form = SolicitacaoForm(
+            instance=solicitacao
+        )
+
+    return render(
+        request,
+        "solicitacoes/corrigir.html",
+        {
+            "form": form,
+            "solicitacao": solicitacao,
         }
     )
 # =====================================================
