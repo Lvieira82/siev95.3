@@ -343,9 +343,13 @@ Painel de Gestão
         </a>
 
         <a href="{% url 'agenda_gestao' %}" class="card">
-            <div class="icone">🗓️</div>
-            <h2>Agenda</h2>
-            <p>Eventos em ordem cronológica.</p>
+            <div class="icone">
+                📚
+            </div>
+            <h2>Histórico</h2>
+            <p>
+                Consultar eventos já realizados.
+            </p>
         </a>
 
         <a href="{% url 'lancamento_manual' %}" class="card">
@@ -440,7 +444,7 @@ Painel de Gestão
         </div>
 
         <div class="acoes-eventos">
-            <a href="{% url 'agenda_gestao' %}" class="btn-ver-todos">
+            <a href="{% url 'proximos_eventos_gestao' %}" class="btn-ver-todos">
                 📁 Ver todos os eventos →
             </a>
             <a href="{% url 'mapa_eventos' %}" class="btn-mapa-eventos">
