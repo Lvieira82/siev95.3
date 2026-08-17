@@ -2015,6 +2015,138 @@ def responder_pesquisa(request, token):
         }
     )
 
+@login_required
+def proximos_eventos_gestao(request):
+
+    hoje = date.today()
+
+    eventos = Solicitacao.objects.filter(
+        status__in=["APROVADO", "CORRECAO"],
+        data_evento__gte=hoje
+    ).order_by(
+        "data_evento",
+        "hora_inicio"
+    )
+
+    return render(
+        request,
+        "gestao/proximos_eventos.html",
+        {
+            "eventos": eventos,
+        }
+    )
+
+
+# =====================================================
+# HISTÓRICO DE EVENTOS
+# =====================================================
+
+@login_required
+def agenda_gestao(request):
+
+    hoje = date.today()
+
+    # -------------------------------------------------
+    # SOMENTE EVENTOS ANTERIORES A HOJE
+    # -------------------------------------------------
+
+    eventos = Solicitacao.objects.filter(
+        status__in=["APROVADO", "CORRECAO"],
+        data_evento__lt=hoje
+    )
+
+    # -------------------------------------------------
+    # FILTRO POR DIA
+    # Exemplo: ?dia=2026-08-10
+    # -------------------------------------------------
+
+    dia = request.GET.get("dia")
+
+    if dia:
+        try:
+            data_filtro = date.fromisoformat(dia)
+
+            eventos = eventos.filter(
+                data_evento=data_filtro
+            )
+
+        except ValueError:
+            pass
+
+    # -------------------------------------------------
+    # FILTRO POR MÊS
+    # Exemplo: ?mes=8
+    # -------------------------------------------------
+
+    mes = request.GET.get("mes")
+
+    if mes:
+        try:
+            eventos = eventos.filter(
+                data_evento__month=int(mes)
+            )
+
+        except ValueError:
+            pass
+
+    # -------------------------------------------------
+    # FILTRO POR ANO
+    # Exemplo: ?ano=2026
+    # -------------------------------------------------
+
+    ano = request.GET.get("ano")
+
+    if ano:
+        try:
+            eventos = eventos.filter(
+                data_evento__year=int(ano)
+            )
+
+        except ValueError:
+            pass
+
+    # -------------------------------------------------
+    # ORDENAÇÃO
+    # -------------------------------------------------
+
+    eventos = eventos.order_by(
+        "-data_evento",
+        "-hora_inicio"
+    )
+
+    # -------------------------------------------------
+    # ANOS DISPONÍVEIS NO BANCO
+    # -------------------------------------------------
+
+    anos = (
+        Solicitacao.objects
+        .filter(
+            status__in=["APROVADO", "CORRECAO"],
+            data_evento__lt=hoje
+        )
+        .dates(
+            "data_evento",
+            "year",
+            order="DESC"
+        )
+    )
+
+    anos = [data.year for data in anos]
+
+    return render(
+        request,
+        "gestao/agenda.html",
+        {
+            "eventos": eventos,
+            "anos": anos,
+            "filtro_dia": dia,
+            "filtro_mes": mes,
+            "filtro_ano": ano,
+        }
+    )
+
+
+
 
 
 
