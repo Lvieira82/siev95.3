@@ -32,6 +32,7 @@ from apps.solicitacoes.views import (
     gerar_mapa_eventos_pdf,
     exportar_emails,
     responder_pesquisa,
+    proximos_eventos_gestao,
 )
 
 urlpatterns = [
@@ -180,6 +181,17 @@ urlpatterns = [
         "aprovacoes/",
         listar_pendentes_opo,
         name="listar_pendentes_opo",
+    ),
+    path(
+        "gestao/proximos-eventos/",
+        proximos_eventos_gestao,
+        name="proximos_eventos_gestao",
+    ),
+
+    path(
+        "gestao/agenda/",
+        agenda_gestao,
+        name="agenda_gestao",
     ),
 
     # Servir arquivos da pasta media
